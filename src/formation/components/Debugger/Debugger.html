@@ -1,0 +1,38 @@
+<div class="{{::Debugger.className }}">
+  <div class="header">
+    Debug Info For "{{ Debugger.$form.$name }}"
+  </div>
+
+  <!-- Form State -->
+  <div class="props">
+    <table>
+      <tr>
+        <td colspan="2">
+          Form State
+        </td>
+      </tr>
+      <tr ng-repeat="prop in ['$pristine', '$submitted', '$submitting', '$valid']">
+        <td class="prop">{{::prop }}</td>
+        <td class="value">{{ !!Debugger.$form[prop] }}</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Model Values -->
+  <div class="props">
+    <table>
+      <tr>
+        <td colspan="2">
+          Model Values
+        </td>
+      </tr>
+      <tr ng-repeat="modelValue in Debugger.$form.getModelValues() | toPairs as modelValues">
+        <td class="prop">{{::modelValue[0] }}:</td>
+        <td class="value">{{ modelValue[1] | json }}</td>
+      </tr>
+      <tr ng-if="!modelValues.length">
+        <td colspan="2">N/A</td>
+      </tr>
+    </table>
+  </div>
+</div>

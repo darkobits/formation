@@ -1,0 +1,97 @@
+@import 'etc/style/color';
+
+
+// ----- General ---------------------------------------------------------------
+
+@mixin transition-props ($props, $animation-duration: 0.15s, $animation-function: ease-in-out) {
+  $transition-string: '';
+
+  @for $i from 1 through length($props) {
+    $prop: nth($props, $i);
+
+    $transition-string: $transition-string + $prop + ' ' + $animation-duration + ' ' + $animation-function;
+
+    @if ($i != length($props)) {
+      $transition-string: $transition-string + ', ';
+    }
+  }
+
+  transition: #{$transition-string};
+}
+
+
+@mixin vertical-spacing ($length: 1.6em) {
+  margin-bottom: -$length;
+  margin-top: $length;
+  padding-bottom: $length;
+}
+
+
+// ----- Control-Related -------------------------------------------------------
+
+@mixin focus {
+  border-color: $dove-gray;
+  outline: none;
+}
+
+@mixin disabled {
+  background-color: $white;
+  border: 1px solid $heather;
+  color: rgba($dark-gray, 0.6);
+  cursor: not-allowed;
+
+  &::placeholder {
+    opacity: 0.5;
+  }
+}
+
+@mixin box-shadow {
+  box-shadow: inset 1px 1px 4px 0px rgba(0, 0, 0, 0.066);
+}
+
+@mixin control-error {
+  border-color: $rosewood;
+  color: $rosewood;
+
+  &::placeholder {
+    color: $rosewood;
+    opacity: 0.5;
+  }
+}
+
+@mixin control-pending {
+  background-color: $white;
+  border-color: $bronze;
+  color: rgba($cola, 0.6);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+@mixin label {
+  color: $dove-gray;
+  display: block;
+  font-family: 'Source Sans Pro', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 1.5px;
+  line-height: 1em;
+  margin-bottom: 0.25em;
+  text-transform: uppercase;
+}
+
+@mixin control {
+  @include box-shadow;
+  @include transition-props((background-color, border-color, color));
+
+  background-color: #FFFFFF;
+  border: 1px solid $light-gray;
+  border-radius: 0px;
+  box-sizing: border-box;
+  color: $jaguar;
+  font-family: 'Source Sans Pro', sans-serif;
+  font-size: 18px;
+  font-weight: 300;
+  letter-spacing: 0.6px;
+  min-width: 20em;
+  padding: 6px 8px;
+}

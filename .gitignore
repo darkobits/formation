@@ -40,15 +40,5 @@ jspm_packages
 # Optional REPL history
 .node_repl_history
 
-coverage
-
 dist
-
-e2e/testresults/
-
-# Ignore files that are auto-updated by the code quality package.
-/.eslintrc.yml
-/.sass-lint.yml
-
-# sonar code coverage
-coverage
+docs

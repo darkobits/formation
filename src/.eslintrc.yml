@@ -1,0 +1,66 @@
+#
+#  ESLint Configuration (App)
+#
+
+globals:
+ webpack: true
+
+# plugins:
+#   - angular
+
+rules:
+  # https://github.com/Gillespie59/eslint-plugin-angular
+
+  # Require array syntax for DI.
+  # angular/di:
+  #   - error
+  #   - array
+
+  # Disallow unused DI parameters.
+  # angular/di-unused:
+  #   - error
+
+  # Require DI parameters to be sorted alphabetically.
+  # angular/di-order:
+  #   - error
+
+  # Limit the number of angular components per file.
+  # angular/component-limit:
+  #   - error
+  #   - 2
+
+  # Disallow use of the deprecated $cookieStore service.
+  # angular/no-cookiestore:
+  #   - error
+
+  # Disallow use of the deprecated directive property 'replace'.
+  # angular/no-directive-replace:
+  #   - error
+
+  # Disallow use of $http's success() and error() callbacks.
+  # angular/no-http-callback:
+  #   - error
+
+  # Use $document instead of document.
+  # angular/document-service:
+  #   - error
+
+  # Use $interval instead of setInterval.
+  # angular/interval-service:
+  #   - error
+
+  # Use $timeout instead of setTimeout.
+  # angular/timeout-service:
+  #   - error
+
+  # Use $window instead of window.
+  # angular/window-service:
+  #   - error
+
+  # Suggest using $log instead of console.
+  # angular/log:
+  #   - warn
+
+  # Disable this rule from the common config, as it is redundant when angular/log is enabled.
+  no-console:
+    - off

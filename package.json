@@ -1,17 +1,17 @@
 {
-  "name": "angular-base",
+  "name": "formation",
   "version": "0.1.0",
   "private": true,
+  "license": "WTFPL",
   "contributors": [
     {
       "name": "Joshua Martin",
       "email": "joshua@frontlawn.net"
     }
   ],
-  "license": "MIT",
   "engines": {
     "npm": ">=3.0.0",
-    "node": ">=4.4.0"
+    "node": ">=6.x"
   },
   "scripts": {
     "start": "npm run clean && webpack-dev-server --env.local",
@@ -22,13 +22,9 @@
     "lint": "npm-run-all --parallel lint:*",
     "clean": "rimraf dist",
     "build": "npm run clean && webpack --env.dist --progress",
-    "bundle-stats": "npm run build -- --env.stats"
-  },
-  "config": {
-    "ghooks": {
-      "pre-commit": "npm run lint",
-      "pre-push": "npm run test"
-    }
+    "bundle-stats": "npm run build -- --env.stats",
+    "docs:build": "rimraf docs && jsdoc --configure jsdoc.conf.json --destination docs --recurse --verbose",
+    "precommit": "npm run lint"
   },
   "dependencies": {
     "angular": "1.6.x",
@@ -41,6 +37,7 @@
   },
   "devDependencies": {
     "angular-mocks": "1.5.x",
+    "animate.css": "3.5.x",
     "autoprefixer": "6.3.x",
     "babel-core": "6.16.x",
     "babel-loader": "6.2.x",
@@ -56,12 +53,13 @@
     "extract-text-webpack-plugin": "1.0.x",
     "favicons-webpack-plugin": "0.0.x",
     "file-loader": "0.9.x",
-    "ghooks": "1.2.x",
     "html-loader": "0.4.x",
     "html-webpack-plugin": "2.22.x",
+    "husky": "0.13.x",
     "jasmine-core": "2.4.x",
     "jasmine-fail-fast": "2.0.x",
     "jasmine-reporters": "2.2.x",
+    "jsdoc": "3.4.x",
     "karma": "1.1.x",
     "karma-coverage": "1.1.x",
     "karma-jasmine": "1.0.x",
@@ -73,6 +71,7 @@
     "npm-run-all": "2.2.x",
     "phantomjs-prebuilt": "2.1.x",
     "postcss-loader": "0.9.x",
+    "prismjs": "1.6.x",
     "raw-loader": "0.5.x",
     "reset-css": "2.0.x",
     "rimraf": "2.5.x",
@@ -80,6 +79,9 @@
     "sass-loader": "4.0.x",
     "sasslint-webpack-plugin": "1.0.x",
     "style-loader": "0.13.x",
+    "susy": "2.2.x",
+    "svg-sprite-loader": "0.1.x",
+    "svg-url-loader": "1.1.x",
     "url-loader": "0.5.x",
     "webpack": "1.13.x",
     "webpack-dev-server": "1.16.x",

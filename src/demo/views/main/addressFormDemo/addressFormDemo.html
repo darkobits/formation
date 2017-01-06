@@ -1,0 +1,30 @@
+<fm name="vm.addressForm"
+  controls="vm.controls"
+  on-submit="vm.submit">
+  <section>
+    <fm-input type="text" name="name">Name</fm-input>
+    <fm-errors for="name"></fm-errors>
+  </section>
+  <section>
+    <fm-input type="text" name="streetAddress">Address</fm-input>
+    <fm-errors for="streetAddress"></fm-errors>
+  </section>
+  <section>
+    <fm-input type="text" name="locality">City</fm-input>
+    <fm-errors for="locality"></fm-errors>
+  </section>
+  <section>
+    <fm-select name="state"
+      options="state.abbreviation as state.name for state in vm.states">
+      State
+    </fm-select>
+    <fm-errors for="state"></fm-errors>
+  </section>
+  <section>
+    <fm-input type="text" name="postalCode">Postal Code</fm-input>
+    <fm-errors for="postalCode"></fm-errors>
+  </section>
+  <br>
+  <button type="submit">Submit</button>
+  <button type="button" ng-click="vm.reset()">Reset</button>
+</fm>

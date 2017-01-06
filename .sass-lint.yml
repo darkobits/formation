@@ -1,0 +1,47 @@
+files:
+  ignore:
+    - 'node_modules/**'
+
+rules:
+  class-name-format:
+    - 0
+  indentation:
+    - 2
+    -
+      size: 2
+  no-url-domains:
+    - 0
+  no-url-protocols:
+    - 0
+  no-vendor-prefixes:
+    - 0
+  leading-zero:
+    - 2
+    -
+      include: true
+  hex-notation:
+    - 2
+    -
+      style: uppercase
+  no-color-literals:
+    - 0
+  hex-length:
+    - 2
+    -
+      style: long
+  shorthand-values:
+    - 0
+  force-attribute-nesting:
+    - 0
+  no-qualifying-elements:
+    - 0
+  zero-unit:
+    - 0
+  nesting-depth:
+    - 1
+    -
+      max-depth: 4
+  force-element-nesting:
+    - 0
+  force-pseudo-nesting:
+    - 0

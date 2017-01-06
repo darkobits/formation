@@ -1,0 +1,15 @@
+@import '~susy/sass/susy';
+
+$susy: (
+  container: 960px,
+  columns: 12,
+  gutters: 0.25,
+  gutter-position: inside,
+  use-custom-breakpoint: false,
+  debug: (
+    image: hide,
+    color: rgba(#66F66F, 0.25),
+    output: background,
+    toggle: top right,
+  )
+);

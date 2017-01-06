@@ -1,0 +1,600 @@
+@import '~reset-css/reset.css';
+@import '~animate.css';
+
+@import 'etc/style/grid';
+@import 'etc/style/mixins';
+
+// Ensure this file is only imported once.
+$globals-imported: false !default;
+@if $globals-imported {
+  @error 'Only import global.scss once.';
+} @else {
+  $globals-imported: true;
+}
+
+
+// ----- Typography ------------------------------------------------------------
+
+@import url('//fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600');
+@import url('//fonts.googleapis.com/css?family=Merriweather:300,400');
+@import url('//fonts.googleapis.com/css?family=Roboto+Mono:300,400');
+
+@font-face {
+  font-family: 'Operator Mono Ssm';
+  font-style: normal;
+  font-weight: 300;
+  src: require('assets/OperatorMonoSSm-Light.woff2') format('woff2'), require('assets/OperatorMonoSSm-Light.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Operator Mono Ssm';
+  font-style: italic;
+  font-weight: 300;
+  src: require('OperatorMonoSSm-LightItalic.woff2') format('woff2'), require('OperatorMonoSSm-LightItalic.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Operator Mono Ssm';
+  font-style: italic;
+  font-weight: bold;
+  src: require('OperatorMonoSSm-BoldItalic.woff2') format('woff2'), require('OperatorMonoSSm-BoldItalic.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Operator Mono Ssm';
+  font-style: normal;
+  font-weight: bold;
+  src: require('OperatorMonoSSm-Bold.woff2') format('woff2'), require('OperatorMonoSSm-Bold.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Operator Mono Ssm';
+  font-style: italic;
+  font-weight: normal;
+  src: require('OperatorMonoSSm-BookItalic.woff2') format('woff2'), require('OperatorMonoSSm-BookItalic.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Operator Mono Ssm';
+  font-style: normal;
+  font-weight: normal;
+  src: require('OperatorMonoSSm-Book.woff2') format('woff2'), require('OperatorMonoSSm-Book.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Operator Mono Ssm';
+  font-style: normal;
+  font-weight: 500;
+  src: require('OperatorMonoSSm-Medium.woff2') format('woff2'), require('OperatorMonoSSm-Medium.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Operator Mono Ssm';
+  font-style: italic;
+  font-weight: 500;
+  src: require('OperatorMonoSSm-MediumItalic.woff2') format('woff2'), require('OperatorMonoSSm-MediumItalic.woff') format('woff');
+}
+
+
+// ----- Globals ---------------------------------------------------------------
+
+$error-element-min-height: 2em;
+
+html,
+body {
+  -webkit-font-smoothing: antialiased;
+  color: $jaguar;
+  font-family: 'Source Sans Pro', 'Helvetica Neue', Helvetica, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.6em;
+  word-spacing: 0.05em;
+}
+
+body {
+  background: url('~assets/geometric2.png');
+}
+
+h1 {
+  font-size: 36px;
+  font-weight: 400;
+}
+
+h2 {
+  font-size: 32px;
+  font-weight: 400;
+  margin-bottom: 0.8em;
+  margin-top: 2.4em;
+}
+
+a {
+  @include transition-props((color), 0.1s);
+
+  color: darken($faded-red, 33%);
+  text-decoration: none;
+
+  &:hover,
+  &:focus {
+    color: darken($faded-red, 50%);
+    outline: none;
+  }
+}
+
+.code {
+  background-color: darken($white, 2%);
+  border-radius: 3px;
+  // font-family: 'Operator Mono Ssm', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+  font-family: 'Roboto Mono', Consolas, Monaco, 'Andale Mono', monospace;
+  font-size: 0.9em;
+  font-weight: 300;
+  letter-spacing: -0.5px;
+  line-height: 1em;
+  margin: 0 -0.1em;
+  padding: 0.01em 0.3em 0.08em 0.3em;
+}
+
+.container {
+  @include container(12 center);
+
+  background-color: #FFFFFF;
+}
+
+
+// ----- Text Inputs -----------------------------------------------------------
+
+fm-input[type='text'] {
+  display: inline-block;
+  margin-bottom: $error-element-min-height;
+
+  label {
+    @include label;
+  }
+
+  input {
+    @include control;
+    // @include control-pending;
+
+    &:focus {
+      @include focus;
+    }
+
+    &:disabled {
+      @include disabled;
+    }
+
+    &.is-pending {
+      @include control-pending;
+    }
+
+    &.has-error {
+      @include control-error;
+    }
+  }
+}
+
+
+// ----- Textareas -------------------------------------------------------------
+
+fm-textarea {
+  display: inline-block;
+  margin-bottom: $error-element-min-height;
+
+  label {
+    @include label;
+  }
+
+  textarea {
+    @include control;
+
+    margin-bottom: -11px;
+    min-height: 5em;
+    resize: vertical;
+    width: 100%;
+
+    &:focus {
+      @include focus;
+    }
+
+    &:disabled {
+      @include disabled;
+    }
+
+    &.is-pending {
+      @include control-pending;
+    }
+
+    &.has-error {
+      @include control-error;
+    }
+  }
+}
+
+
+// ----- Radio Buttons ---------------------------------------------------------
+
+fm-input[type='radio'] {
+  $basis: 20px;
+  $basis-inner: $basis - 10px;
+  $border-width: 1px;
+
+  // Depending on the typeface used, the control element may need to be
+  // transposed slightly.
+  $v-shift: 0px;
+
+  display: inline-block;
+  line-height: 1em;
+  margin-bottom: $error-element-min-height;
+  padding-left: $basis;
+  position: relative;
+
+  input {
+    opacity: 0;
+    // Remove the native input from the normal flow and ensure it is invisible.
+    // We don't want to use display: none here for accessibility reasons.
+    position: absolute;
+
+    // Inner circle (checked).
+    &:checked ~ label {
+      &::after {
+        background-color: $dove-gray;
+      }
+    }
+
+    &:focus {
+      & ~label {
+        &::before {
+          @include focus;
+        }
+      }
+    }
+
+    &:disabled {
+      & ~ label {
+        color: rgba($dark-gray, 0.6);
+        cursor: not-allowed;
+
+        &::before {
+          border: 1px solid $heather;
+          cursor: not-allowed;
+        }
+
+        &::after {
+          color: rgba($dark-gray, 0.6);
+          cursor: not-allowed;
+        }
+      }
+    }
+
+    &.has-error  {
+      & ~ label {
+        color: $rosewood;
+
+        &::before {
+          border-color: $rosewood;
+        }
+      }
+    }
+  }
+
+  label {
+    @include label;
+
+    display: inline-block;
+    margin-left: $basis / 2;
+
+    &:hover {
+      cursor: pointer;
+
+      &::before {
+        @include focus;
+      }
+    }
+
+    // Outer border of the radio button.
+    &::before {
+      @include box-shadow;
+      @include transition-props((border-color));
+
+      border-color: $light-gray;
+      border-radius: 50%;
+      border-style: solid;
+      border-width: $border-width;
+      box-sizing: border-box;
+      content: '';
+      display: flex;
+      height: $basis;
+      left: 0;
+      margin-right: 0.3em;
+      position: absolute;
+      top: $v-shift;
+      width: $basis;
+
+      &:hover {
+        cursor: pointer;
+      }
+    }
+
+    // Inner circle of the radio button.
+    &::after {
+      @include transition-props((background-color), 0.1s, cubic-bezier(1, 0.5, 0.5, 0));
+
+      background-color: transparent;
+      border-radius: 50%;
+      box-sizing: border-box;
+      content: '';
+      display: flex;
+      height: $basis-inner;
+      left: ($basis / 2) - ($basis-inner / 2);
+      position: absolute;
+      top: $v-shift + ($basis / 2) - ($basis-inner / 2);
+      width: $basis-inner;
+
+      &:hover {
+        cursor: pointer;
+      }
+    }
+  }
+}
+
+
+// ----- Checkboxes ------------------------------------------------------------
+
+fm-input[type='checkbox'] {
+  $basis: 20px;
+  $basis-inner: $basis - 8px;
+  $border-width: 1px;
+
+  // Depending on the typeface used, the control element may need to be
+  // transposed slightly.
+  $v-shift: -1px;
+
+  display: inline-block;
+  line-height: 1em;
+  margin-bottom: $error-element-min-height;
+  padding-left: $basis;
+  position: relative;
+
+  input {
+    opacity: 0;
+    // Remove the native input from the normal flow and ensure it is invisible.
+    // We don't want to use display: none here for accessibility reasons.
+    position: absolute;
+
+    &:focus {
+      & ~label {
+        &::before {
+          @include focus;
+        }
+      }
+    }
+
+    &:disabled {
+      & ~ label {
+        color: rgba($dark-gray, 0.6);
+        cursor: not-allowed;
+
+        &::before {
+          border: 1px solid $heather;
+          cursor: not-allowed;
+        }
+
+        &::after {
+          color: rgba($dark-gray, 0.6);
+          cursor: not-allowed;
+        }
+      }
+    }
+
+    &.has-error  {
+      & ~ label {
+        color: $rosewood;
+
+        &::before {
+          border-color: $rosewood;
+        }
+      }
+    }
+
+    // Inner circle (checked).
+    &:checked ~ label {
+      &::after {
+        background-color: $dove-gray;
+      }
+    }
+  }
+
+  label {
+    @include label;
+
+    display: inline-block;
+    margin-left: $basis / 2;
+
+    &:hover {
+      cursor: pointer;
+
+      &::before {
+        @include focus;
+      }
+    }
+
+    // Outer border of the checkbox.
+    &::before {
+      @include box-shadow;
+      @include transition-props((border-color));
+
+      border-color: $light-gray;
+      border-radius: 4px;
+      border-style: solid;
+      border-width: $border-width;
+      box-sizing: border-box;
+      content: '';
+      display: flex;
+      height: $basis;
+      left: 0;
+      margin-right: 0.3em;
+      position: absolute;
+      top: $v-shift;
+      width: $basis;
+
+      &:hover {
+        cursor: pointer;
+      }
+    }
+
+    // Inner circle of the checkbox.
+    &::after {
+      @include transition-props((background-color), 0.1s, cubic-bezier(1, 0.5, 0.5, 0));
+
+      background-color: transparent;
+      border-radius: 2px;
+      box-sizing: border-box;
+      content: '';
+      display: flex;
+      height: $basis-inner;
+      left: ($basis / 2) - ($basis-inner / 2);
+      position: absolute;
+      top: $v-shift + ($basis / 2) - ($basis-inner / 2);
+      width: $basis-inner;
+
+      &:hover {
+        cursor: pointer;
+      }
+    }
+  }
+}
+
+
+// ----- Dropdowns -------------------------------------------------------------
+
+fm-select {
+  display: inline-block;
+  margin-bottom: $error-element-min-height;
+  position: relative;
+
+  label {
+    @include label;
+  }
+
+  select {
+    @include control;
+
+    appearance: button;
+
+    &:focus {
+      @include focus;
+    }
+
+    &:disabled {
+      @include disabled;
+    }
+
+    &.is-pending {
+      @include control-pending;
+    }
+
+    &.has-error {
+      @include control-error;
+    }
+  }
+
+  &::after {
+    color: darken($white, 12%);
+    content: '\25BC';
+    display: block;
+    position: absolute;
+    right: 10px;
+    top: 25px;
+    transform: scale(0.7, 0.8);
+  }
+}
+
+
+// ----- Errors ----------------------------------------------------------------
+
+fm-errors {
+  $animation-duration: 0.1s;
+
+  box-sizing: border-box;
+  color: $rosewood;
+  display: block;
+  font-family: 'Source Sans Pro', sans-serif;
+  font-size: 14px;
+  font-weight: 300;
+  letter-spacing: 0.2px;
+  line-height: 1em;
+  margin-top: -$error-element-min-height;
+  min-height: $error-element-min-height;
+  padding-top: 0.2em;
+
+  label {
+    color: inherit;
+    display: flex;
+  }
+
+  [ng-message] {
+    @include transition-props((opacity), $animation-duration, linear);
+
+    order: 2;
+
+    &.ng-enter-prepare,
+    &.ng-enter {
+      opacity: 0;
+
+      &:not(:only-child) {
+        transition-delay: $animation-duration;
+      }
+    }
+
+    &.ng-enter.ng-enter-active {
+      opacity: 1;
+    }
+
+    &.ng-leave {
+      opacity: 1;
+      order: 1;
+    }
+
+    &.ng-leave.ng-leave-active {
+      opacity: 0;
+    }
+  }
+}
+
+
+// ----- Buttons ---------------------------------------------------------------
+
+button {
+  @include transition-props((background-color, border-color, color));
+
+  appearance: none;
+  background-color: lighten($white, 5%);
+  border: 1px solid $dark-gray;
+  color: $dove-gray;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 1.6px;
+  padding: 10px 12px;
+  text-transform: uppercase;
+
+  &:hover {
+    background-color: lighten($white, 1%);
+    border-color: $dove-gray;
+    color: $jaguar;
+    cursor: pointer;
+  }
+
+  &:focus {
+    @include focus;
+    color: $jaguar;
+  }
+
+  &:disabled {
+    background-color: #270001;
+    border-color: #5A0104;
+    color: #FC7F81;
+  }
+
+  &:not(:last-of-type) {
+    margin-right: 1em;
+  }
+}
