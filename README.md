@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/darkobits/formation.svg?branch=master)](https://travis-ci.org/darkobits/formation)
+
 ## formation
 
 Formation is a form framework for Angular 1.5+. It aims to address many of the shortcomings in the built-in form facilities, and increase consistensy across large code bases by reducing the amount of boilterplace needed to build robust forms. It is inspired by the two leading paradigms for working with forms in Angular 2, [template-driven forms](http://toddmotto.com/angular-2-forms-template-driven) and [reactive forms](http://toddmotto.com/angular-2-forms-reactive), both of which have their own advantages and drawbacks.
