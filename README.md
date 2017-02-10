@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/darkobits/formation.svg?branch=master)](https://travis-ci.org/darkobits/formation)
+[![Build Status](https://travis-ci.org/darkobits/formation.svg?branch=master)](https://travis-ci.org/darkobits/formation) [![Dependencies](https://david-dm.org/username/repo.svg)](https://david-dm.org/darkobits/formation)
 
 ## formation
 
