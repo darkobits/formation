@@ -22,7 +22,9 @@ function DebuggerController () {
 
 
 formationModule.run(Formation => {
-  Formation.$registerComponent('fmDebugger', {
+  const NAME = Formation.$getPrefixedName('Debugger');
+
+  Formation.$registerComponent(NAME, {
     require: {
       [FORM_CONTROLLER]: `^^${FORM_COMPONENT_NAME}`
     },

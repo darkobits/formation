@@ -661,7 +661,7 @@ export function FormController ($attrs, $log, $parse, $q, $scope, Formation) {
 
       if (Form[NG_FORM_CONTROLLER].$valid) {
         // Invoke the consumer's onSubmit callback with current model data.
-        return Form.$onSubmit(Form.getModelValues());
+        return $q.when(Form.$onSubmit(Form.getModelValues()));
       } else {
         Form.$debug('Form is invalid.', Form[NG_FORM_CONTROLLER].$error);
       }
