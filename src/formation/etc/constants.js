@@ -39,7 +39,7 @@ export const FORM_COMPONENT_NAME = 'fm';
  *
  * @description
  *
- * Prefixed used for all components registered with Formation.registerComponent.
+ * Prefix used for all components registered with Formation.registerComponent.
  * This incluedes all built-in components.
  *
  * @type {String}

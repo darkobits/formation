@@ -24,13 +24,13 @@ import {
  *
  * @example
  *
- * <my-form name="myForm">
- *   <my-input name="myControl"
+ * <fm name="myForm">
+ *   <fm-input name="myControl"
  *     type="text">
  *     Enter some text:
- *   </my-input>
- *   <my-errors for="myControl"></my-errors>
- *  </my-form>
+ *   </fm-input>
+ *   <fm-errors for="myControl"></fm-errors>
+ *  </fm-form>
  */
 
 

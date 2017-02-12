@@ -168,7 +168,7 @@ formationModule.provider('Formation', function ($compileProvider) {
      *
      * @example
      *
-     * Formation.$getPrefixedName('Input') // => 'xInput';
+     * Formation.$getPrefixedName('Input') // => 'fmInput';
      *
      * @param  {string} name
      * @return {string}
@@ -188,7 +188,7 @@ formationModule.provider('Formation', function ($compileProvider) {
      *
      * @example
      *
-     * Formation.$registerComponent('xInput', {
+     * Formation.$registerComponent('fmInput', {
      *   ...
      * });
      *
@@ -210,9 +210,9 @@ formationModule.provider('Formation', function ($compileProvider) {
      *
      * @example
      *
-     * Formation.$registerDirective('xInput', () => {
+     * Formation.$registerDirective('fmInput', () => {
      *   return {
-     *     // DDO
+     *     // Directive Definition Object
      *   }
      * });
      *

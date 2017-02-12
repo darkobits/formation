@@ -62,7 +62,7 @@ export const NG_MESSAGES = '$ngMessages';
 /**
  * This class provides the functionality necessary for a component to interact
  * with a Formation form controller. It can be extended by component controllers
- * to create custom controls.
+ * to create custom controls. All built-in Formation controls extend this class.
  *
  * ## Ways to use Formation
  *
@@ -74,16 +74,15 @@ export const NG_MESSAGES = '$ngMessages';
  * 3. Create your own custom components that extend `FormationControl` and
  *    register them with `registerControl`.
  *
- * 4. Use `RegisterWithParent` on any element insdie a Formation form to
+ * 4. Use `RegisterWithParent` on any element inside a Formation form to
  *    register the ngModel controller with the form.
  *
  * ### Extending FormationControl
  *
- * Components that extend `FormationControl` should define components via
- * the `registerControl` function of the Formation service. This ensures the
- * necessary bindings are defined so that the control will work with Formation
- * forms. Additionally, custom components should adhere to the following
- * guidelines:
+ * Components that extend `FormationControl` should use the the
+ * `registerControl` method of the Formation service. This ensures the necessary
+ * bindings are defined so that the control will work with Formation forms.
+ * Additionally, custom components should adhere to the following guidelines:
  *
  * 1. Define a binding for either `name` or `for`, which should refer to the
  *    control name that the component will represent or interact with. Note that
@@ -286,7 +285,8 @@ export class FormationControl {
    *
    * @example
    *
-   * vm.myForm.getControl('email').getCustomErrorMessage() => 'This e-mail address is in use. Please try again.'
+   * vm.myForm.getControl('email').getCustomErrorMessage()
+   * // => 'This e-mail address is in use. Please try again.'
    *
    * @return {string}
    */
@@ -306,9 +306,7 @@ export class FormationControl {
 
 
   /**
-   * Sets the local disabled flag on the control to true. Note that the control
-   * will still be disabled if the form's disabled flag or an ngDisabled
-   * expression on the control is truthy.
+   * Sets the local disabled flag on the control to true.
    */
   disable () {
     this.$disabled = true;

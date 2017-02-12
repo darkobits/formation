@@ -216,7 +216,7 @@ export function pattern (pattern) {
 
 /**
  * Accepts a control name and returns a validator configuration function which
- * will be invoked by the form and will return function that, when provided a
+ * will be invoked by the form and will return a function that, when provided a
  * model value, will return true if the model value matches the model value of
  * the named control.
  *

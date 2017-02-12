@@ -2,7 +2,6 @@ import R from 'ramda';
 import formationModule from 'formation/module';
 
 
-
 /**
  * Key on parent controllers at which this component will expect a registration
  * method to be implemented.
