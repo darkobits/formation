@@ -57,12 +57,21 @@ export function lowercase (str) {
  * @return {object}
  */
 export function mergeWithDeep (f, ...objs) {
-  if (objs.length > 1) {
+  if (objs.length >= 2) {
     const d = R.clone(R.nth(-2, objs)) || {};
     const s = R.nth(-1, objs) || {};
-    return R.mergeWith(f, d, s);
-  } else {
+    const merged = R.mergeWith(f, d, s);
+
+    if (objs.length === 2) {
+      return merged;
+    } else {
+      const rest = R.slice(0, -2, objs);
+      return mergeWithDeep(f, ...R.append(merged, rest));
+    }
+  } else if (objs.length === 1) {
     return R.head(objs);
+  } else {
+    return {};
   }
 }
 
