@@ -2,12 +2,12 @@
 // ----- Input Component -------------------------------------------------------
 // -----------------------------------------------------------------------------
 
-import app from 'app';
+import app from '../../app';
 
 import {
   FormationControl,
   NG_MODEL_CTRL
-} from 'components/FormationControl';
+} from '../FormationControl';
 
 
 /**

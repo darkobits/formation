@@ -1,6 +1,6 @@
 {
   "presets": ["es2015"],
-  "plugins": [],
+  "plugins": ["angularjs-annotate"],
   "env": {
     "test": {
       "plugins": [

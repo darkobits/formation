@@ -20,15 +20,15 @@ import R from 'ramda';
 
 import {
   capitalize
-} from 'etc/utils';
+} from './utils';
 
 import {
   CONFIGURABLE_VALIDATOR
-} from 'etc/constants';
+} from './constants';
 
 import {
   NG_MODEL_CTRL
-} from 'components/FormationControl';
+} from '../components/FormationControl';
 
 
 

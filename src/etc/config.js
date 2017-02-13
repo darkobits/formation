@@ -1,23 +1,23 @@
-import app from 'app';
+import app from '../app';
 import R from 'ramda';
 
 import {
   FormController
-} from 'components/Form/Form';
+} from '../components/Form/Form';
 
 import {
   FormationControl
-} from 'components/FormationControl';
+} from '../components/FormationControl';
 
 import {
   throwError
-} from 'etc/utils';
+} from './utils';
 
 import {
   FORM_COMPONENT_NAME,
   REGISTER_FORM_CALLBACK,
   REGISTER_NG_MODEL_CALLBACK
-} from 'etc/constants';
+} from './constants';
 
 
 app.config(($provide, FormationProvider) => {

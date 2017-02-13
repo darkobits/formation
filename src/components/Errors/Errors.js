@@ -2,15 +2,15 @@
 // ----- Errors Component ------------------------------------------------------
 // -----------------------------------------------------------------------------
 
-import app from 'app';
+import app from '../../app';
 
 import {
   FormationControl
-} from 'components/FormationControl';
+} from '../FormationControl';
 
 import {
   CUSTOM_ERROR_KEY
-} from 'etc/constants';
+} from '../../etc/constants';
 
 
 /**

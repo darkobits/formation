@@ -4,7 +4,7 @@
 
 import {
   REGISTER_NG_MODEL_CALLBACK
-} from 'etc/constants';
+} from '../../etc/constants';
 
 
 /**
@@ -123,14 +123,12 @@ export class FormationControl {
    * @param {object} ngModelController
    */
   [REGISTER_NG_MODEL_CALLBACK] (ngModelController) {
-    if (name === 'ngModel') {
-      if (this[FORM_CONTROLLER]) {
-        // Create a reference to the control's ngModel controller.
-        this[NG_MODEL_CTRL] = ngModelController;
+    if (this[FORM_CONTROLLER]) {
+      // Create a reference to the control's ngModel controller.
+      this[NG_MODEL_CTRL] = ngModelController;
 
-        // Register the control with the form.
-        this[FORM_CONTROLLER].$registerControl(this);
-      }
+      // Register the control with the form.
+      this[FORM_CONTROLLER].$registerControl(this);
     }
   }
 

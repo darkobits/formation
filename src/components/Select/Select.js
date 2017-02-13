@@ -2,18 +2,18 @@
 // ----- Select Component ------------------------------------------------------
 // -----------------------------------------------------------------------------
 
-import app from 'app';
+import app from '../../app';
 
 import {
   FORM_COMPONENT_NAME
-} from 'etc/constants';
+} from '../../etc/constants';
 
 import {
   FormationControl,
   COMPONENT_CONFIGURATION,
   FORM_CONTROLLER,
   NG_MODEL_CTRL
-} from 'components/FormationControl';
+} from '../FormationControl';
 
 
 /**

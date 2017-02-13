@@ -1,7 +1,6 @@
 import module from './app';
 
 import './etc/config';
-
 import './components';
 import './services';
 import './filters';

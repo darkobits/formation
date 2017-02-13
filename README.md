@@ -1,10 +1,11 @@
-[![Build Status](https://travis-ci.org/darkobits/formation.svg?branch=master)](https://travis-ci.org/darkobits/formation) [![Dependencies](https://david-dm.org/username/repo.svg)](https://david-dm.org/darkobits/formation)
+[![Build Status](https://travis-ci.org/darkobits/formation.svg?branch=master)](https://travis-ci.org/darkobits/formation) [![Dependencies](https://david-dm.org/darkobits/formation/status.svg)](https://david-dm.org/darkobits/formation) [![Codacy Badge](https://img.shields.io/codacy/grade/e3fb8e46d6a241f5a952cf3fe6a49d06.svg)](https://www.codacy.com/app/darkobits/formation) [![NPM Version](https://img.shields.io/npm/v/@darkobits/formation.svg)](https://www.npmjs.com/package/@darkobits/formation)
+
 
 ## formation
 
 Formation is a form framework for Angular 1.5+. It aims to address many of the shortcomings in the built-in form facilities, and increase consistensy across large code bases by reducing the amount of boilterplace needed to build robust forms. It is inspired by the two leading paradigms for working with forms in Angular 2, [template-driven forms](http://toddmotto.com/angular-2-forms-template-driven) and [reactive forms](http://toddmotto.com/angular-2-forms-reactive), both of which have their own advantages and drawbacks.
 
-Formation consists of several small components designed to be used as atoms (see: [atomic web design](http://bradfrost.com/blog/post/atomic-web-design/#atoms)) to compose [larger elements](src/demo/components/emailControl/emailControl.js). It is completely unopinionated about style, and ships with no CSS or themes.
+Formation consists of several small components designed to be used as atoms (see: [atomic web design](http://bradfrost.com/blog/post/atomic-web-design/#atoms)) to compose larger elements. It is completely unopinionated about style, and ships with no CSS or themes.
 
 ### Template-Driven vs. Reactive
 
@@ -91,12 +92,12 @@ app.controller('MyCtrl', function () {
   vm.controls = {
     // Each key here corresponds to the control name we used in the template.
     name: {
-      // Make this field required, and ensure the user enters at least 6 characters.
+      // Make this field required, and ensure the user enters at least 6 characters:
       validators: {
         required,
         minLength: minLength(6)
       },
-      // Errors messages are just arrays of validation key/messages pairs.
+      // Error messages are just arrays of validation key/message pairs:
       errors: [
         ['required', 'This field is required.'],
         ['minLength', 'Please enter at least 6 characters.']
@@ -123,7 +124,7 @@ app.controller('MyCtrl', function () {
     postalCode: {
       validators: {
         required,
-        // Require a valid U.S. postal code on this field.
+        // Require a valid U.S. postal code on this field:
         pattern: pattern(/(\d{5}([-]\d{4})?)/g)
       },
       errors: [

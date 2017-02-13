@@ -2,13 +2,13 @@
 // ----- Form Component --------------------------------------------------------
 // -----------------------------------------------------------------------------
 
-import app from 'app';
+import app from '../../app';
 import R from 'ramda';
 
 import {
   mergeDeep,
   throwError
-} from 'etc/utils';
+} from '../../etc/utils';
 
 import {
   CONFIGURABLE_VALIDATOR,
@@ -16,13 +16,13 @@ import {
   FORM_COMPONENT_NAME,
   REGISTER_FORM_CALLBACK,
   REGISTER_NG_MODEL_CALLBACK
-} from 'etc/constants';
+} from '../../etc/constants';
 
 import {
   COMPONENT_CONFIGURATION,
   NG_MODEL_CTRL,
   NG_MESSAGES
-} from 'components/FormationControl';
+} from '../FormationControl';
 
 
 /**
@@ -785,6 +785,9 @@ export function FormController ($attrs, $log, $parse, $q, $scope, Formation) {
     mapControls(control => control[NG_MODEL_CTRL].$validate());
   };
 }
+
+
+FormController.$inject = ['$attrs', '$log', '$parse', '$q', '$scope', 'Formation'];
 
 
 app.run(Formation => {

@@ -1,13 +1,13 @@
 import angular from 'angular';
-import 'angular-messages';
+import ngMessages from 'angular-messages';
 
 import {
   MODULE_NAME
-} from 'etc/constants';
+} from './etc/constants';
 
 
 const module = angular.module(MODULE_NAME, [
-  'ngMessages'
+  ngMessages
 ]);
 
 

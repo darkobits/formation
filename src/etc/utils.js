@@ -6,7 +6,7 @@ import R from 'ramda';
 
 import {
   MODULE_NAME
-} from 'etc/constants';
+} from './constants';
 
 
 /**

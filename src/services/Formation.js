@@ -2,24 +2,24 @@
 // ----- Formation Service -----------------------------------------------------
 // -----------------------------------------------------------------------------
 
-import app from 'app';
+import app from '../app';
 import R from 'ramda';
 
 import {
   DEFAULT_PREFIX,
   FORM_COMPONENT_NAME
-} from 'etc/constants';
+} from '../etc/constants';
 
 import {
   COMPONENT_CONFIGURATION,
   FORM_CONTROLLER
-} from 'components/FormationControl';
+} from '../components/FormationControl';
 
 import {
   capitalize,
   lowercase,
   mergeDeep
-} from 'etc/utils';
+} from '../etc/utils';
 
 
 /**

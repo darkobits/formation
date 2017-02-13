@@ -5,7 +5,6 @@
 
 const webpack = require('webpack');
 const autoprefixer = require('autoprefixer');
-const ExtractTextWebpackPlugin = require('extract-text-webpack-plugin');
 const SassLintPlugin = require('sasslint-webpack-plugin');
 const VisualizerWebpackPlugin = require('webpack-visualizer-plugin');
 
@@ -92,16 +91,17 @@ module.exports = env => {
 
 
   // JavaScript: Transpile and annotate.
+  // (Using Babel plugin for annotation.)
   config.module.rules.push({
     test: /\.(m)?js$/,
     exclude: /node_modules/,
     use: [
-      {
-        loader: 'ng-annotate-loader',
-        options: {
-          add: true
-        }
-      },
+      // {
+      //   loader: 'ng-annotate-loader',
+      //   options: {
+      //     add: true
+      //   }
+      // },
       {
         loader: 'babel-loader'
       }
@@ -109,10 +109,13 @@ module.exports = env => {
   });
 
 
-  // Sass: Compile, add PostCSS transforms, emit to ExtractText.
+  // Sass: Compile, add PostCSS transforms..
   config.module.rules.push({
     test: /\.(c|sc|sa)ss$/,
-    use: ExtractTextWebpackPlugin.extract([
+    use: [
+      {
+        loader: 'style-loader'
+      },
       {
         loader: 'css-loader',
         options: {
@@ -139,7 +142,7 @@ module.exports = env => {
           ]
         }
       }
-    ])
+    ]
   });
 
 
@@ -174,7 +177,7 @@ module.exports = env => {
     test: /\.html$/,
     use: [
       {
-        loader: 'ngtemplate',
+        loader: 'ngtemplate-loader',
         options: {
           requireAngular: true,
           relativeTo: CONTEXT,
@@ -182,7 +185,7 @@ module.exports = env => {
         }
       },
       {
-        loader: 'html'
+        loader: 'html-loader'
       }
     ]
   });
@@ -207,12 +210,6 @@ module.exports = env => {
   // Configure source map plugin.
   config.plugins.push(new webpack.SourceMapDevToolPlugin({
     filename: '[file].map'
-  }));
-
-
-  // Responsible for extracting the CSS in the bundle into a separate file.
-  config.plugins.push(new ExtractTextWebpackPlugin('[name].css', {
-    allChunks: true
   }));
 
 
@@ -251,18 +248,6 @@ module.exports = env => {
     config.plugins.push(new VisualizerWebpackPlugin({
       filename: resolve(CONTEXT, 'stats/index.html')
     }));
-  }
-
-
-  if (!env.test) {
-
-    /**
-     * Do not use the CommonsChunkPlugin when testing. This ensures that the
-     * entire app is emitted as a single bundle (index.js).
-     */
-    // config.plugins.push(new webpack.optimize.CommonsChunkPlugin({
-    //   name: 'vendor'
-    // }));
   }
 
 
