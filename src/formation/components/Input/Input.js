@@ -77,8 +77,7 @@ formationModule.run(Formation => {
           'has-error': Input.getControlErrors(),
           'is-pending': Input.${NG_MODEL_CTRL}.$pending
         }"
-        ng-disabled="Input.$isDisabled()"
-        register-with-parent="ngModel:${NAME}">
+        ng-disabled="Input.$isDisabled()">
       <label for="{{::Input.getControlId() }}"
         ng-if="Input.type === 'radio' || Input.type === 'checkbox'"
         ng-class="{

@@ -12,13 +12,11 @@ import {
 } from 'formation/etc/utils';
 
 import {
-  RWP_CALLBACK
-} from 'formation/components/RegisterWithParent';
-
-import {
   CONFIGURABLE_VALIDATOR,
   CUSTOM_ERROR_KEY,
-  FORM_COMPONENT_NAME
+  FORM_COMPONENT_NAME,
+  REGISTER_FORM_CALLBACK,
+  REGISTER_NG_MODEL_CALLBACK
 } from 'formation/etc/constants';
 
 import {
@@ -67,7 +65,7 @@ const CUSTOM_ERROR_MESSAGE_KEY = '$customError';
  * - `ng-disabled`: Expression to evaluate that, if truthy, will disable all
  *   Formation controls in the form.
  */
-function FormController ($attrs, $log, $parse, $q, $scope, Formation) {
+export function FormController ($attrs, $log, $parse, $q, $scope, Formation) {
   const Form = this;
 
   /**
@@ -304,16 +302,14 @@ function FormController ($attrs, $log, $parse, $q, $scope, Formation) {
 
   /**
    * Wraps an ngModel controller instance in a mock control instance, allowing
-   * users to use ngModel in conjunction with RegisterWithParent to register
-   * arbitrary controls with the form.
+   * users to use ngModel outside of Formation controls.
    *
    * @example
    *
    * <fm name="vm.myForm">
    *   <input type="text"
    *     name="email"
-   *     ng-model="vm.email"
-   *     register-with-parent="ngModel:myForm">
+   *     ng-model="vm.email">
    * </fm>
    *
    * @private
@@ -426,32 +422,32 @@ function FormController ($attrs, $log, $parse, $q, $scope, Formation) {
   // ----- Semi-Private Methods ------------------------------------------------
 
   /**
-   * Implement a RegisterWithParent callback.
+   * Implement a callback for ngForm.
    *
    * @private
    *
    * @param {string} name - Name of the controller being registered.
    * @param {object} controller - Controller to register.
    */
-  Form[RWP_CALLBACK] = (name, controller) => {
-    switch (name) {
-      case 'form':
-        Form[NG_FORM_CONTROLLER] = controller;
-
-        // Expose common Angular form controller properties.
-        R.forEach(prop => {
-          Reflect.defineProperty(Form, prop, {
-            get: () => R.path([NG_FORM_CONTROLLER, prop], Form)
-          });
-        }, ['$dirty', '$invalid', '$pending', '$pristine', '$submitted', '$valid']);
-        break;
-      case 'ngModel':
-        Form.$registerControl(createMockInputControl(controller));
-        break;
-      default:
-        Form.$debug(`Unknown controller type: "${name}".`);
-        break;
+  Form[REGISTER_FORM_CALLBACK] = ngFormController => {
+    if (Form[NG_FORM_CONTROLLER]) {
+      throwError('ngForm already registered with Formation.');
     }
+
+    Form[NG_FORM_CONTROLLER] = ngFormController;
+
+    // Expose common Angular form controller properties.
+    R.forEach(prop => {
+      Reflect.defineProperty(Form, prop, {
+        get: () => R.path([NG_FORM_CONTROLLER, prop], Form)
+      });
+    }, ['$dirty', '$invalid', '$pending', '$pristine', '$submitted', '$valid']);
+  };
+
+
+
+  Form[REGISTER_NG_MODEL_CALLBACK] = ngModelController => {
+    Form.$registerControl(createMockInputControl(ngModelController));
   };
 
 
@@ -808,7 +804,6 @@ formationModule.run(Formation => {
       <form novalidate
         ng-submit="Form.$submit()"
         ng-model-options="{getterSetter: true}"
-        register-with-parent="form:${FORM_COMPONENT_NAME}"
         ng-transclude>
       </form>
     `

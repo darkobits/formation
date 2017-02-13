@@ -93,8 +93,7 @@ formationModule.run(Formation => {
           ng-class="{
             'has-error': Select.getControlErrors(),
             'is-pending': Select.${NG_MODEL_CTRL}.$pending
-          }"
-          register-with-parent="ngModel:${NAME}"">
+          }">
           <option value=""
             ng-if="::Select.placeholder"
             hidden>
@@ -110,7 +109,6 @@ formationModule.run(Formation => {
             'has-error': Select.getControlErrors(),
             'is-pending': Select.${NG_MODEL_CTRL}.$pending
           }"
-          register-with-parent="ngModel:${NAME}""
           multiple>
         </select>
       `

@@ -352,5 +352,5 @@ app.component('addressFormDemo', {
       });
     };
   },
-  templateUrl: templateUrl
+  templateUrl
 });

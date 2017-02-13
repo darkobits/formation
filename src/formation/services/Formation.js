@@ -3,6 +3,7 @@
 // -----------------------------------------------------------------------------
 
 import formationModule from 'formation/module';
+import R from 'ramda';
 
 import {
   DEFAULT_PREFIX,
@@ -60,6 +61,17 @@ formationModule.provider('Formation', function ($compileProvider) {
   var counter = -1;
 
 
+  /**
+   * @private
+   *
+   * Maintains a list of all components and directives registered with the
+   * service.
+   *
+   * @type {array}
+   */
+  const registeredComponents = [];
+
+
   // ----- Provider ------------------------------------------------------------
 
   /**
@@ -109,6 +121,21 @@ formationModule.provider('Formation', function ($compileProvider) {
    */
   this.showErrorsOn = flags => {
     showErrorsOnStr = flags;
+  };
+
+
+  /**
+   * @alias module:FormationProvider.getRegisteredComponents
+   *
+   * @description
+   *
+   * Returns a list of all components and directives registered with the
+   * service.
+   *
+   * @return {array}
+   */
+  this.getRegisteredComponents = () => {
+    return R.clone(registeredComponents);
   };
 
 
@@ -197,6 +224,7 @@ formationModule.provider('Formation', function ($compileProvider) {
      */
     function $registerComponent (name, definition) {
       $compileProvider.component(lowercase(name), definition);
+      registeredComponents.push(name);
     }
 
 
@@ -221,6 +249,7 @@ formationModule.provider('Formation', function ($compileProvider) {
      */
     function $registerDirective (name, directiveFn) {
       $compileProvider.directive(lowercase(name), directiveFn);
+      registeredComponents.push(name);
     }
 
 

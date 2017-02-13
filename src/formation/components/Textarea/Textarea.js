@@ -66,8 +66,7 @@ formationModule.run(Formation => {
           'has-error': Textarea.getControlErrors(),
           'is-pending': Textarea.${NG_MODEL_CTRL}.$pending
         }"
-        ng-disabled="Textarea.$isDisabled()"
-        register-with-parent="ngModel:${NAME}">
+        ng-disabled="Textarea.$isDisabled()">
     `
   });
 });

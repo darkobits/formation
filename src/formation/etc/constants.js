@@ -35,6 +35,34 @@ export const FORM_COMPONENT_NAME = 'fm';
 
 /**
  * @memberOf constants
+ * @alias REGISTER_FORM_CALLBACK
+ *
+ * @description
+ *
+ * Key at which controllers should implement a function to handle ngForm
+ * registration.
+ *
+ * @type {symbol}
+ */
+export const REGISTER_FORM_CALLBACK = Symbol('registerForm');
+
+
+/**
+ * @memberOf constants
+ * @alias REGISTER_NG_MODEL_CALLBACK
+ *
+ * @description
+ *
+ * Key at which controllers should implement a function to handle ngModel
+ * registration.
+ *
+ * @type {symbol}
+ */
+export const REGISTER_NG_MODEL_CALLBACK = Symbol('registerNgModel');
+
+
+/**
+ * @memberOf constants
  * @alias DEFAULT_PREFIX
  *
  * @description
