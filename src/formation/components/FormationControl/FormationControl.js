@@ -2,7 +2,9 @@
 // ----- Control Base Class ----------------------------------------------------
 // -----------------------------------------------------------------------------
 
-import {RWP_CALLBACK} from 'formation/components/RegisterWithParent';
+import {
+  REGISTER_NG_MODEL_CALLBACK
+} from 'formation/etc/constants';
 
 
 /**
@@ -74,8 +76,8 @@ export const NG_MESSAGES = '$ngMessages';
  * 3. Create your own custom components that extend `FormationControl` and
  *    register them with `registerControl`.
  *
- * 4. Use `RegisterWithParent` on any element inside a Formation form to
- *    register the ngModel controller with the form.
+ * 4. Use `ngModel` on any element inside a Formation form to register the
+ *    ngModel controller with the form.
  *
  * ### Extending FormationControl
  *
@@ -91,16 +93,9 @@ export const NG_MESSAGES = '$ngMessages';
  *
  * 2. (Optional) If the component uses `ngModel`, ensure that the `ng-model`
  *    expression in the component's template references the controller's
- *    `$ngModelGetterSetter` property (provided by `FormationControl`) and use
- *    `RegisterWithParent` to provide `FormationControl` with a reference to the
- *    `ngModelCtrl` instance. Once registered, Formation will assign the ngModel
- *    controller instance to the controller at the key `NG_MODEL_CTRL`
- *    (see `constants`).
- *
- *    Example: `register-with-parent="ngModel:YourComponent"`
+ *    `$ngModelGetterSetter` property (provided by `FormationControl`).
  *
  * For a reference implementation, see `Input.js`.
- *
  *
  * ### Control Configuration
  *
@@ -121,18 +116,17 @@ export class FormationControl {
 
 
   /**
-   * Implement a RegisterWithParent callback.
+   * Implement a callback for ngModel.
    *
    * @private
    *
-   * @param {string} name - Name of the controller being registered.
-   * @param {object} controller - Controller to register.
+   * @param {object} ngModelController
    */
-  [RWP_CALLBACK] (name, controller) {
+  [REGISTER_NG_MODEL_CALLBACK] (ngModelController) {
     if (name === 'ngModel') {
       if (this[FORM_CONTROLLER]) {
         // Create a reference to the control's ngModel controller.
-        this[NG_MODEL_CTRL] = controller;
+        this[NG_MODEL_CTRL] = ngModelController;
 
         // Register the control with the form.
         this[FORM_CONTROLLER].$registerControl(this);
