@@ -6,15 +6,11 @@
 const webpack = require('webpack');
 const autoprefixer = require('autoprefixer');
 const ExtractTextWebpackPlugin = require('extract-text-webpack-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 const SassLintPlugin = require('sasslint-webpack-plugin');
 const VisualizerWebpackPlugin = require('webpack-visualizer-plugin');
 
 const packageJson = require('./package.json');
 const resolve = require('path').resolve;
-
-const bourbon = require('bourbon');
-const bourbonNeat = require('bourbon-neat');
 
 const CONTEXT = resolve(__dirname, 'src');
 const MODULE_NAME = packageJson.name;
@@ -35,17 +31,9 @@ module.exports = (env => {
   config.context = CONTEXT;
 
 
-  config.entry = {};
-
-
-  if (env.local) {
-    // In development, use the demo app as the entrypoint -- it will import the
-    // component.
-    config.entry.index = resolve(CONTEXT, 'demo', 'index.js');
-  } else {
-    // In any other scenario, use the component as the entrypoint.
-    config.entry.index = resolve(CONTEXT, 'formation', 'index.js');
-  }
+  config.entry = {
+    index: resolve(CONTEXT, 'index.js')
+  };
 
 
   // Configure output.
@@ -165,16 +153,6 @@ module.exports = (env => {
   }));
 
 
-  // Responsible for managing index.html and injecting references to bundles.
-  if (env.local) {
-    config.plugins.push(new HtmlWebpackPlugin({
-      template: resolve(CONTEXT, 'demo/index.html'),
-      chunksSortMode: 'dependency',
-      showErrors: !env.dist
-    }));
-  }
-
-
   // Responsible for extracting the CSS in the bundle into a separate file.
   config.plugins.push(new ExtractTextWebpackPlugin('[name].css', {
     allChunks: true
@@ -246,33 +224,6 @@ module.exports = (env => {
   }
 
 
-  // ----- Development Server --------------------------------------------------
-
-  config.devServer = {
-    inline: true,
-    host: '0.0.0.0',
-    port: env.port || 8080,
-    historyApiFallback: true,
-    // Configure output.
-    stats: {
-      colors: true,
-      hash: false,
-      version: false,
-      timings: true,
-      assets: false,
-      chunks: false,
-      modules: false,
-      reasons: false,
-      children: false,
-      source: false,
-      errors: true,
-      errorDetails: true,
-      warnings: true,
-      publicPath: false
-    }
-  };
-
-
   // ----- Miscellany ----------------------------------------------------------
 
   // Exit on error when compiling.
@@ -290,11 +241,8 @@ module.exports = (env => {
   config.sassLoader = {
     includePaths: [
       CONTEXT,
-      resolve(CONTEXT, 'demo'),
       'node_modules'
     ]
-    .concat(bourbon.includePaths)
-    .concat(bourbonNeat.includePaths)
   };
 
 
