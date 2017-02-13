@@ -16,11 +16,8 @@ const CONTEXT = resolve(__dirname, 'src');
 const MODULE_NAME = packageJson.name;
 const VERSION = packageJson.version;
 
-const ENV = ['local', 'dist', 'test', 'stats'].reduce((obj, env) => Object.assign(obj, {
-  [env]: process.argv.indexOf('--env.' + env) > -1
-}), {});
 
-module.exports = (env => {
+module.exports = env => {
   const config = {};
 
 
@@ -73,57 +70,120 @@ module.exports = (env => {
   // ----- Loaders -------------------------------------------------------------
 
   config.module = {
-    preLoaders: [],
-    loaders: []
+    rules: []
   };
 
 
   // JavaScript: Lint source and emit errors to the browser console/terminal.
-  if (env.local) {
-    config.module.preLoaders.push({
-      test: /\.(m)?js$/,
-      loaders: ['eslint'],
-      exclude: /node_modules/
-    });
-  }
+  config.module.rules.push({
+    enforce: 'pre',
+    test: /\.(m)?js$/,
+    exclude: /node_modules/,
+    use: [
+      {
+        loader: 'eslint-loader',
+        options: {
+          // Exit on error when compiling.
+          failOnError: env.dist
+        }
+      }
+    ]
+  });
 
 
   // JavaScript: Transpile and annotate.
-  config.module.loaders.push({
+  config.module.rules.push({
     test: /\.(m)?js$/,
-    loaders: ['ng-annotate?add=true', 'babel'],
-    exclude: /node_modules/
+    exclude: /node_modules/,
+    use: [
+      {
+        loader: 'ng-annotate-loader',
+        options: {
+          add: true
+        }
+      },
+      {
+        loader: 'babel-loader'
+      }
+    ]
   });
 
 
   // Sass: Compile, add PostCSS transforms, emit to ExtractText.
-  config.module.loaders.push({
+  config.module.rules.push({
     test: /\.(c|sc|sa)ss$/,
-    loader: ExtractTextWebpackPlugin.extract(['css?sourceMap', 'postcss', 'sass?sourceMap'])
+    use: ExtractTextWebpackPlugin.extract([
+      {
+        loader: 'css-loader',
+        options: {
+          sourceMap: true
+        }
+      },
+      {
+        loader: 'postcss-loader',
+        options: {
+          plugins () {
+            return [
+              autoprefixer
+            ];
+          }
+        }
+      },
+      {
+        loader: 'sass-loader',
+        options: {
+          sourceMap: true,
+          includePaths: [
+            CONTEXT,
+            'node_modules'
+          ]
+        }
+      }
+    ])
   });
 
 
   // Static assets: Inline anything under 10k, otherwise emit a file in the
   // output directory and return a URL pointing to it.
-  config.module.loaders.push({
+  config.module.rules.push({
     test: /\.(png|jpg|gif|eot|ttf|woff|woff2)$/,
-    loaders: ['url?limit=10000']
+    use: [
+      {
+        loader: 'url-loader',
+        options: {
+          limit: 10000
+        }
+      }
+    ]
   });
 
 
-  config.module.loaders.push({
+  config.module.rules.push({
     test: /\.svg$/,
-    loaders: ['svg-sprite']
+    use: [
+      {
+        loader: 'svg-sprite-loader'
+      }
+    ]
   });
 
 
   // HTML (templates): Add to the Angular Template Cache and return a URL
   // pointing to the template.
-  config.module.loaders.push({
+  config.module.rules.push({
     test: /\.html$/,
-    loaders: [`ngtemplate?requireAngular&relativeTo=${CONTEXT}&prefix=${MODULE_NAME}`, 'html'],
-    exclude: [
-      resolve(CONTEXT, 'demo/index.html')
+    use: [
+      {
+        loader: 'ngtemplate',
+        options: {
+          requireAngular: true,
+          relativeTo: CONTEXT,
+          prefix: MODULE_NAME
+        }
+      },
+      {
+        loader: 'html'
+      }
     ]
   });
 
@@ -131,12 +191,9 @@ module.exports = (env => {
   // ----- Module Resolving ----------------------------------------------------
 
   config.resolve = {
-    modulesDirectories: [
-      // Search for modules relative to source root.
-      resolve(CONTEXT, 'demo'),
+    modules: [
       CONTEXT,
       resolve('./tests'),
-      // Search for NPM modules.
       'node_modules'
     ]
   };
@@ -209,48 +266,11 @@ module.exports = (env => {
   }
 
 
-  // Use these plugins only when compiling the application.
-  if (env.dist) {
-    // Ensure modules are only emitted to bundles once.
-    config.plugins.push(new webpack.optimize.DedupePlugin());
-
-    // Minify source.
-    config.plugins.push(new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        screw_ie8: true,
-        warnings: false
-      }
-    }));
-  }
-
-
   // ----- Miscellany ----------------------------------------------------------
 
   // Exit on error when compiling.
   config.bail = env.dist;
 
 
-  // Configuration for the ESLint loader.
-  config.esLint = {
-    // Exit on error when compiling.
-    failOnError: env.dist
-  };
-
-
-  // Configuration for the Sass loader.
-  config.sassLoader = {
-    includePaths: [
-      CONTEXT,
-      'node_modules'
-    ]
-  };
-
-
-  // Configuration for the PostCSS loader.
-  config.postcss = () => [
-    autoprefixer
-  ];
-
-
   return config;
-})(ENV);
+};
