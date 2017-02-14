@@ -1,7 +1,6 @@
-[![Build Status](https://travis-ci.org/darkobits/formation.svg?branch=master)](https://travis-ci.org/darkobits/formation) [![Dependencies](https://david-dm.org/darkobits/formation/status.svg)](https://david-dm.org/darkobits/formation) [![Codacy Badge](https://img.shields.io/codacy/grade/e3fb8e46d6a241f5a952cf3fe6a49d06.svg)](https://www.codacy.com/app/darkobits/formation) [![NPM Version](https://img.shields.io/npm/v/@darkobits/formation.svg)](https://www.npmjs.com/package/@darkobits/formation)
+# formation
 
-
-## formation
+[![travis][travis-img]][travis-url] [![david][david-img]][david-url] [![codacy][codacy-img]][codacy-url] [![NPM Version][npm-img]][npm-url]
 
 Formation is a form framework for Angular 1.5+. It aims to address many of the shortcomings in the built-in form facilities, and increase consistensy across large code bases by reducing the amount of boilterplace needed to build robust forms. It is inspired by the two leading paradigms for working with forms in Angular 2, [template-driven forms](http://toddmotto.com/angular-2-forms-template-driven) and [reactive forms](http://toddmotto.com/angular-2-forms-reactive), both of which have their own advantages and drawbacks.
 
@@ -152,3 +151,12 @@ Wowza! We kept our template focused on structure, and our controller neatly desc
 - `errors (Array)`: Ranked list of paired validation keys and errror messages. This will be used with ngMessages to drive the errors component.
 
 For more context about these concepts, see the official documentation for [ngModel](http://docs.angularjs.org/api/ng/type/ngModel.NgModelController) and [ngMessages](http://docs.angularjs.org/api/ngMessages/directive/ngMessages). To see a demo of what the above form might look like, clone this repository, then run `npm i && npm start`.
+
+[travis-img]: https://img.shields.io/travis/darkobits/formation.svg?style=flat-square
+[travis-url]: https://travis-ci.org/darkobits/formation
+[david-img]: https://img.shields.io/david/darkobits/formation.svg?style=flat-square
+[david-url]: https://david-dm.org/darkobits/formation
+[codacy-img]: https://img.shields.io/codacy/grade/e3fb8e46d6a241f5a952cf3fe6a49d06.svg?style=flat-square
+[codacy-url]: https://www.codacy.com/app/darkobits/formation
+[npm-img]: https://img.shields.io/npm/v/@darkobits/formation.svg?style=flat-square
+[npm-url]: https://www.npmjs.com/package/@darkobits/formation
