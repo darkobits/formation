@@ -2,8 +2,8 @@
 // ----- Formation Service -----------------------------------------------------
 // -----------------------------------------------------------------------------
 
-import app from '../app';
 import R from 'ramda';
+import app from '../app';
 
 import {
   DEFAULT_PREFIX,
@@ -30,7 +30,6 @@ import {
  * The `Formation` provider.
  */
 app.provider('Formation', function ($compileProvider) {
-
   /**
    * @private
    *
@@ -149,7 +148,6 @@ app.provider('Formation', function ($compileProvider) {
    * The `Formation` service.
    */
   this.$get = () => {
-
     /**
      * @alias module:FormationService#getNextId
      * @private

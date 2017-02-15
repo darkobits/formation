@@ -35,9 +35,7 @@ import {
 
 
 class Errors extends FormationControl {
-  constructor () {
-    super();
-  }
+
 }
 
 

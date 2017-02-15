@@ -15,8 +15,11 @@
  * a model value (and/or view value) and returns a boolean.
  */
 
-
 import R from 'ramda';
+
+import {
+  NG_MODEL_CTRL
+} from '../components/FormationControl';
 
 import {
   capitalize
@@ -25,11 +28,6 @@ import {
 import {
   CONFIGURABLE_VALIDATOR
 } from './constants';
-
-import {
-  NG_MODEL_CTRL
-} from '../components/FormationControl';
-
 
 
 /**
@@ -162,7 +160,7 @@ export function maxLength (length) {
 }
 
 
-const EMAIL_PATTERN = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/g; // eslint-disable-line max-len
+const EMAIL_PATTERN = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/g; // eslint-disable-line max-len
 
 /**
  * Returns true if the provided model value is a valid e-mail address according
@@ -184,7 +182,7 @@ const EMAIL_PATTERN = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".
  * @return {boolean}
  */
 export function email (modelValue) {
-  return String(modelValue).match(EMAIL_PATTERN);
+  return Boolean(String(modelValue).match(EMAIL_PATTERN));
 }
 
 
@@ -209,7 +207,7 @@ export function email (modelValue) {
  */
 export function pattern (pattern) {
   return (modelValue, viewValue) => {
-    return pattern.test(String(viewValue));
+    return Boolean(String(viewValue).match(pattern));
   };
 }
 
@@ -237,7 +235,6 @@ export function pattern (pattern) {
  * @return {function}
  */
 export function match (independentControlName) {
-
   // Validator configuration function.
   function configureMatch (form, dependentControl) {
     const dependentControlName = dependentControl.$getName();
@@ -260,7 +257,7 @@ export function match (independentControlName) {
       const independentNgModelCtrl = R.path([NG_MODEL_CTRL], form.getControl(independentControlName));
 
       if (!independentNgModelCtrl) {
-        form.$debug(`Match validator for "${dependentControlName}" could not find control "${independentControlName}".`); // eslint-disable-line
+        form.$debug(`Match validator for "${dependentControlName}" could not find control "${independentControlName}".`); // eslint-disable-line max-len
         return false;
       }
 

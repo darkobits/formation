@@ -32,9 +32,7 @@ import {
  *  </my-form>
  */
 class TextareaControl extends FormationControl {
-  constructor () {
-    super();
-  }
+
 }
 
 

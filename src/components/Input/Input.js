@@ -39,9 +39,7 @@ import {
  *  </my-form>
  */
 class InputControl extends FormationControl {
-  constructor () {
-    super();
-  }
+
 }
 
 

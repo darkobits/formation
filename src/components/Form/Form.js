@@ -2,8 +2,8 @@
 // ----- Form Component --------------------------------------------------------
 // -----------------------------------------------------------------------------
 
-import app from '../../app';
 import R from 'ramda';
+import app from '../../app';
 
 import {
   mergeDeep,
@@ -33,7 +33,7 @@ import {
  *
  * @type {string}
  */
-const NG_FORM_CONTROLLER = '$ngFormController';
+export const NG_FORM_CONTROLLER = '$ngFormController';
 
 
 /**
@@ -43,7 +43,7 @@ const NG_FORM_CONTROLLER = '$ngFormController';
  *
  * @type {string}
  */
-const CUSTOM_ERROR_MESSAGE_KEY = '$customError';
+export const CUSTOM_ERROR_MESSAGE_KEY = '$customError';
 
 
 /**
@@ -376,6 +376,10 @@ export function FormController ($attrs, $log, $parse, $q, $scope, Formation) {
    * @return {array}
    */
   function parseFlags (string) {
+    if (!string || string === '') {
+      return;
+    }
+
     const states = R.map(state => {
       return state.length && `$${state.replace(/[, ]/g, '')}`;
     }, String(string).split(' '));
@@ -444,7 +448,13 @@ export function FormController ($attrs, $log, $parse, $q, $scope, Formation) {
   };
 
 
-
+  /**
+   * Implement a callback for ngModel registration. This will only be called
+   * when an ngModel controller is used in a Formation form outside of a
+   * Formation control.
+   *
+   * @param  {object} ngModelController
+   */
   Form[REGISTER_NG_MODEL_CALLBACK] = ngModelController => {
     Form.$registerControl(createMockInputControl(ngModelController));
   };
@@ -457,7 +467,7 @@ export function FormController ($attrs, $log, $parse, $q, $scope, Formation) {
    */
   Form.$onInit = () => {
     // Set debug mode if the "debug" attribute is present.
-    if ($attrs.hasOwnProperty('debug')) {
+    if (Reflect.has($attrs, 'debug')) {
       Form.$debugging = true;
     }
 
@@ -598,8 +608,8 @@ export function FormController ($attrs, $log, $parse, $q, $scope, Formation) {
 
     // If the user did not configure error behavior, return the control's errors
     // if it is invalid.
-    if (!Form.showErrorsOn.length) {
-      return ngModelCtrl.$invalid && ngModelCtrl.$error;
+    if (R.isNil(Form.showErrorsOn) || Form.showErrorsOn === '') {
+      return !ngModelCtrl.$valid && ngModelCtrl.$error;
     }
 
     // Otherwise, determine if the control should show errors.
@@ -641,45 +651,55 @@ export function FormController ($attrs, $log, $parse, $q, $scope, Formation) {
    * @private
    */
   Form.$submit = () => {
+    const endSubmit = () => {
+      Form.enable();
+      Form.$submitting = false;
+    };
+
     if (Form.$submitting) {
       Form.$debug('Submit already in progress.');
-      return;
+      return $q.reject(new Error('SUBMIT_IN_PROGRESS'));
     }
 
     Form.$submitting = true;
     Form.disable();
 
-    waitForAsyncValidators()
+    return waitForAsyncValidators()
     .then(() => {
-
-      /**
-       * We need to clear all custom errors set from the last submission in
-       * order for the form's $valid flag to be true so we can proceed.
-       */
+      // We need to clear all custom errors set from the last submission in
+      // order for the form's $valid flag to be true so we can proceed.
       mapControls(clearCustomErrorOnControl);
 
       if (Form[NG_FORM_CONTROLLER].$valid) {
         // Invoke the consumer's onSubmit callback with current model data.
-        return $q.when(Form.$onSubmit(Form.getModelValues()));
+        if (typeof Form.$onSubmit === 'function') {
+          return $q.when(Form.$onSubmit(Form.getModelValues()));
+        }
       } else {
         Form.$debug('Form is invalid.', Form[NG_FORM_CONTROLLER].$error);
+        return $q.reject(new Error('NG_FORM_INVALID'));
       }
     })
-    .catch(error => {
-      Form.$debug('Submit failed, consumer did not catch.', error);
+    .catch(err => {
+      if (err.message === 'NG_FORM_INVALID') {
+        Form.$debug('Submit cancelled; form is invalid.');
+        endSubmit();
+        return $q.reject(err);
+      }
+
+      Form.$debug('Submit failed. Consumer did not catch.', err);
+      endSubmit();
+      return $q.reject(new Error('CONSUMER_REJECTED'));
     })
     .then(fieldErrors => {
-
-      /**
-       * If the consumer returned an object, assume it is a mapping of field
-       * names to error messages and apply each error to its field.
-       */
+      // If the consumer returned an object, assume it is a mapping of field
+      // names to error messages and apply each error to its field.
       if (R.is(Object, fieldErrors)) {
         applyFieldErrors(fieldErrors);
       }
 
-      Form.enable();
-      Form.$submitting = false;
+      endSubmit();
+      return $q.resolve('SUBMIT_COMPLETE');
     });
   };
 
@@ -811,3 +831,5 @@ app.run(Formation => {
     `
   });
 });
+
+export default FormController;

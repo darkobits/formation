@@ -1,15 +1,4 @@
 {
   "presets": ["es2015"],
-  "plugins": ["angularjs-annotate"],
-  "env": {
-    "test": {
-      "plugins": [
-        ["istanbul", {
-          "exclude": [
-            "**/*.spec.js"
-          ]
-        }]
-      ]
-    }
-  }
+  "plugins": ["angularjs-annotate"]
 }

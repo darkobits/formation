@@ -1,9 +1,0 @@
-# ESLint Ignore Configuration
-# Version: 0.1.0
-#
-# This file is not updated automatically.
-# To get the latest version, delete it and run 'npm install'.
-
-dist
-docs
-src/jsdoc-theme

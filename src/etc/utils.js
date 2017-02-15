@@ -64,15 +64,15 @@ export function mergeWithDeep (f, ...objs) {
 
     if (objs.length === 2) {
       return merged;
-    } else {
-      const rest = R.slice(0, -2, objs);
-      return mergeWithDeep(f, ...R.append(merged, rest));
     }
+
+    const rest = R.slice(0, -2, objs);
+    return mergeWithDeep(f, ...R.append(merged, rest));
   } else if (objs.length === 1) {
     return R.head(objs);
-  } else {
-    return {};
   }
+
+  return {};
 }
 
 
@@ -100,9 +100,9 @@ const DEFAULT_MERGER = (d, s) => {
     return R.concat(d, s);
   } else if (R.is(Object, d) && R.is(Object, s) && !R.is(Function, s)) {
     return mergeWithDeep(DEFAULT_MERGER, d, s);
-  } else {
-    return s;
   }
+
+  return s;
 };
 
 

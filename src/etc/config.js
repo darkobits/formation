@@ -1,9 +1,7 @@
-import app from '../app';
 import R from 'ramda';
+import app from '../app';
 
-import {
-  FormController
-} from '../components/Form/Form';
+import FormController from '../components/Form/Form';
 
 import {
   FormationControl
@@ -114,7 +112,7 @@ app.config(($provide, FormationProvider) => {
             throwError('Directive "ngModel" found multiple parent controllers that are Formation forms.');
           }
 
-          if (candidateComponents.length) {
+          if (candidateComponents.length > 0) {
             // If we have a parent controller that is a Formation control,
             // register with it.
             const [fmComponentController] = candidateComponents;
@@ -122,7 +120,7 @@ app.config(($provide, FormationProvider) => {
             if (R.is(Function, fmComponentController[REGISTER_NG_MODEL_CALLBACK])) {
               fmComponentController[REGISTER_NG_MODEL_CALLBACK](ngModelController);
             }
-          } else if (candidateForms.length) {
+          } else if (candidateForms.length > 0) {
             // Otherwise, if we have a parent controller that is a Formation
             // form, register with it. This may happen if a developer uses
             // ngModel outside of a Formation component.

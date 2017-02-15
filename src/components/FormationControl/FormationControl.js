@@ -112,8 +112,6 @@ export const NG_MESSAGES = '$ngMessages';
  * - `errors`: Array containing tuples of validation keys and error messages.
  */
 export class FormationControl {
-  constructor () { }
-
 
   /**
    * Implement a callback for ngModel.
@@ -213,7 +211,7 @@ export class FormationControl {
    * @return {*} - Model value, if invoked without arguments.
    */
   $ngModelGetterSetter (...args) {
-    if (args.length) {
+    if (args.length > 0) {
       const [newValue] = args;
       this.setModelValue(newValue);
     } else {

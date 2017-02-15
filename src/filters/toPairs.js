@@ -1,12 +1,13 @@
-import app from '../app';
 import R from 'ramda';
+import app from '../app';
+
 
 app.filter('toPairs', () => {
   return R.memoize(input => {
-    try {
+    if (R.is(Object, input)) {
       return R.toPairs(input);
-    } catch (e) {
-      return input;
     }
+
+    return input;
   });
 });

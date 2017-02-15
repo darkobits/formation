@@ -46,9 +46,7 @@ import {
  *  </my-form>
  */
 class SelectControl extends FormationControl {
-  constructor () {
-    super();
-  }
+
 }
 
 
