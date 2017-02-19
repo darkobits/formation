@@ -700,6 +700,14 @@ export function FormController ($attrs, $log, $parse, $q, $scope, Formation) {
 
       endSubmit();
       return $q.resolve('SUBMIT_COMPLETE');
+    })
+    .catch(err => {
+      // We want to catch the rejections returned above so as to not produce
+      // console errors in production environments, but we want to re-throw them
+      // when testing so we know exactly what happened during a submission.
+      if (typeof process !== 'undefined' && process.env.NODE_ENV === 'test') {
+        return $q.reject(err);
+      }
     });
   };
 
