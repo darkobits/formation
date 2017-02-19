@@ -27,7 +27,7 @@ angular.module('MyApp', [
 
 ## Template-Driven vs. Reactive
 
-Template-driven forms have been the longstanding paradigm in Angular 1.x. Structure, configuration, and validation of form controls is accomplished via markup and adding attributes to control elements for additional behavior (ex: `required`, or custom directives). This approach is straightforward, and allows newcomers to Angular to create simple to modestly complex forms quickly, but in large applications that require consistency and robust validation, working with a multitude of directives and managing model values, state, and errors for each control can quickly become burdensome.
+Template-driven forms have been the longstanding paradigm in Angular 1.x. Structure, configuration, and validation of form controls is accomplished via markup and adding attributes to control elements for additional behavior (ex: `required`, or custom directives). This approach is straightforward, and allows newcomers to Angular to create simple-to-moderately complex forms quickly, but in large applications that require consistency and robust validation, working with a multitude of directives and managing model values, state, and errors for each control can quickly become burdensome.
 
 With reactive forms, Angular 2 encourages developers to configure forms declaratively in code, requiring far less markup. However, the APIs can be cumbersome and rely too heavily on the relationships created between various class instances.
 
@@ -35,12 +35,12 @@ Formation attempts to strike a balance between both approaches: eliminate extran
 
 ## Feature Overview
 
-- Controls are configured using Plain Old JavaScript Objects at either the control level or the from level. Developers no longer need to spin-up new directives to provide custom behavior or validation to a control. Configuration definitions can be shared across the application, improving consistency.
-- Developers no longer need to manage two sets of state with respect to controls and their models (ex: a form control at `vm.myForm.name` and its model value at `vm.name`). The form manages model values, which are determined by its registered controls.
-- Submit handlers no longer need to check the `$valid` state of the form, wait for `$asyncValidators` to complete, or ensure that another submission is not already in progress. A form's submit handler will only be invoked when it should be, and will be passed the model values of all controls in the form.
-- Using `ngMessages` for client-side validation has been greatly simplified: errors are defined as a simple array in code, and one line of markup in templates. Sharing error messages across forms no longer requres exposing error copy to templates via controllers. Formation also supports assigning custom error messages on each control -- from your API, for example.
+- Controls are configured using Plain Old JavaScript Objects at either the control level or the from level. Developers no longer need to spin-up new directives to provide custom behavior or validation to a control. Configuration definitions can be shared across the application, improving consistency. (See: [Control Configuration](/src/components/FormationControl#control-configuration))
+- Developers no longer need to manage two sets of state with respect to controls and their models (ex: a form control at `vm.myForm.name` and its model value at `vm.name`). The form manages model values, which are determined by its registered controls. (See: [Working With Model Values](/src/components/Form#working-with-model-values))
+- Submit handlers no longer need to check the `$valid` state of the form, wait for `$asyncValidators` to complete, or ensure that another submission is not already in progress. A form's submit handler will only be invoked when it should be, and will be passed the model values of all controls in the form. (See: [Submitting](/src/components/Form#submitting))
+- Using `ngMessages` for client-side validation has been greatly simplified: errors are defined as a simple array in code, and one line of markup in templates. Sharing error messages across forms no longer requres exposing error copy to templates via controllers. Formation also supports assigning custom error messages on each control -- from your API, for example. (See: [Errors](/src/components/Errors))
 - Configuring when to display validation errors is trivial. Either set the behavior application-wide or for each form by providing a list of states (ex: `"touched, submitted"`) to match against. Errors for a given control will be shown if either the control or the form has one of the states.
-- Reset all controls to a pristine, untouched state and optionally reset the form's model to an initial state.
+- Reset all controls to a pristine, untouched state and optionally reset the form's model to an initial state. (See: [showErrorsOn](/src/services/Formation#showerrorsonflags))
 - Accessibility: `id` and `for` attributes are managed by the form, so controls and labels are correctly associated without any extra markup.
 
 ## Example

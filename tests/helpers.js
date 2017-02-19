@@ -249,6 +249,8 @@ export default class NgUnit {
    * });
    */
   prepareDirective (directive, opts = {}) {
+    let compiledDirective;
+
     this.spec.$scope = this.get('$rootScope').$new();
 
     if (!opts.template) {
@@ -266,17 +268,33 @@ export default class NgUnit {
       this.loadInjectables(opts.inject);
     }
 
-    // Attach compiled element.
-    this.spec.$element = this.get('$compile')(opts.template)(this.spec.$scope);
+    if (opts.wrap) {
+      // Compile the wrapper element.
+      let compiledWrapper = this.get('$compile')(opts.wrap)(this.spec.$scope);
 
-    // Attach directive's controller.
-    this.spec[directive] = this.spec.$element.controller(directive);
+      // Construct directive's template.
+      let directiveEl = angular.element(opts.template);
 
+      // Append template to compiled wrapper.
+      compiledWrapper.append(directiveEl);
+
+      // Compile directive.
+      compiledDirective = this.get('$compile')(directiveEl)(this.spec.$scope);
+    } else {
+      // Use simple directive compilation.
+      compiledDirective = this.get('$compile')(opts.template)(this.spec.$scope);
+    }
+
+    // Attach directive's controller and element to spec.
+    this.spec[directive] = compiledDirective.controller(directive);
+    this.spec.$element = compiledDirective;
+
+    // Run a digest cycle.
     this.spec.$scope.$digest();
 
     // Attach isolate scope.
-    if (this.spec.$element.isolateScope) {
-      this.spec.$isolateScope = this.spec.$element.isolateScope();
+    if (compiledDirective.isolateScope) {
+      this.spec.$isolateScope = compiledDirective.isolateScope();
     }
   }
 

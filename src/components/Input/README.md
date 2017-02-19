@@ -4,9 +4,11 @@
 
 **Type:** [`component`](https://docs.angularjs.org/guide/component)
 
-**Description:** Creates a `<label>` and an `<input>` control.
+## Description
 
-**Bindings:**
+This component creates a label and an input control. It supports any [valid HTML5 input type](http://www.w3schools.com/html/html_form_input_types.asp). The control and label will be assigned matching `id` and `for` attributes. When `type` is set to `radio` or `checkbox`, the label will be placed after the control. Otherwise, it will be placed before the control.
+
+## Bindings
 
 |Name|Type|Description|
 |---|---|---|
@@ -14,14 +16,23 @@
 |`placeholder`|`@`|Input placeholder (if applicable).|
 |`type`|`@`|Input type (`text`, `radio`, `checkbox`, etc).|
 |`ngValue`|`<`|Value to set the control's model to when selected (for radios).|
+|`config`|`<`|Control configuration object. (See: [Control Configuration](/src/components/FormationControl#control-configuration))|
 
-**Transclusion:**
+## API
 
-Transcluded content will be placed in the `<label>` created by this component.
+This control extends the [`FormationControl`](/src/components/FormationControl) class, and does not implement any additional methods.
 
-----
+## Additional Behavior
 
-This component creates a label and an input control. It supports any [valid HTML5 input type](http://www.w3schools.com/html/html_form_input_types.asp). The control and label will be assigned matching `id` and `for` attributes. When `type` is set to `radio` or `checkbox`, the label will be placed after the control. Otherwise, it will be placed before the control.
+- Transclusion: Transcluded content will be placed in the `<label>` created by this component.
+- CSS
+  - The class `has-error` will be applied to the `<input>` and `<label>` elements when the control has an error.
+  - The class `is-pending` will be applied to the `<input>` and `<label>` elements when the control is pending.
+- Disabling: The component can be disabled/enabled in any of four ways:
+  - Using `ngDisabled` on the Formation form element (`<fm>`).
+  - Using `ngDisabled` on the component's element.
+  - Using the [`disable`](https://github.com/darkobits/formation/tree/canary/src/components/Form#disable)/[`enable`](https://github.com/darkobits/formation/tree/canary/src/components/Form#enable) methods of the Formation form API.
+  - Using the [`disable`](/src/components/FormationControl#disable)/[`enable`](/src/components/FormationControl#enable) methods of the component API.
 
 ## Example
 
@@ -37,6 +48,6 @@ This component creates a label and an input control. It supports any [valid HTML
 </fm>
 ```
 
-## API
+## Additional Resources
 
-This control extends the [`FormationControl`](/src/formation/components/FormationControl) class, and does not implement any additional methods.
+- [AngularJS API: input](https://docs.angularjs.org/api/ng/directive/input)

@@ -3,23 +3,23 @@
 // -----------------------------------------------------------------------------
 
 import R from 'ramda';
-import app from '../app';
+import app from '../../app';
 
 import {
   DEFAULT_PREFIX,
   FORM_COMPONENT_NAME
-} from '../etc/constants';
+} from '../../etc/constants';
 
 import {
   COMPONENT_CONFIGURATION,
   FORM_CONTROLLER
-} from '../components/FormationControl';
+} from '../../components/FormationControl';
 
 import {
   capitalize,
   lowercase,
   mergeDeep
-} from '../etc/utils';
+} from '../../etc/utils';
 
 
 /**
@@ -74,6 +74,21 @@ app.provider('Formation', function ($compileProvider) {
   // ----- Provider ------------------------------------------------------------
 
   /**
+   * @alias module:FormationProvider.getRegisteredComponents
+   *
+   * @description
+   *
+   * Returns a list of all components and directives registered with the
+   * service.
+   *
+   * @return {array}
+   */
+  this.$getRegisteredComponents = () => {
+    return R.clone(registeredComponents);
+  };
+
+
+  /**
    * @alias module:FormationProvider.setPrefix
    *
    * @description
@@ -120,21 +135,6 @@ app.provider('Formation', function ($compileProvider) {
    */
   this.showErrorsOn = flags => {
     showErrorsOnStr = flags;
-  };
-
-
-  /**
-   * @alias module:FormationProvider.getRegisteredComponents
-   *
-   * @description
-   *
-   * Returns a list of all components and directives registered with the
-   * service.
-   *
-   * @return {array}
-   */
-  this.getRegisteredComponents = () => {
-    return R.clone(registeredComponents);
   };
 
 

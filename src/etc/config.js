@@ -8,10 +8,6 @@ import {
 } from '../components/FormationControl';
 
 import {
-  throwError
-} from './utils';
-
-import {
   FORM_COMPONENT_NAME,
   REGISTER_FORM_CALLBACK,
   REGISTER_NG_MODEL_CALLBACK
@@ -19,16 +15,16 @@ import {
 
 
 app.config(($provide, FormationProvider) => {
-  // Decorate "form".
+  // Decorate ngForm.
   $provide.decorator('formDirective', $delegate => {
     const [ngFormDirective] = $delegate;
     const compile = ngFormDirective.compile;
 
     // Add the Formation form controller as an optional parent require.
-    ngFormDirective.require = ngFormDirective.require.concat(`^^?${FORM_COMPONENT_NAME}`);
+    ngFormDirective.require = ngFormDirective.require.concat(`^?${FORM_COMPONENT_NAME}`);
 
     ngFormDirective.compile = function () {
-      // Invoke original compile to get link object.
+      // Invoke original compile function to get link object it returns.
       const link = Reflect.apply(compile, this, arguments);
 
       // Return new link object.
@@ -48,18 +44,11 @@ app.config(($provide, FormationProvider) => {
           // Get a reference to the Angular Form controller.
           const [ngFormController] = controllers;
 
-          // Get a list of all controllers that are instance of the (Formation) FormController.
-          const candidateControllers = controllers.filter(controller => controller instanceof FormController);
+          // Get a reference to the Formation form controller.
+          const fmFormController = R.find(R.is(FormController), controllers);
 
-          // Ensure only one controller was found.
-          if (candidateControllers.length === 1) {
-            const [fmFormController] = candidateControllers;
-
-            if (R.is(Function, fmFormController[REGISTER_FORM_CALLBACK])) {
-              fmFormController[REGISTER_FORM_CALLBACK](ngFormController);
-            }
-          } else if (candidateControllers.length > 1) {
-            throwError('Directive "form" found multiple parent controllers that are Formation forms.');
+          if (R.is(Function, fmFormController[REGISTER_FORM_CALLBACK])) {
+            fmFormController[REGISTER_FORM_CALLBACK](ngFormController);
           }
         }
       };
@@ -69,16 +58,17 @@ app.config(($provide, FormationProvider) => {
   });
 
 
-  // Decorate "ngModel".
+  // Decorate ngModel.
   $provide.decorator('ngModelDirective', $delegate => {
     const [ngModelDirective] = $delegate;
     const compile = ngModelDirective.compile;
-    const registeredComponents = FormationProvider.getRegisteredComponents();
+    const registeredComponents = FormationProvider.$getRegisteredComponents();
 
     // Add each registered component as an optional parent require on ngModel.
-    ngModelDirective.require = ngModelDirective.require.concat(registeredComponents.map(component => {
-      return `^^?${component}`;
-    }));
+    ngModelDirective.require = R.concat(
+      ngModelDirective.require,
+      R.map(component => `^^?${component}`, registeredComponents)
+    );
 
     ngModelDirective.compile = function () {
       // Invoke original compile to get link object.
@@ -97,38 +87,20 @@ app.config(($provide, FormationProvider) => {
           // Get a reference to the ngModel controller.
           const [ngModelController] = controllers;
 
-          // Get a list of all parent controllers that are Formation controls.
-          const candidateComponents = controllers.filter(controller => controller instanceof FormationControl);
+          // Get a reference to parent Formation controls, if any.
+          const fmComponentController = R.find(R.is(FormationControl), controllers);
 
-          if (candidateComponents.length > 1) {
-            throwError('Directive "ngModel" found multiple parent controllers that are Formation controls.');
-          }
+          // Get a reference to parent Formation forms, if any.
+          const fmFormController = R.find(R.is(FormController), controllers);
 
-          // Get a list of all parent controllers that are instances of
-          // Formation forms.
-          const candidateForms = controllers.filter(controller => controller instanceof FormController);
-
-          if (candidateForms.length > 1) {
-            throwError('Directive "ngModel" found multiple parent controllers that are Formation forms.');
-          }
-
-          if (candidateComponents.length > 0) {
-            // If we have a parent controller that is a Formation control,
-            // register with it.
-            const [fmComponentController] = candidateComponents;
-
-            if (R.is(Function, fmComponentController[REGISTER_NG_MODEL_CALLBACK])) {
-              fmComponentController[REGISTER_NG_MODEL_CALLBACK](ngModelController);
-            }
-          } else if (candidateForms.length > 0) {
-            // Otherwise, if we have a parent controller that is a Formation
-            // form, register with it. This may happen if a developer uses
-            // ngModel outside of a Formation component.
-            const [fmFormController] = candidateForms;
-
-            if (R.is(Function, fmFormController[REGISTER_NG_MODEL_CALLBACK])) {
-              fmFormController[REGISTER_NG_MODEL_CALLBACK](ngModelController);
-            }
+          if (fmComponentController && R.is(Function, fmComponentController[REGISTER_NG_MODEL_CALLBACK])) {
+            // If we are the child of a Formation control, register with the
+            // control.
+            fmComponentController[REGISTER_NG_MODEL_CALLBACK](ngModelController);
+          } else if (fmFormController && R.is(Function, fmFormController[REGISTER_NG_MODEL_CALLBACK])) {
+            // Otherwise, if we are the child of a Formation form, register with
+            // the form.a
+            fmFormController[REGISTER_NG_MODEL_CALLBACK](ngModelController);
           }
         }
       };

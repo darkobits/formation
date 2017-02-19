@@ -1,6 +1,6 @@
 {
   "name": "@darkobits/formation",
-  "version": "0.2.9",
+  "version": "0.2.10",
   "license": "WTFPL",
   "contributors": [
     {
@@ -24,7 +24,8 @@
     "build": "rimraf dist && babel src --out-dir dist --copy-files",
     "docs:build": "rimraf docs && jsdoc --configure jsdoc.conf.json --destination docs --recurse --verbose",
     "precommit": "run-p lint test",
-    "release": "npm run build && ncp ./package.json ./dist/package.json && npm publish ./dist"
+    "release": "npm run build && ncp ./package.json ./dist/package.json && npm publish ./dist",
+    "release:canary": "npm run build && ncp ./package.json ./dist/package.json && npm publish --tag=canary ./dist"
   },
   "xo": {
     "env": "jest",
@@ -46,7 +47,15 @@
   "jest": {
     "coveragePathIgnorePatterns": [
       "/tests/"
-    ]
+    ],
+    "coverageThreshold": {
+      "global": {
+        "statements": 75,
+        "branches": 50,
+        "functions": 75,
+        "lines": 75
+      }
+    }
   },
   "peerDependencies": {
     "angular": ">=1.5.0",

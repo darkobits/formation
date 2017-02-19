@@ -4,9 +4,11 @@
 
 **Type:** [`component`](https://docs.angularjs.org/guide/component)
 
-**Description:** Creates a `<label>` and a `<select>` control.
+## Description
 
-**Bindings:**
+This component creates a `<label>` and a `<select>` control. The control and label will be assigned matching `id` and `for` attributes.
+
+## Bindings
 
 |Name|Type|Description|
 |---|---|---|
@@ -14,23 +16,32 @@
 |`placeholder`|`@`|Input placeholder (will be rendered as a null option).|
 |`multiple`|`@`|Whether to render a single select or a multi-select.|
 |`options`|`@`|Comprehension expression to pass to `ngOptions`.|
+|`config`|`<`|Control configuration object. (See: [Control Configuration](/src/components/FormationControl#control-configuration))|
 
-**Transclusion:**
+## API
 
-Transcluded content will be placed in the `<label>` created by this component.
+This control extends the [`FormationControl`](/src/components/FormationControl) class, and does not implement any additional methods.
 
-----
+## Additional Behavior
 
-This component creates a label and a select control. The control and label will be assigned matching `id` and `for` attributes.
+- Transclusion: Transcluded content will be placed in the `<label>` created by this component.
+- CSS
+  - The class `has-error` will be applied to the `<select>` and `<label>` elements when the control has an error.
+  - The class `is-pending` will be applied to the `<select>` and `<label>` elements when the control is pending.
+  - Disabling: The component can be disabled/enabled in any of four ways:
+    - Using `ngDisabled` on the Formation form element (`<fm>`).
+    - Using `ngDisabled` on the component's element.
+    - Using the [`disable`](https://github.com/darkobits/formation/tree/canary/src/components/Form#disable)/[`enable`](https://github.com/darkobits/formation/tree/canary/src/components/Form#enable) methods of the Formation form API.
+    - Using the [`disable`](/src/components/FormationControl#disable)/[`enable`](/src/components/FormationControl#enable) methods of the component API.
 
 ## Example
 
 ```html
 <fm name="vm.myForm" controls="vm.controls">
-  <fm-select name="birthYear" options="year in vm.years">What year were you born in?</fm-input>
+  <fm-select name="birthYear" options="year in vm.years">What year were you born in?</fm-select>
 </fm>
 ```
 
-## API
+## Additional Resources
 
-This control extends the [`FormationControl`](/src/formation/components/FormationControl) class, and does not implement any additional methods.
+- [AngularJS API: input](https://docs.angularjs.org/api/ng/directive/select)

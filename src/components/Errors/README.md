@@ -1,22 +1,34 @@
 # Errors Component
 
+**Name:** `fmErrors` (Prefix Configurable)
+
 **Type:** [`component`](https://docs.angularjs.org/guide/component)
 
-**Description:** Shows `ngMessages` errors for a specific control.
-
-|Binding|Type|Description|
-|---|---|---|
-|`for`|`<`|Control name to show errors for.|
-
-----
+## Description
 
 `ngMessages` is a powerful Angular 1.x module that allows developers to display validation error messages for individual form controls. However, in large applications, it can be cumbersome to work with for the following reaons:
 
-- All message strings must be literals or exposed to the template via the controller.
+- All message strings must be template literals or exposed to the template via the controller.
 - Determining when to show/hide errors is tedious.
 - Markup bloats with each validation message added.
 - Developers have to concern themselves with a model value and the control state, which are stored in different objects.
 - Consistency is difficult to maintain as each developer working on a large codebase may use slightly different markup or message copy.
+
+## Bindings
+
+|Name|Type|Description|
+|---|---|---|
+|`for`|`<`|Control name to show errors for.|
+
+## API
+
+This control extends the [`FormationControl`](/src/components/FormationControl) class, and does not implement any additional methods.
+
+## Additional Behavior
+
+- This component uses `ngIf` to hide itself when there are no errors to display.
+
+## Example
 
 Here's an example of what the markup for an `ngMessages` block might look like in a typical application:
 
@@ -108,10 +120,7 @@ Now, business logic lives in the controller, presentation and strucutre in the t
 
 Note that `validators` are nothing special. Formation provides several common validators for convenience, but a validatior can be any function that returns a boolean.
 
-## API
+## Additional Resources
 
-This control extends the [`FormationControl`](/src/formation/components/FormationControl) class, and does not implement any additional methods.
-
-## See Also:
 - [AngularJS: API: ngMessages](https://docs.angularjs.org/api/ngMessages/directive/ngMessages)
 - [AngularJS: API: ngModel.ngModelController](https://docs.angularjs.org/api/ng/type/ngModel.NgModelController)

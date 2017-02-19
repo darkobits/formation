@@ -12,7 +12,7 @@ describe('Formation Provider/Service', () => {
     T.prepareService('Formation');
   });
 
-  describe('#setPrefix / $getPrefixedName', () => {
+  describe('setPrefix / $getPrefixedName', () => {
     it('should return a prefixed name', () => {
       let [prefix, name] = ['foo', 'Bar'];
 
@@ -23,7 +23,7 @@ describe('Formation Provider/Service', () => {
     });
   });
 
-  describe('#showErrorsOn / $getShowErrorsOnStr', () => {
+  describe('showErrorsOn / $getShowErrorsOnStr', () => {
     it('should save and return the configured value', () => {
       let showErrorsOn = 'foo, bar';
 
@@ -33,14 +33,14 @@ describe('Formation Provider/Service', () => {
     });
   });
 
-  describe('#getRegisteredComponents / $registerComponent / $registerDirective', () => {
+  describe('$getRegisteredComponents / $registerComponent / $registerDirective', () => {
     it('should return a list of registered directives/components', () => {
       let [directive, component] = ['foo', 'bar'];
 
       T.spec.Formation.$registerDirective(directive, () => {});
       T.spec.Formation.$registerDirective(component, () => {});
 
-      expect(T.spec.FormationProvider.getRegisteredComponents()).toEqual(expect.arrayContaining([directive, component]));
+      expect(T.spec.FormationProvider.$getRegisteredComponents()).toEqual(expect.arrayContaining([directive, component]));
     });
   });
 

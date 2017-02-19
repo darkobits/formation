@@ -200,7 +200,7 @@ export function FormController ($attrs, $log, $parse, $q, $scope, Formation) {
     }
 
 
-    // Set up syncronous validators.
+    // Set up validators.
     if (R.is(Object, validators)) {
       R.mapObjIndexed((validator, name) => {
         if (!R.is(Function, validator)) {
@@ -676,13 +676,12 @@ export function FormController ($attrs, $log, $parse, $q, $scope, Formation) {
           return $q.when(Form.$onSubmit(Form.getModelValues()));
         }
       } else {
-        Form.$debug('Form is invalid.', Form[NG_FORM_CONTROLLER].$error);
         return $q.reject(new Error('NG_FORM_INVALID'));
       }
     })
     .catch(err => {
       if (err.message === 'NG_FORM_INVALID') {
-        Form.$debug('Submit cancelled; form is invalid.');
+        Form.$debug('Form is invalid.', Form[NG_FORM_CONTROLLER].$error);
         endSubmit();
         return $q.reject(err);
       }
@@ -766,7 +765,7 @@ export function FormController ($attrs, $log, $parse, $q, $scope, Formation) {
   Form.setModelValues = modelValues => {
     R.forEach(args => {
       Form.$setModelValue(...args);
-    }, R.toPairs(modelValues));
+    }, R.toPairs(R.clone(modelValues)));
   };
 
 

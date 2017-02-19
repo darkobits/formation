@@ -5,7 +5,7 @@ import scopeMock from '../../__mocks__/$scope.mock';
 
 import {
   // CONFIGURABLE_VALIDATOR,
-  // CUSTOM_ERROR_KEY,
+  CUSTOM_ERROR_KEY,
   // FORM_COMPONENT_NAME,
   REGISTER_FORM_CALLBACK,
   REGISTER_NG_MODEL_CALLBACK
@@ -19,7 +19,7 @@ import {
 
 import {
   // FORM_CONTROLLER,
-  // NG_MESSAGES,
+  NG_MESSAGES,
   NG_MODEL_CTRL
   // FormationControl
 } from '../../../src/components/FormationControl';
@@ -60,7 +60,14 @@ function createForm (bindings, injectables = {}) {
 function ngModelCtrl (attrs) {
   return Object.assign({
     $validate () { },
-    $setValidity () { }
+    $setValidity (errorKey, valid) {
+      this.$error[errorKey] = !valid;
+    },
+    $parsers: [],
+    $formatters: [],
+    $validators: {},
+    $asyncValidators: {},
+    $error: {}
   }, attrs);
 }
 
@@ -68,8 +75,7 @@ function formationCtrl (spec) {
   let base = {
     name: spec.name,
     [NG_MODEL_CTRL]: ngModelCtrl({
-      $name: spec.name,
-      $validators: {}
+      $name: spec.name
     })
   };
 
@@ -165,19 +171,77 @@ describe('FormController', () => {
       });
     });
 
-    describe('setting the $name field', () => {
-      describe('when provided a name', () => {
+    describe('assigning "$name" to parent scope', () => {
+      describe('when provided a non-empty string', () => {
+        let formName = 'vm.myForm';
 
+        let assignSpy = jest.fn();
+
+        let parseSpy = jest.fn().mockImplementation(() => {
+          return {
+            assign: assignSpy
+          };
+        });
+
+        let form = createForm({
+          $name: formName
+        }, {
+          $parse: parseSpy
+        });
+
+        form.$onInit();
+
+        it('should assign the form controller to its parent scope', () => {
+          expect(parseSpy.mock.calls[0]).toEqual(expect.arrayContaining([formName]));
+          expect(assignSpy.mock.calls[0]).toEqual(expect.arrayContaining([form]));
+        });
       });
 
-      describe('when not provided a name', () => {
+      describe('when not provided a falsy value', () => {
+        let form = createForm({});
+        form.$onInit();
 
+        it('should assign an auto-generated name', () => {
+          expect(form.$name).toMatch(new RegExp(`Form-\\d*`));
+        });
       });
     });
 
-    // describe('parsing "showErrorsOn"', () => {
+    describe('parsing "$showErrorsOn"', () => {
+      describe('when provided a valid string', () => {
+        let form = createForm({
+          $showErrorsOn: 'touched, submitted'
+        });
 
-    // });
+        form.$onInit();
+
+        it('should parse the string into an array of flags', () => {
+          expect(form.showErrorsOn).toEqual(['$touched', '$submitted']);
+        });
+      });
+
+      describe('when provided a falsy value', () => {
+        let form = createForm();
+
+        form.$onInit();
+
+        it('should no-op', () => {
+          expect(form.showErrorsOn).toBeFalsy();
+        });
+      });
+
+      describe('when provided an empty string', () => {
+        let form = createForm({
+          $showErrorsOn: ''
+        });
+
+        form.$onInit();
+
+        it('should no-op', () => {
+          expect(form.showErrorsOn).toBeFalsy();
+        });
+      });
+    });
   });
 
   describe('$isDisabled', () => {
@@ -209,37 +273,168 @@ describe('FormController', () => {
 
   describe('$registerControl', () => {
     let ctrlName = 'foo';
-    let validatorName = 'bar';
-    let validatorFn = () => {};
 
-    let form = createForm({
-      $controlConfiguration: {
-        [ctrlName]: {
-          validators: {
-            [validatorName]: validatorFn
+    describe('assigning a uid', () => {
+      it('should assign a uid to the control', () => {
+        let form = createForm({});
+
+        let ctrl = formationCtrl({
+          name: ctrlName
+        });
+
+        form.$onInit();
+
+        form.$registerControl(ctrl);
+
+        expect(ctrl.$uid).toMatch(new RegExp(`${ctrlName}-\\d*`));
+      });
+    });
+
+    describe('adding controls to the registry', () => {
+      it('should add the control to the registry', () => {
+        let form = createForm({});
+
+        let ctrl = formationCtrl({
+          name: ctrlName
+        });
+
+        form.$onInit();
+
+        form.$registerControl(ctrl);
+
+        expect(form.getControl(ctrlName)).toBe(ctrl);
+      });
+    });
+
+    describe('applying parsers', () => {
+      it('should apply parsers to the control', () => {
+        let parsers = [
+          () => {}
+        ];
+
+        let form = createForm({
+          $controlConfiguration: {
+            [ctrlName]: {
+              parsers
+            }
           }
-        }
-      }
+        });
+
+        let ctrl = formationCtrl({
+          name: ctrlName
+        });
+
+        form.$onInit();
+
+        form.$registerControl(ctrl);
+
+        expect(ctrl[NG_MODEL_CTRL].$parsers).toEqual(expect.arrayContaining(parsers));
+      });
     });
 
-    let ctrl = formationCtrl({name: ctrlName});
+    describe('applying formatters', () => {
+      it('should apply formatters to the control', () => {
+        let formatters = [
+          () => {}
+        ];
 
-    form.$registerControl(ctrl);
+        let form = createForm({
+          $controlConfiguration: {
+            [ctrlName]: {
+              formatters
+            }
+          }
+        });
 
-    it('should assign a uid to the control', () => {
-      expect(ctrl.$uid).toMatch(new RegExp(`${ctrlName}-\\d*`));
+        let ctrl = formationCtrl({
+          name: ctrlName
+        });
+
+        form.$onInit();
+
+        form.$registerControl(ctrl);
+
+        expect(ctrl[NG_MODEL_CTRL].$formatters).toEqual(expect.arrayContaining(formatters));
+      });
     });
 
-    it('should add the control to the registry', () => {
-      expect(form.getControl(ctrlName)).toBe(ctrl);
+    describe('applying validators', () => {
+      it('should apply validators to the control', () => {
+        let validators = {
+          foo: () => {}
+        };
+
+        let form = createForm({
+          $controlConfiguration: {
+            [ctrlName]: {
+              validators
+            }
+          }
+        });
+
+        let ctrl = formationCtrl({
+          name: ctrlName
+        });
+
+        form.$onInit();
+
+        form.$registerControl(ctrl);
+
+        expect(ctrl[NG_MODEL_CTRL].$validators).toEqual(expect.objectContaining(validators));
+      });
     });
 
-    it('should apply configuration to the control', () => {
-      expect(ctrl[NG_MODEL_CTRL].$validators[validatorName]).toBe(validatorFn);
+    describe('applying async validators', () => {
+      it('should apply async validators to the control', () => {
+        let asyncValidators = {
+          foo: () => {}
+        };
+
+        let form = createForm({
+          $controlConfiguration: {
+            [ctrlName]: {
+              asyncValidators
+            }
+          }
+        });
+
+        let ctrl = formationCtrl({
+          name: ctrlName
+        });
+
+        form.$onInit();
+
+        form.$registerControl(ctrl);
+
+        expect(ctrl[NG_MODEL_CTRL].$asyncValidators).toEqual(expect.objectContaining(asyncValidators));
+      });
     });
 
-    // Test application of parsers, formatters, async validators,
-    // ngModelOptions, and error messags.
+    describe('applying error messages', () => {
+      it('should apply ngMessages to the control', () => {
+        let errors = [
+          ['foo', 'bar']
+        ];
+
+        let form = createForm({
+          $controlConfiguration: {
+            [ctrlName]: {
+              errors
+            }
+          }
+        });
+
+        let ctrl = formationCtrl({
+          name: ctrlName
+        });
+
+        form.$onInit();
+
+        form.$registerControl(ctrl);
+
+        expect(ctrl[NG_MESSAGES]).toEqual(expect.arrayContaining(errors));
+      });
+    });
   });
 
   describe('$unregisterControl', () => {
@@ -412,7 +607,7 @@ describe('FormController', () => {
 
       form.$onInit();
       form.$registerControl(ctrl);
-      expect(form.$getErrorsForControl(ctrlName)).toBe(errors);
+      expect(form.$getErrorsForControl(ctrlName)).toEqual(expect.objectContaining(errors));
     });
 
 
@@ -483,7 +678,7 @@ describe('FormController', () => {
 
       form.$onInit();
       form.$registerControl(ctrl);
-      expect(form.$getErrorsForControl(ctrlName)).toBe(errors);
+      expect(form.$getErrorsForControl(ctrlName)).toEqual(expect.objectContaining(errors));
     });
   });
 
@@ -571,6 +766,7 @@ describe('FormController', () => {
      * - [X] Form is already submitting
      * - [ ] Form has pending async validators
      * - [ ] Form is valid
+     * - [ ] Control has a custom error set
      * - [ ] onSubmit returned field errors
      */
     describe('Scenario 1', () => {
@@ -593,6 +789,7 @@ describe('FormController', () => {
      * - [ ] Form is already submitting
      * - [X] Form has pending async validators
      * - [ ] Form is valid
+     * - [ ] Control has a custom error set
      * - [ ] onSubmit returned field errors
      */
     describe('Scenario 2', () => {
@@ -623,6 +820,7 @@ describe('FormController', () => {
      * - [ ] Form is already submitting
      * - [X] Form has pending async validators
      * - [X] Form is valid
+     * - [ ] Control has a custom error set
      * - [ ] onSubmit returned field errors
      */
     describe('Scenario 3', () => {
@@ -653,6 +851,7 @@ describe('FormController', () => {
      * - [ ] Form is already submitting
      * - [ ] Form has pending async validators
      * - [X] Form is valid
+     * - [ ] Control has a custom error set
      * - [X] onSubmit returned a promise
      */
     describe('Scenario 4', () => {
@@ -663,8 +862,7 @@ describe('FormController', () => {
         let fieldError = 'bar';
 
         let ctrl = formationCtrl({
-          name: ctrlName,
-          [NG_MODEL_CTRL]: {}
+          name: ctrlName
         });
 
         let fieldErrors = {
@@ -697,6 +895,7 @@ describe('FormController', () => {
      * - [ ] Form is already submitting
      * - [ ] Form has pending async validators
      * - [X] Form is valid
+     * - [ ] Control has a custom error set
      * - [ ] onSubmit returned field errors
      */
     describe('Scenario 5', () => {
@@ -710,6 +909,52 @@ describe('FormController', () => {
 
         let promise = test.form.$submit().catch(err => {
           expect(err.message).toBe('CONSUMER_REJECTED');
+          expect(test.spies.disable.mock.calls.length).toBe(1);
+          expect(test.spies.onSubmit.mock.calls.length).toBe(1);
+          expect(test.spies.enable.mock.calls.length).toBe(1);
+        });
+
+        jest.runAllTimers();
+        return promise;
+      });
+    });
+
+
+    /**
+     * Scenario 6
+     *
+     * - [ ] Form is already submitting
+     * - [ ] Form has pending async validators
+     * - [ ] Form is valid
+     * - [X] Control has a custom error set
+     * - [ ] onSubmit returned field errors
+     */
+    describe('Scenario 6', () => {
+      it('should clear custom errors on controls', () => {
+        expect.assertions(6);
+
+        let ctrlName = 'foo';
+        let customMessage = 'bar';
+        let test = onSubmitForm();
+
+        let ctrl = formationCtrl({
+          name: ctrlName,
+          [CUSTOM_ERROR_MESSAGE_KEY]: customMessage,
+          [NG_MODEL_CTRL]: {
+            $error: {
+              [CUSTOM_ERROR_KEY]: true
+            }
+          }
+        });
+
+        test.pending(false);
+        test.valid(true);
+        test.form.$registerControl(ctrl);
+
+        let promise = test.form.$submit().then(response => {
+          expect(response).toBe('SUBMIT_COMPLETE');
+          expect(ctrl[CUSTOM_ERROR_MESSAGE_KEY]).toBeFalsy();
+          expect(ctrl[NG_MODEL_CTRL].$error[CUSTOM_ERROR_KEY]).toBe(false);
           expect(test.spies.disable.mock.calls.length).toBe(1);
           expect(test.spies.onSubmit.mock.calls.length).toBe(1);
           expect(test.spies.enable.mock.calls.length).toBe(1);
