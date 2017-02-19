@@ -1,6 +1,6 @@
 {
   "name": "@darkobits/formation",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "license": "WTFPL",
   "contributors": [
     {
@@ -34,12 +34,19 @@
       "import/no-unassigned-import": "off",
       "max-params": "off",
       "no-multiple-empty-lines": "off",
-      "space-before-function-paren": ["error", {"named": "always"}],
+      "space-before-function-paren": [
+        "error",
+        {
+          "named": "always"
+        }
+      ],
       "unicorn/filename-case": "off"
     }
   },
   "jest": {
-    "coveragePathIgnorePatterns": ["/tests/"]
+    "coveragePathIgnorePatterns": [
+      "/tests/"
+    ]
   },
   "peerDependencies": {
     "angular": ">=1.5.0",
