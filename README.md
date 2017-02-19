@@ -6,7 +6,26 @@ Formation is a form framework for Angular 1.5+. It aims to address many of the s
 
 Formation consists of several small components designed to be used as atoms (see: [atomic web design](http://bradfrost.com/blog/post/atomic-web-design/#atoms)) to compose larger elements. It is completely unopinionated about style, and ships with no CSS or themes.
 
-### Template-Driven vs. Reactive
+## Setup
+
+```bash
+$ npm install @darkobits/formation
+```
+
+```js
+import Formation from '@darkobits/formation';
+
+angular.module('MyApp', [
+  Formation
+])
+.config(FormationProvider => {
+  // While optional, you should probably configure this behavior here to ensure
+  // every form behaves consistently.
+  FormationProvider.showErrorsOn('touched, submitted');
+});
+```
+
+## Template-Driven vs. Reactive
 
 Template-driven forms have been the longstanding paradigm in Angular 1.x. Structure, configuration, and validation of form controls is accomplished via markup and adding attributes to control elements for additional behavior (ex: `required`, or custom directives). This approach is straightforward, and allows newcomers to Angular to create simple to modestly complex forms quickly, but in large applications that require consistency and robust validation, working with a multitude of directives and managing model values, state, and errors for each control can quickly become burdensome.
 
@@ -14,7 +33,7 @@ With reactive forms, Angular 2 encourages developers to configure forms declarat
 
 Formation attempts to strike a balance between both approaches: eliminate extraneous markup and give developers a way to configure controls from code with Plain Old JavaScript Objects. By moving configuration from the template to the controller, it promotes code re-use, consistency, and maintainability.
 
-### Feature Overview
+## Feature Overview
 
 - Controls are configured using Plain Old JavaScript Objects at either the control level or the from level. Developers no longer need to spin-up new directives to provide custom behavior or validation to a control. Configuration definitions can be shared across the application, improving consistency.
 - Developers no longer need to manage two sets of state with respect to controls and their models (ex: a form control at `vm.myForm.name` and its model value at `vm.name`). The form manages model values, which are determined by its registered controls.
@@ -24,7 +43,7 @@ Formation attempts to strike a balance between both approaches: eliminate extran
 - Reset all controls to a pristine, untouched state and optionally reset the form's model to an initial state.
 - Accessibility: `id` and `for` attributes are managed by the form, so controls and labels are correctly associated without any extra markup.
 
-### Example
+## Example
 
 Let's take a look at how to create a form using Formation. Keep in mind that Formation does not come bundled with any styles, and class attributes have been omitted here for simplicity.
 Here's the template strucutre you might use to construct a simple address form:
