@@ -43,4 +43,4 @@ This control extends the [`FormationControl`](/src/components/FormationControl) 
 
 ## Additional Resources
 
-- [AngularJS API: input](https://docs.angularjs.org/api/ng/directive/textarea)
+- [AngularJS: API: textarea](https://docs.angularjs.org/api/ng/directive/textarea)

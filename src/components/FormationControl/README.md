@@ -276,3 +276,8 @@ app.controller('MyCtrl', function () {
 });
 
 ```
+
+## Additional Resources
+
+- [AngularJS: API: ngModel.ngModelController](http://docs.angularjs.org/api/ng/type/ngModel.NgModelController)
+- [AngularJS: API: ngMessages](http://docs.angularjs.org/api/ngMessages/directive/ngMessages).

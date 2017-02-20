@@ -160,16 +160,21 @@ app.controller('MyCtrl', function () {
 });
 ```
 
-Wowza! We kept our template focused on structure, and our controller neatly describes exactly how each control in the form should behave. Let's go over each property that can be supplied to a control's configuration object:
+Wowza! We kept our template focused on structure, and our controller neatly describes exactly how each control in the form should behave. Check out the documentation on [Control Configuration](/src/components/FormationControl#control-configuration) for a detailed breakdown, or head over to [darkobits.github.io/formation](https://darkobits.github.io/formation/) to see a live demo of this form.
 
-- `parsers (Array)`: Pipeline of functions that will be called, in order, to transform updated view values into model values.
-- `formatters (Array)`: Pipeline of functions that will be called, in order, to transform updated model values into view values.
-- `validators (Object)`: Map of validation error keys to validation functions.
-- `asyncValidators (Object)`: Map of validation error keys to asynchronous validation functions.
-- `ngModelOptions (Object)`: Additional configuration for the ngModel instance.
-- `errors (Array)`: Ranked list of paired validation keys and errror messages. This will be used with ngMessages to drive the errors component.
+## Documentation
 
-For more context about these concepts, see the official documentation for [ngModel](http://docs.angularjs.org/api/ng/type/ngModel.NgModelController) and [ngMessages](http://docs.angularjs.org/api/ngMessages/directive/ngMessages). To see a demo of what the above form might look like, head over to [darkobits.github.io/formation](https://darkobits.github.io/formation/).
+Feel free to explore the [source](/src) -- most of the core components are documented with inline READMEs:
+
+- [Formation Provider/Service](/src/services/Formation)
+- Components:
+  - [Form](/src/components/Form)
+  - [Input](/src/components/Input)
+  - [Select](/src/components/Select)
+  - [Textarea](/src/components/Textarea)
+  - [Errors](/src/components/Errors)
+- Classes:
+  - [FormationControl](/src/components/FormationControl)
 
 [travis-img]: https://img.shields.io/travis/darkobits/formation.svg?style=flat-square
 [travis-url]: https://travis-ci.org/darkobits/formation

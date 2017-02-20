@@ -50,4 +50,4 @@ This control extends the [`FormationControl`](/src/components/FormationControl) 
 
 ## Additional Resources
 
-- [AngularJS API: input](https://docs.angularjs.org/api/ng/directive/input)
+- [AngularJS: API: input](https://docs.angularjs.org/api/ng/directive/input)

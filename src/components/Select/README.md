@@ -44,4 +44,4 @@ This control extends the [`FormationControl`](/src/components/FormationControl) 
 
 ## Additional Resources
 
-- [AngularJS API: input](https://docs.angularjs.org/api/ng/directive/select)
+- [AngularJS: API: select](https://docs.angularjs.org/api/ng/directive/select)
