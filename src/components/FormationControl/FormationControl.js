@@ -2,6 +2,8 @@
 // ----- Control Base Class ----------------------------------------------------
 // -----------------------------------------------------------------------------
 
+import R from 'ramda';
+
 import {
   REGISTER_NG_MODEL_CALLBACK
 } from '../../etc/constants';
@@ -327,7 +329,7 @@ export class FormationControl {
    * @param  {*} newValue - Value to set.
    */
   setModelValue (newValue) {
-    this[FORM_CONTROLLER].$setModelValue(this.$getName(), newValue);
+    this[FORM_CONTROLLER].$setModelValue(this.$getName(), R.clone(newValue));
   }
 }
 

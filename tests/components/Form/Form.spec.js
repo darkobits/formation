@@ -985,16 +985,26 @@ describe('FormController', () => {
   });
 
   describe('getModelValues / setModelValues', () => {
+    let deepValue = {
+      foo: 'bar'
+    };
+
+    let modelValues = {
+      deep: deepValue
+    };
+
+    let form = createForm();
+    form.$onInit();
+    form.setModelValues(modelValues);
+
     it('should set and get model values', () => {
-      let modelValues = {
-        foo: 'bar'
-      };
-
-      let form = createForm();
-      form.$onInit();
-
-      form.setModelValues(modelValues);
       expect(form.getModelValues()).toEqual(modelValues);
+    });
+
+    it('should deep clone non-primitive values', () => {
+      expect(form.getModelValues()).not.toBe(modelValues);
+      expect(form.getModelValues().deep).toEqual(deepValue);
+      expect(form.getModelValues().deep).not.toBe(deepValue);
     });
   });
 

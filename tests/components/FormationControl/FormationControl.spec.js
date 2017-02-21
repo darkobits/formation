@@ -128,12 +128,25 @@ describe('FormationControl', () => {
     });
 
     describe('when called with parameters', () => {
+      let controlName = 'bar';
+      let control = createControl({name: controlName}, form);
+
       it('should set the model value with the form', () => {
-        let controlName = 'bar';
         let modelValue = 17;
-        let control = createControl({name: controlName}, form);
         control.$ngModelGetterSetter(modelValue);
         expect(form.$getModelValue(controlName)).toBe(modelValue);
+      });
+
+      it('should deep clone non-primitive values', () => {
+        let deepValue = {foo: 'bar'};
+        let modelValue = {deep: deepValue};
+        control.$ngModelGetterSetter(modelValue);
+
+        expect(form.$getModelValue(controlName)).toEqual(modelValue);
+        expect(form.$getModelValue(controlName)).not.toBe(modelValue);
+
+        expect(form.$getModelValue(controlName).deep).toEqual(deepValue);
+        expect(form.$getModelValue(controlName).deep).not.toBe(deepValue);
       });
     });
   });
