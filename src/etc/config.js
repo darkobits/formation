@@ -47,7 +47,7 @@ app.config(($provide, FormationProvider) => {
           // Get a reference to the Formation form controller.
           const fmFormController = R.find(R.is(FormController), controllers);
 
-          if (R.is(Function, fmFormController[REGISTER_FORM_CALLBACK])) {
+          if (fmFormController && R.is(Function, fmFormController[REGISTER_FORM_CALLBACK])) {
             fmFormController[REGISTER_FORM_CALLBACK](ngFormController);
           }
         }
