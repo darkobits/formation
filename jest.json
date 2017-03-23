@@ -1,0 +1,13 @@
+{
+  "coveragePathIgnorePatterns": [
+    "/tests/"
+  ],
+  "coverageThreshold": {
+    "global": {
+      "statements": 75,
+      "branches": 50,
+      "functions": 75,
+      "lines": 75
+    }
+  }
+}

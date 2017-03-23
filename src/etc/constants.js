@@ -42,9 +42,9 @@ export const FORM_COMPONENT_NAME = 'fm';
  * Key at which controllers should implement a function to handle ngForm
  * registration.
  *
- * @type {symbol}
+ * @type {string}
  */
-export const REGISTER_FORM_CALLBACK = Symbol('registerForm');
+export const REGISTER_FORM_CALLBACK = '$fmRegisterForm';
 
 
 /**
@@ -56,9 +56,9 @@ export const REGISTER_FORM_CALLBACK = Symbol('registerForm');
  * Key at which controllers should implement a function to handle ngModel
  * registration.
  *
- * @type {symbol}
+ * @type {string}
  */
-export const REGISTER_NG_MODEL_CALLBACK = Symbol('registerNgModel');
+export const REGISTER_NG_MODEL_CALLBACK = '$fmRegisterNgModel';
 
 
 /**
@@ -94,9 +94,9 @@ export const CUSTOM_ERROR_KEY = '$custom';
  *
  * @description
  *
- * Symbol added to validator function objects to signal to Formation that they
+ * Property added to validator function objects to signal to Formation that they
  * need to be configured.
  *
- * @type {symbol}
+ * @type {string}
  */
-export const CONFIGURABLE_VALIDATOR = Symbol('configurableValidator');
+export const CONFIGURABLE_VALIDATOR = '$fmConfigurableValidator';

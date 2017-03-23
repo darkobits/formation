@@ -328,7 +328,7 @@ describe('FormController', () => {
 
         form.$registerControl(ctrl);
 
-        expect(ctrl[NG_MODEL_CTRL].$parsers).toEqual(expect.arrayContaining(parsers));
+        expect(ctrl[NG_MODEL_CTRL].$parsers.length).toEqual(1);
       });
     });
 
@@ -354,7 +354,7 @@ describe('FormController', () => {
 
         form.$registerControl(ctrl);
 
-        expect(ctrl[NG_MODEL_CTRL].$formatters).toEqual(expect.arrayContaining(formatters));
+        expect(ctrl[NG_MODEL_CTRL].$formatters.length).toEqual(1);
       });
     });
 
@@ -380,7 +380,8 @@ describe('FormController', () => {
 
         form.$registerControl(ctrl);
 
-        expect(ctrl[NG_MODEL_CTRL].$validators).toEqual(expect.objectContaining(validators));
+        expect(Object.keys(ctrl[NG_MODEL_CTRL].$validators))
+          .toEqual(expect.arrayContaining(Object.keys(validators)));
       });
     });
 
@@ -406,7 +407,8 @@ describe('FormController', () => {
 
         form.$registerControl(ctrl);
 
-        expect(ctrl[NG_MODEL_CTRL].$asyncValidators).toEqual(expect.objectContaining(asyncValidators));
+        expect(Object.keys(ctrl[NG_MODEL_CTRL].$asyncValidators))
+          .toEqual(expect.arrayContaining(Object.keys(asyncValidators)));
       });
     });
 

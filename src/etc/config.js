@@ -1,7 +1,9 @@
 import R from 'ramda';
 import app from '../app';
 
-import FormController from '../components/Form/Form';
+import {
+  FormController
+} from '../components/Form/Form';
 
 import {
   FormationControl

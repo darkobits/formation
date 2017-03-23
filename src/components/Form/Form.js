@@ -179,10 +179,10 @@ export function FormController ($attrs, $log, $parse, $q, $scope, Formation) {
     // Set up parsers.
     if (Array.isArray(parsers)) {
       parsers.forEach(parser => {
-        if (!R.is(Function, parser)) {
+        if (R.is(Function, parser)) {
+          ngModelCtrl.$parsers.push(parser.bind(ngModelCtrl));
+        } else {
           throwError(`Expected parser to be a function, got "${typeof parser}".`);
-        } else if (!R.contains(parser, ngModelCtrl.$parsers)) {
-          ngModelCtrl.$parsers.push(parser);
         }
       });
     }
@@ -191,10 +191,10 @@ export function FormController ($attrs, $log, $parse, $q, $scope, Formation) {
     // Set up formatters.
     if (Array.isArray(formatters)) {
       formatters.forEach(formatter => {
-        if (!R.is(Function, formatter)) {
+        if (R.is(Function, formatter)) {
+          ngModelCtrl.$formatters.push(formatter.bind(ngModelCtrl));
+        } else {
           throwError(`Expected formatter to be a function, got "${typeof formatter}".`);
-        } else if (!R.contains(formatter, ngModelCtrl.$formatters)) {
-          ngModelCtrl.$formatters.push(formatter);
         }
       });
     }
@@ -207,11 +207,9 @@ export function FormController ($attrs, $log, $parse, $q, $scope, Formation) {
           throwError(`Expected validator to be a function, got "${typeof validator}".`);
         } else if (!R.has(name, ngModelCtrl.$validators)) {
           if (validator[CONFIGURABLE_VALIDATOR]) {
-            // Currently, configurable validators are passed the form controller
-            // and the control instance that the validator is being applied to.
-            ngModelCtrl.$validators[name] = validator(Form, control);
+            ngModelCtrl.$validators[name] = validator(Form).bind(ngModelCtrl);
           } else {
-            ngModelCtrl.$validators[name] = validator;
+            ngModelCtrl.$validators[name] = validator.bind(ngModelCtrl);
           }
         }
       }, validators);
@@ -224,7 +222,11 @@ export function FormController ($attrs, $log, $parse, $q, $scope, Formation) {
         if (!R.is(Function, asyncValidator)) {
           throwError(`Expected validator to be a function, got "${typeof asyncValidator}".`);
         } else if (!R.has(name, ngModelCtrl.$asyncValidators)) {
-          ngModelCtrl.$asyncValidators[name] = asyncValidator;
+          if (asyncValidator[CONFIGURABLE_VALIDATOR]) {
+            ngModelCtrl.$asyncValidators[name] = asyncValidator(Form).bind(ngModelCtrl);
+          } else {
+            ngModelCtrl.$asyncValidators[name] = asyncValidator.bind(ngModelCtrl);
+          }
         }
       }, asyncValidators);
     }
@@ -417,7 +419,7 @@ export function FormController ($attrs, $log, $parse, $q, $scope, Formation) {
         R.forEach(control => {
           applyCustomErrorOnControl(control, message);
         }, R.filter(R.propEq('name', controlName), controlRegistry));
-      }, R.toPairs(fieldErrors));
+      }, Object.entries(fieldErrors));
     }
   }
 
@@ -765,7 +767,7 @@ export function FormController ($attrs, $log, $parse, $q, $scope, Formation) {
   Form.setModelValues = modelValues => {
     R.forEach(args => {
       Form.$setModelValue(...args);
-    }, R.toPairs(R.clone(modelValues)));
+    }, Object.entries(R.clone(modelValues)));
   };
 
 

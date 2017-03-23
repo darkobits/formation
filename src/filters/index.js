@@ -1,1 +1,1 @@
-import './toPairs';
+import './entries';

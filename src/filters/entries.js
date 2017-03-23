@@ -2,10 +2,10 @@ import R from 'ramda';
 import app from '../app';
 
 
-app.filter('toPairs', () => {
+app.filter('entries', () => {
   return R.memoize(input => {
     if (R.is(Object, input)) {
-      return R.toPairs(input);
+      return Object.entries(input);
     }
 
     return input;
