@@ -33,10 +33,13 @@ jest.useFakeTimers();
 function createForm (bindings, injectables = {}) {
   let i = Object.assign({
     $attrs: {},
+    $compile: {},
+    $element: {},
     $log: {},
     $parse: {},
     $q: qMock,
     $scope: scopeMock,
+    $transclude: {},
     Formation: {
       $getNextId: () => 42,
       $getShowErrorsOnStr: () => ''
@@ -45,10 +48,13 @@ function createForm (bindings, injectables = {}) {
 
   let form = Object.assign(new FormController(
     i.$attrs,
+    i.$compile,
+    i.$element,
     i.$log,
     i.$parse,
     i.$q,
     i.$scope,
+    i.$transclude,
     i.Formation
   ), bindings);
 

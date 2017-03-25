@@ -64,7 +64,7 @@ export const CUSTOM_ERROR_MESSAGE_KEY = '$customError';
  * - `ng-disabled`: Expression to evaluate that, if truthy, will disable all
  *   Formation controls in the form.
  */
-export function FormController ($attrs, $log, $parse, $q, $scope, Formation) {
+export function FormController ($attrs, $compile, $element, $log, $parse, $q, $scope, $transclude, Formation) {
   const Form = this;
 
   /**
@@ -463,6 +463,46 @@ export function FormController ($attrs, $log, $parse, $q, $scope, Formation) {
 
 
   /**
+   * Determines whether to use a form or ngForm element based on whether this
+   * instance has a parent form or not. Ensures content is transcluded correctly
+   * as if "ng-transclude" had been used on the form/ngForm element.
+   *
+   * @private
+   */
+  Form.$postLink = () => {
+    let elementName;
+    let template;
+
+    if (Form.$parentForm) {
+      // If we have a parent form, use <ng-form>.
+      elementName = 'ng-form';
+      template = `<${elementName}></${elementName}>`;
+    } else {
+      // Otherwise, use <form>.
+      elementName = 'form';
+      template = `
+      <${elementName}
+        ng-submit="Form.$submit()"
+        ng-model-options="{getterSetter: true}"
+        novalidate>
+      </${elementName}>`;
+    }
+
+    // Compile our template using our isolate scope and append it to our element.
+    $compile(template)($scope, compiledElement => {
+      $element.append(compiledElement);
+    });
+
+    // Handle transcluded content from the user by appending it to the above
+    // form/ngForm template and using a new scope that inherits from our outer
+    // scope, mimicing the default Angular behavior.
+    $transclude($scope.$parent.$new(), compiledElement => {
+      $element.find(elementName).append(compiledElement);
+    });
+  };
+
+
+  /**
    * Set up form name and assign controller instance to its name attribute.
    *
    * @private
@@ -816,11 +856,14 @@ export function FormController ($attrs, $log, $parse, $q, $scope, Formation) {
 }
 
 
-FormController.$inject = ['$attrs', '$log', '$parse', '$q', '$scope', 'Formation'];
+FormController.$inject = ['$attrs', '$compile', '$element', '$log', '$parse', '$q', '$scope', '$transclude', 'Formation'];
 
 
 app.run(Formation => {
   Formation.$registerComponent(FORM_COMPONENT_NAME, {
+    require: {
+      $parentForm: `?^^${FORM_COMPONENT_NAME}`
+    },
     bindings: {
       $name: '@name',
       $controlConfiguration: '<controls',
@@ -830,15 +873,9 @@ app.run(Formation => {
     },
     transclude: true,
     controller: FormController,
-    controllerAs: 'Form',
-    template: `
-      <form novalidate
-        ng-submit="Form.$submit()"
-        ng-model-options="{getterSetter: true}"
-        ng-transclude>
-      </form>
-    `
+    controllerAs: 'Form'
   });
 });
+
 
 export default FormController;

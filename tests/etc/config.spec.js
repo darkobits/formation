@@ -46,7 +46,7 @@ describe('Formation Configuration', () => {
   describe('Decorating ngForm', () => {
     it('should require the Formation form controller', () => {
       let [ngFormDirective] = T.get('formDirective');
-      expect(ngFormDirective.require).toEqual(expect.arrayContaining([`^?${FORM_COMPONENT_NAME}`]));
+      expect(ngFormDirective.require).toEqual(expect.arrayContaining([`?^${FORM_COMPONENT_NAME}`]));
     });
 
     describe('registering with a Formation form', () => {
@@ -78,7 +78,7 @@ describe('Formation Configuration', () => {
       let [ngModelDirective] = T.get('ngModelDirective');
 
       let registeredComponents = R.map(
-        component => `^^?${component}`,
+        component => `?^^${component}`,
         T.spec.FormationProvider.$getRegisteredComponents()
       );
 
