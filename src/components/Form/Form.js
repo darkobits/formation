@@ -173,6 +173,9 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
   /**
    * Applies form-level configuration to a control (or mock control).
    *
+   * TODO: Move to FormationControl class. Determine why it was here, probably a
+   * reason.
+   *
    * @private
    *
    * @param  {object} configuration - Configuration to apply.
@@ -772,6 +775,8 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
    * error behavior) returns the controls' `$error` object. Otherwise, returns
    * `false`.
    *
+   * TODO: Move to FormationControl class.
+   *
    * @private
    *
    * @param  {string} controlName
@@ -805,6 +810,8 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
   /**
    * Returns the copy for the current custom error message on the named control,
    * if set.
+   *
+   * TODO: Move to FormationControl class.
    *
    * @private
    *
@@ -895,10 +902,6 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
         } else {
           throwError('Unsure what to do with custom error object fragment:', messageOrObject);
         }
-
-        // R.forEach(control => {
-        //   applyCustomErrorOnControl(control, message);
-        // }, R.filter(R.propEq('name', controlName), controlRegistry));
       }, Object.entries(customErrors));
     }
   };
@@ -947,7 +950,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
 
     // [2] Apply configuration to any existing registered controls and child
     // forms.
-    Object.entries(controlConfiguration).forEach((controlOrFormName, config) => {
+    R.forEach((controlOrFormName, config) => {
       const control = Form.getControl(controlOrFormName);
       const childForm = Form.getForm(controlOrFormName);
 
@@ -956,7 +959,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
       } else if (childForm) {
         childForm.configure(config);
       }
-    });
+    }, Object.entries(controlConfiguration));
   };
 
 
@@ -1005,9 +1008,20 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
    * @param  {object} modelValues - Map of control names to model values.
    */
   Form.setModelValues = modelValues => {
-    R.forEach(args => {
-      Form.$setModelValue(...args);
-    }, Object.entries(R.clone(modelValues)));
+    if (R.is(Object, modelValues)) {
+      R.forEach(([controlOrFormName, modelData]) => {
+        const control = Form.getControl(controlOrFormName);
+        const childForm = Form.getForm(controlOrFormName);
+
+        if (control) {
+          Form.$setModelValue(controlOrFormName, modelData);
+        } else if (childForm && R.is(Object, modelData)) {
+          childForm.setModelValues(modelData);
+        } else {
+          throwError('Unsure what to do with model data fragment:', modelData);
+        }
+      }, Object.entries(R.clone(modelValues)));
+    }
   };
 
 
@@ -1054,6 +1068,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
 
     Form[NG_FORM_CONTROLLER].$setPristine();
     mapControls(control => control[NG_MODEL_CTRL].$validate());
+    formRegistry.forEach(childForm => childForm.reset());
   };
 }
 
