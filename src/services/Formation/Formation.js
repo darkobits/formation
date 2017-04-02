@@ -256,6 +256,11 @@ app.provider('Formation', function ($compileProvider) {
      *
      * @description
      *
+     * TODO: Move this to a class that constructs components. This should remove
+     * the need for component registration to happen in this service. Tracking
+     * registered components can likely be accomplished with a non-angular
+     * module.
+     *
      * Registers an Angular component as a Formation control using the base
      * component definition object, ensuring the minimum necessary `bindings`
      * and `required` attributes are defined. It is recommended this function be
