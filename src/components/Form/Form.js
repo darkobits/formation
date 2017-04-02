@@ -563,7 +563,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
    */
   Form.$onInit = () => {
     // Auto-generate name if one was not supplied.
-    Form.$name = Form.$name || `Form-${Formation.$getNextId()}`;
+    Form.name = Form.name || `Form-${Formation.$getNextId()}`;
 
     // Merge configuration data from the "config" attribute into our local copy.
     controlConfiguration = mergeDeep(controlConfiguration, Form.$controlConfiguration);
@@ -591,7 +591,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
       });
     } else {
       // If we are the top-level form, assign to parent scope expression.
-      assignToExpression(Form.$name);
+      assignToExpression(Form.name);
     }
 
     // Parse error behavior.
@@ -613,8 +613,8 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
    */
   Form.$onChanges = changes => {
     // Handle changes to name.
-    if (changes.$name && !changes.$name.isFirstChange()) {
-      const {currentValue, previousValue} = changes.$name;
+    if (changes.name && !changes.name.isFirstChange()) {
+      const {currentValue, previousValue} = changes.name;
       Form.$debug(`Name changed from "${previousValue}" to "${currentValue}".`);
       assignToExpression(currentValue);
     }
@@ -709,7 +709,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
    * @param  {object} form
    */
   Form.$registerForm = childForm => {
-    const childFormName = childForm.$name;
+    const childFormName = childForm.name;
 
     // Ensure there is not a registered control with the same name as the form
     // being registered.
@@ -750,8 +750,8 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
    * @param  {object} control
    */
   Form.$unregisterForm = childForm => {
-    Form.$debug(`Unregistering child form "${childForm.$name}".`);
-    formRegistry = R.reject(R.propEq('$name', childForm.$name), formRegistry);
+    Form.$debug(`Unregistering child form "${childForm.name}".`);
+    formRegistry = R.reject(R.propEq('name', childForm.name), formRegistry);
   };
 
 
@@ -765,7 +765,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
    */
   Form.$debug = (...args) => {
     if (Form.$debugging) {
-      $log.log(`[${Form.$name}]`, ...args);
+      $log.log(`[${Form.name}]`, ...args);
     }
   };
 
@@ -932,7 +932,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
    * @return {object} - Child form instance, if found.
    */
   Form.getForm = formName => {
-    return R.find(R.propEq('$name', formName), formRegistry);
+    return R.find(R.propEq('name', formName), formRegistry);
   };
 
 
@@ -981,7 +981,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
     // object with values consisting of calling a function on each member of the
     // registry.
     const childFormModelValues = R.fromPairs(R.map(childForm => {
-      return [childForm.$name, childForm.getModelValues()];
+      return [childForm.name, childForm.getModelValues()];
     }, formRegistry));
 
     // Model values for the local form.
@@ -1082,7 +1082,7 @@ app.run(Formation => {
       $parentForm: `?^^${FORM_COMPONENT_NAME}`
     },
     bindings: {
-      $name: '@name',
+      name: '@',
       $controlConfiguration: '<controls',
       $onSubmit: '<onSubmit',
       $showErrorsOn: '@showErrorsOn',
