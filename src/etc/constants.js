@@ -35,6 +35,19 @@ export const FORM_COMPONENT_NAME = 'fm';
 
 /**
  * @memberOf constants
+ * @alias FORM_GROUP_COMPONENT_NAME
+ *
+ * @description
+ *
+ * Name used for the form group component (not prefixed).
+ *
+ * @type {String}
+ */
+export const FORM_GROUP_COMPONENT_NAME = 'fmGroup';
+
+
+/**
+ * @memberOf constants
  * @alias REGISTER_FORM_CALLBACK
  *
  * @description

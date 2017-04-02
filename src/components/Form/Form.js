@@ -47,6 +47,22 @@ export const CUSTOM_ERROR_MESSAGE_KEY = '$customError';
 
 
 /**
+ * Event name used to signal to child forms that a submit has begun.
+ *
+ * @type {string}
+ */
+export const BEGIN_SUBMIT_EVENT = '$fmInitiateSubmit';
+
+
+/**
+ * Event name used to signal to child forms that a submit has ended.
+ *
+ * @type {string}
+ */
+export const END_SUBMIT_EVENT = '$fmTerminateSubmit';
+
+
+/**
  * @module FormController
  *
  * @description
@@ -75,7 +91,17 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
    *
    * @type {number}
    */
-  var counter = -1;
+  let counter = -1;
+
+
+  /**
+   * Control configuration data for this form and possible child forms.
+   *
+   * @private
+   *
+   * @type {object}
+   */
+  let controlConfiguration = {};
 
 
   /**
@@ -85,7 +111,17 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
    *
    * @type {Array}
    */
-  var controlRegistry = [];
+  let controlRegistry = [];
+
+
+  /**
+   * Tracks registered child forms.
+   *
+   * @private
+   *
+   * @type {Array}
+   */
+  let formRegistry = [];
 
 
   /**
@@ -270,6 +306,8 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
    * Sets the "custom" validity state of the provided control to true, and
    * clears the custom error message.
    *
+   * TODO: Move this to the FormationControl class.
+   *
    * @private
    *
    * @param  {object} control
@@ -286,6 +324,8 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
   /**
    * Resets the provided contol to an untouched, pristine state. Does not change
    * the control's model value.
+   *
+   * TODO: Move this to the FormationControl class.
    *
    * @private
    *
@@ -321,7 +361,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
   function createMockInputControl (ngModelCtrl) {
     const controlName = ngModelCtrl.$name;
 
-    // We don't know what this control's ngModel expression is bound do, so in
+    // We don't know what this control's ngModel expression is bound to, so in
     // order to keep it in sync we need to watch it and update our internal
     // model value when it changes.
     const cancelWatcher = $scope.$watch(() => ngModelCtrl.$modelValue, newValue => {
@@ -350,23 +390,22 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
    * @return {promise}
    */
   function waitForAsyncValidators () {
-    const deferred = $q.defer();
-    const watchExpression = `Form.${NG_FORM_CONTROLLER}.$pending`;
+    return new Promise(resolve => {
+      const watchExpression = `Form.${NG_FORM_CONTROLLER}.$pending`;
 
-    const cancelWatcher = $scope.$watch(watchExpression, isPending => {
-      if (!isPending) {
-        cancelWatcher();
-        deferred.resolve();
-      }
+      const cancelWatcher = $scope.$watch(watchExpression, isPending => {
+        if (!isPending) {
+          cancelWatcher();
+          resolve();
+        }
+      });
     });
-
-    return deferred.promise;
   }
 
 
   /**
-   * Accepts a comma/space-delimited list of fields and returns an array of
-   * $-prefixed fields.
+   * Accepts a comma/space-delimited list of strings and returns an array of
+   * $-prefixed strings.
    *
    * @example
    *
@@ -393,6 +432,8 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
   /**
    * Applies each registered control to the provided function.
    *
+   * TODO: Make this more generic to support child forms. mapRegistry?
+   *
    * @private
    *
    * @param  {function} fn
@@ -404,23 +445,34 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
 
 
   /**
-   * Handles field errors returned from the consumer's submit handler.
-   * Expects a mapping of field names to error messages.
+   * Sets related form attributes to the correct state for submitting.
    *
    * @private
-   *
-   * @param  {object} fieldErrors
    */
-  function applyFieldErrors (fieldErrors) {
-    if (R.is(Object, fieldErrors)) {
-      R.forEach(error => {
-        const [controlName, message] = error;
+  function initiateSubmit () {
+    // We need to clear all custom errors set from the last submission in
+    // order for the form's $valid flag to be true so we can proceed.
+    mapControls(clearCustomErrorOnControl);
 
-        R.forEach(control => {
-          applyCustomErrorOnControl(control, message);
-        }, R.filter(R.propEq('name', controlName), controlRegistry));
-      }, Object.entries(fieldErrors));
-    }
+    // Form.$debug('Broadcasting BEGIN_SUBMIT on $scope:', $scope.$parent);
+    Form[NG_FORM_CONTROLLER].$setSubmitted(true);
+    Form.$submitting = true;
+    Form.disable();
+
+    $scope.$parent.$broadcast(BEGIN_SUBMIT_EVENT);
+  }
+
+
+  /**
+   * Returns the form to an editable state when a submit process is complete.
+   *
+   * @private
+   */
+  function terminateSubmit () {
+    // Form.$debug('Broadcasting END_SUBMIT on $scope:', $scope.$parent);
+    Form.$submitting = false;
+    Form.enable();
+    $scope.$parent.$broadcast(END_SUBMIT_EVENT);
   }
 
 
@@ -444,7 +496,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
     // Expose common Angular form controller properties.
     R.forEach(prop => {
       Reflect.defineProperty(Form, prop, {
-        get: () => R.path([NG_FORM_CONTROLLER, prop], Form)
+        get: () => Form[NG_FORM_CONTROLLER][prop]
       });
     }, ['$dirty', '$invalid', '$pending', '$pristine', '$submitted', '$valid']);
   };
@@ -508,19 +560,42 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
    * @private
    */
   Form.$onInit = () => {
+    // Auto-generate name if one was not supplied.
+    Form.$name = Form.$name || `Form-${Formation.$getNextId()}`;
+
+    // Merge configuration data from the "config" attribute into our local copy.
+    controlConfiguration = mergeDeep(controlConfiguration, Form.$controlConfiguration);
+
     // Set debug mode if the "debug" attribute is present.
     if (Reflect.has($attrs, 'debug')) {
       Form.$debugging = true;
     }
 
-    if (Form.$name) {
-      assignToExpression(Form.$name);
+    if (Form.$parentForm) {
+      // If we are a child form, register with our parent form and set up submit
+      // listeners.
+      Form.$parentForm.$registerForm(Form);
+
+      $scope.$on(BEGIN_SUBMIT_EVENT, () => {
+        if (!Form.$submitting) {
+          initiateSubmit();
+        }
+      });
+
+      $scope.$on(END_SUBMIT_EVENT, () => {
+        if (Form.$submitting) {
+          terminateSubmit();
+        }
+      });
     } else {
-      Form.$name = `Form-${Formation.$getNextId()}`;
+      // If we are the top-level form, assign to parent scope expression.
+      assignToExpression(Form.$name);
     }
 
     // Parse error behavior.
+    // TODO: Swap this so that local show-errors-on supercedes global config.
     Form.showErrorsOn = parseFlags(Formation.$getShowErrorsOnStr() || Form.$showErrorsOn);
+    Form.$debug('Using show error scheme:', Form.showErrorsOn);
   };
 
 
@@ -545,6 +620,18 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
 
 
   /**
+   * Handles form tear-down and cleanup.
+   *
+   * @private
+   */
+  Form.$onDestroy = () => {
+    if (Form.$parentForm) {
+      Form.$parentForm.$unregisterForm(Form);
+    }
+  };
+
+
+  /**
    * Returns true if the form should be disabled.
    *
    * @private
@@ -552,7 +639,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
    * @return {boolean}
    */
   Form.$isDisabled = () => {
-    return Form.$disabled || Form.$ngDisabled;
+    return Form.$disabled || Form.$ngDisabled || (Form.$parentForm && Form.$parentForm.$isDisabled());
   };
 
 
@@ -590,15 +677,53 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
    * @param  {object} control
    */
   Form.$registerControl = control => {
-    const name = control.name;
-    const formConfiguration = R.pathOr({}, ['$controlConfiguration', name], Form);
+    const controlName = control.name;
 
-    Form.$debug(`Registering control "${name}".`);
+    // Ensure there is not a registered child form with the same name as the
+    // control being registered.
+    if (Form.getForm(controlName)) {
+      throwError(`Cannot register control "${controlName}"; a child form with this name already exists.`);
+    }
+
+    const config = controlConfiguration[controlName];
+
+    Form.$debug(`Registering control "${controlName}".`);
     control.$uid = `${name}-${getNextId()}`;
     controlRegistry = R.append(control, controlRegistry);
 
-    // Apply configuration.
-    applyConfigurationToControl(formConfiguration, control);
+    // If the control was configured by the user, apply its configuration.
+    if (config) {
+      applyConfigurationToControl(config, control);
+    }
+  };
+
+
+  /**
+   * Adds the provided form to the registry and applies model values and
+   * configuration.
+   *
+   * @private
+   *
+   * @param  {object} form
+   */
+  Form.$registerForm = childForm => {
+    const childFormName = childForm.$name;
+
+    // Ensure there is not a registered control with the same name as the form
+    // being registered.
+    if (Form.getControl(childFormName)) {
+      throwError(`Cannot register child form "${childFormName}"; a control with this name already exists.`);
+    }
+
+    const config = controlConfiguration[childFormName];
+
+    Form.$debug(`Registering child form "${childFormName}".`);
+    formRegistry = R.append(childForm, formRegistry);
+
+    // If the form was configured by the user, apply its configuration.
+    if (config) {
+      childForm.configure(config);
+    }
   };
 
 
@@ -612,6 +737,19 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
   Form.$unregisterControl = control => {
     Form.$debug(`Unregistering control "${control.name}".`);
     controlRegistry = R.reject(R.propEq('$uid', control.$uid), controlRegistry);
+  };
+
+
+  /**
+   * Removes the provided control from the registry.
+   *
+   * @private
+   *
+   * @param  {object} control
+   */
+  Form.$unregisterForm = childForm => {
+    Form.$debug(`Unregistering child form "${childForm.$name}".`);
+    formRegistry = R.reject(R.propEq('$name', childForm.$name), formRegistry);
   };
 
 
@@ -692,64 +830,78 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
    *
    * @private
    */
-  Form.$submit = () => {
-    const endSubmit = () => {
-      Form.enable();
-      Form.$submitting = false;
-    };
+  Form.$submit = async () => {
+    try {
+      // [1] Ensure a submit is not already underway.
+      if (Form.$submitting) {
+        Form.$debug('Submit already in progress.');
+        throw new Error('SUBMIT_IN_PROGRESS');
+      }
 
-    if (Form.$submitting) {
-      Form.$debug('Submit already in progress.');
-      return $q.reject(new Error('SUBMIT_IN_PROGRESS'));
+      // [2] Wait for async validators to finish.
+      await waitForAsyncValidators();
+
+      // [3] Prepare form and child forms for submit.
+      initiateSubmit();
+
+      // [4] If the form is (still) invalid, bail.
+      if (Form[NG_FORM_CONTROLLER].$invalid) {
+        throw new Error('NG_FORM_INVALID');
+      }
+
+      // [5] If the consumer provided a submit handler, invoke it and assume its
+      // return value is custom error messages to apply to controls.
+      if (typeof Form.$onSubmit === 'function') {
+        // Invoke the consumer's onSubmit callback with current model data.
+        const customErrors = await Promise.resolve(Form.$onSubmit(Form.getModelValues()));
+        Form.$applyCustomErrors(customErrors);
+      }
+    } catch (err) {
+      // Re-throw errors when testing so we know what caused the submit to fail.
+      if (typeof process !== 'undefined' && process.env.NODE_ENV === 'test') {
+        throw err;
+      }
     }
 
-    Form.$submitting = true;
-    Form.disable();
-
-    return waitForAsyncValidators()
-    .then(() => {
-      // We need to clear all custom errors set from the last submission in
-      // order for the form's $valid flag to be true so we can proceed.
-      mapControls(clearCustomErrorOnControl);
-
-      if (Form[NG_FORM_CONTROLLER].$valid) {
-        // Invoke the consumer's onSubmit callback with current model data.
-        if (typeof Form.$onSubmit === 'function') {
-          return $q.when(Form.$onSubmit(Form.getModelValues()));
-        }
-      } else {
-        return $q.reject(new Error('NG_FORM_INVALID'));
-      }
-    })
-    .catch(err => {
-      if (err.message === 'NG_FORM_INVALID') {
-        Form.$debug('Form is invalid.', Form[NG_FORM_CONTROLLER].$error);
-        endSubmit();
-        return $q.reject(err);
-      }
-
-      Form.$debug('Submit failed. Consumer did not catch.', err);
-      endSubmit();
-      return $q.reject(new Error('CONSUMER_REJECTED'));
-    })
-    .then(fieldErrors => {
-      // If the consumer returned an object, assume it is a mapping of field
-      // names to error messages and apply each error to its field.
-      if (R.is(Object, fieldErrors)) {
-        applyFieldErrors(fieldErrors);
-      }
-
-      endSubmit();
-      return $q.resolve('SUBMIT_COMPLETE');
-    })
-    .catch(err => {
-      // We want to catch the rejections returned above so as to not produce
-      // console errors in production environments, but we want to re-throw them
-      // when testing so we know exactly what happened during a submission.
-      if (typeof process !== 'undefined' && process.env.NODE_ENV === 'test') {
-        return $q.reject(err);
-      }
+    // [6] Restore forms to editable state.
+    $scope.$apply(() => {
+      terminateSubmit();
     });
+  };
+
+
+  /**
+   * Applies "$custom" errors returned from the consumer's submit handler.
+   * Expects a mapping of field names to error messages or child forms.
+   *
+   * TODO: Make this a more abstract interaction with a "registry" that can be
+   * done from mapControls, which will make it easier to delegate field errors
+   * to child forms.
+   *
+   * @private
+   *
+   * @param  {object} customErrors
+   */
+  Form.$applyCustomErrors = customErrors => {
+    if (R.is(Object, customErrors)) {
+      R.forEach(error => {
+        const [controlOrFormName, messageOrObject] = error;
+        const control = Form.getControl(controlOrFormName);
+        const childForm = Form.getForm(controlOrFormName);
+
+        if (control && R.is(String, messageOrObject)) {
+          applyCustomErrorOnControl(control, messageOrObject);
+        } else if (childForm && R.is(Object, messageOrObject)) {
+          childForm.$applyCustomErrors(messageOrObject);
+        } else {
+          throwError('Unsure what to do with custom error object fragment:', messageOrObject);
+        }
+
+        // R.forEach(control => {
+        //   applyCustomErrorOnControl(control, message);
+        // }, R.filter(R.propEq('name', controlName), controlRegistry));
+      }, Object.entries(customErrors));
+    }
   };
 
 
@@ -771,6 +923,45 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
 
 
   /**
+   * Similar to getControl, returns the first child form from the form registry
+   * that matches the provided name.
+   *
+   * @param  {string} formName
+   * @return {object} - Child form instance, if found.
+   */
+  Form.getForm = formName => {
+    return R.find(R.propEq('$name', formName), formRegistry);
+  };
+
+
+  /**
+   * Accepts a control configuration object and applies it to each control in
+   * the form.
+   *
+   * TODO: Add $onChanges support for this.
+   *
+   * @param  {object} formConfiguration
+   */
+  Form.configure = config => {
+    // [1] Update out local configuration object.
+    controlConfiguration = mergeDeep(controlConfiguration, config);
+
+    // [2] Apply configuration to any existing registered controls and child
+    // forms.
+    Object.entries(controlConfiguration).forEach((controlOrFormName, config) => {
+      const control = Form.getControl(controlOrFormName);
+      const childForm = Form.getForm(controlOrFormName);
+
+      if (control) {
+        applyConfigurationToControl(config, control);
+      } else if (childForm) {
+        childForm.configure(config);
+      }
+    });
+  };
+
+
+  /**
    * @function getModelValues
    * @memberOf FormController
    * @instance
@@ -784,9 +975,19 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
    * @return {object} - Map of control names to model values.
    */
   Form.getModelValues = () => {
-    return R.reject(modelValue => {
+    // Find a better way to map over a "registry" (collection) and build an
+    // object with values consisting of calling a function on each member of the
+    // registry.
+    const childFormModelValues = R.fromPairs(R.map(childForm => {
+      return [childForm.$name, childForm.getModelValues()];
+    }, formRegistry));
+
+    // Model values for the local form.
+    const localModelValues = R.reject(modelValue => {
       return R.isNil(modelValue) || modelValue === '';
     }, modelValues);
+
+    return mergeDeep(childFormModelValues, localModelValues);
   };
 
 
@@ -833,6 +1034,8 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
    * Resets each control and the form to a pristine state. Optionally resets the
    * model value of each control to the provided value, and validates all
    * controls.
+   *
+   * TODO: This needs to support child forms.
    *
    * @example
    *
