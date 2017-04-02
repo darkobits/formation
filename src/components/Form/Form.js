@@ -2,6 +2,7 @@
 // ----- Form Component --------------------------------------------------------
 // -----------------------------------------------------------------------------
 
+import angular from 'angular';
 import R from 'ramda';
 import app from '../../app';
 
@@ -479,12 +480,12 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
   // ----- Semi-Private Methods ------------------------------------------------
 
   /**
-   * Implement a callback for ngForm.
+   * Implement a callback that decorated form/ngForm directives will use to
+   * register with this controller.
    *
    * @private
    *
-   * @param {string} name - Name of the controller being registered.
-   * @param {object} controller - Controller to register.
+   * @param {object} ngFormController - Form/ngForm controller instance.
    */
   Form[REGISTER_FORM_CALLBACK] = ngFormController => {
     if (Form[NG_FORM_CONTROLLER]) {
@@ -503,9 +504,9 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
 
 
   /**
-   * Implement a callback for ngModel registration. This will only be called
-   * when an ngModel controller is used in a Formation form outside of a
-   * Formation control.
+   * Implement a callback that decorated ngModel directives will use to register
+   * with this controller. This is used primarily to support instances of
+   * ngModel used in a Formation form without a Formation control.
    *
    * @param  {object} ngModelController
    */
@@ -516,41 +517,39 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
 
   /**
    * Determines whether to use a form or ngForm element based on whether this
-   * instance has a parent form or not. Ensures content is transcluded correctly
-   * as if "ng-transclude" had been used on the form/ngForm element.
+   * instance has a parent form or not.
    *
    * @private
    */
   Form.$postLink = () => {
-    let elementName;
-    let template;
+    function transclude (template) {
+      const elementName = angular.element(template)[0].tagName;
 
-    if (Form.$parentForm) {
-      // If we have a parent form, use <ng-form>.
-      elementName = 'ng-form';
-      template = `<${elementName}></${elementName}>`;
-    } else {
-      // Otherwise, use <form>.
-      elementName = 'form';
-      template = `
-      <${elementName}
-        ng-submit="Form.$submit()"
-        ng-model-options="{getterSetter: true}"
-        novalidate>
-      </${elementName}>`;
+      // Compile our template using our isolate scope and append it to our element.
+      $compile(template)($scope, compiledElement => {
+        $element.append(compiledElement);
+      });
+
+      // Handle transcluded content from the user by appending it to the above
+      // form/ngForm template and using a new scope that inherits from our outer
+      // scope, mimicing the default Angular behavior.
+      $transclude($scope.$parent.$new(), compiledElement => {
+        $element.find(elementName).append(compiledElement);
+      });
     }
 
-    // Compile our template using our isolate scope and append it to our element.
-    $compile(template)($scope, compiledElement => {
-      $element.append(compiledElement);
-    });
-
-    // Handle transcluded content from the user by appending it to the above
-    // form/ngForm template and using a new scope that inherits from our outer
-    // scope, mimicing the default Angular behavior.
-    $transclude($scope.$parent.$new(), compiledElement => {
-      $element.find(elementName).append(compiledElement);
-    });
+    if (Form.$parentForm) {
+      transclude(`
+        <ng-form></ng-form>
+      `);
+    } else {
+      transclude(`
+        <form novalidate
+          ng-submit="Form.$submit()"
+          ng-model-options="{getterSetter: true}">
+        </form>
+      `);
+    }
   };
 
 
