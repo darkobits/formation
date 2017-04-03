@@ -12,18 +12,11 @@ import {
 } from '../../etc/utils';
 
 import {
-  CONFIGURABLE_VALIDATOR,
-  CUSTOM_ERROR_KEY,
+  APPLY_CONFIGURATION,
   FORM_COMPONENT_NAME,
   REGISTER_FORM_CALLBACK,
   REGISTER_NG_MODEL_CALLBACK
 } from '../../etc/constants';
-
-import {
-  COMPONENT_CONFIGURATION,
-  NG_MODEL_CTRL,
-  NG_MESSAGES
-} from '../FormationControl';
 
 
 /**
@@ -35,16 +28,6 @@ import {
  * @type {string}
  */
 export const NG_FORM_CONTROLLER = '$ngFormController';
-
-
-/**
- * Key at which the form controller will store custom error messags on controls.
- *
- * @private
- *
- * @type {string}
- */
-export const CUSTOM_ERROR_MESSAGE_KEY = '$customError';
 
 
 /**
@@ -171,181 +154,6 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
 
 
   /**
-   * Applies form-level configuration to a control (or mock control).
-   *
-   * TODO: Move to FormationControl class. Determine why it was here, probably a
-   * reason.
-   *
-   * @private
-   *
-   * @param  {object} configuration - Configuration to apply.
-   * @param  {object} control - Control instance.
-   */
-  function applyConfigurationToControl (configuration, control) {
-    const ngModelCtrl = control[NG_MODEL_CTRL];
-
-    if (!ngModelCtrl) {
-      return;
-    }
-
-    // Merge provided configuration and control's configuration.
-    const mergedConfig = mergeDeep(R.pathOr({}, [COMPONENT_CONFIGURATION], control), configuration);
-
-    const {
-      errors,
-      parsers,
-      formatters,
-      validators,
-      asyncValidators,
-      ngModelOptions
-    } = mergedConfig;
-
-    Form.$debug(`Applying configuration to "${control.name}":`, mergedConfig);
-
-    // Set up error messages.
-    if (Array.isArray(errors)) {
-      control[NG_MESSAGES] = control[NG_MESSAGES] || [];
-
-      errors.forEach(error => {
-        if (!Array.isArray(error) || error.length !== 2) {
-          throwError(`Expected error message tuple to be an array of length 2, got "${typeof error}".`);
-        } else if (!R.contains(error, control[NG_MESSAGES])) {
-          control[NG_MESSAGES].push(error);
-        }
-      });
-    }
-
-
-    // Set up parsers.
-    if (Array.isArray(parsers)) {
-      parsers.forEach(parser => {
-        if (R.is(Function, parser)) {
-          ngModelCtrl.$parsers.push(parser.bind(ngModelCtrl));
-        } else {
-          throwError(`Expected parser to be a function, got "${typeof parser}".`);
-        }
-      });
-    }
-
-
-    // Set up formatters.
-    if (Array.isArray(formatters)) {
-      formatters.forEach(formatter => {
-        if (R.is(Function, formatter)) {
-          ngModelCtrl.$formatters.push(formatter.bind(ngModelCtrl));
-        } else {
-          throwError(`Expected formatter to be a function, got "${typeof formatter}".`);
-        }
-      });
-    }
-
-
-    // Set up validators.
-    if (R.is(Object, validators)) {
-      R.mapObjIndexed((validator, name) => {
-        if (!R.is(Function, validator)) {
-          throwError(`Expected validator to be a function, got "${typeof validator}".`);
-        } else if (!R.has(name, ngModelCtrl.$validators)) {
-          if (validator[CONFIGURABLE_VALIDATOR]) {
-            ngModelCtrl.$validators[name] = validator(Form).bind(ngModelCtrl);
-          } else {
-            ngModelCtrl.$validators[name] = validator.bind(ngModelCtrl);
-          }
-        }
-      }, validators);
-    }
-
-
-    // Set up asyncronous validators.
-    if (R.is(Object, asyncValidators)) {
-      R.mapObjIndexed((asyncValidator, name) => {
-        if (!R.is(Function, asyncValidator)) {
-          throwError(`Expected validator to be a function, got "${typeof asyncValidator}".`);
-        } else if (!R.has(name, ngModelCtrl.$asyncValidators)) {
-          if (asyncValidator[CONFIGURABLE_VALIDATOR]) {
-            ngModelCtrl.$asyncValidators[name] = asyncValidator(Form).bind(ngModelCtrl);
-          } else {
-            ngModelCtrl.$asyncValidators[name] = asyncValidator.bind(ngModelCtrl);
-          }
-        }
-      }, asyncValidators);
-    }
-
-
-    // Configure ngModelOptions.
-    if (R.is(Object, ngModelOptions)) {
-      ngModelCtrl.$options = ngModelCtrl.$options.createChild(ngModelOptions);
-    }
-
-
-    // Validate the control to ensure any new parsers/formatters/validators
-    // are run.
-    ngModelCtrl.$validate();
-  }
-
-
-  /**
-   * Sets a custom error on the provided control and sets the "custom" validity
-   * state to false.
-   *
-   * @private
-   *
-   * @param  {object} control
-   * @param  {string} errorMessage
-   */
-  function applyCustomErrorOnControl (control, errorMessage) {
-    if (!R.is(String, errorMessage)) {
-      throwError(`Expected error key to be of type "string" but got "${typeof errorMessage}".`);
-    }
-
-    if (control) {
-      Form.$debug(`Setting custom error "${errorMessage}" on control "${control.name}".`);
-      control[CUSTOM_ERROR_MESSAGE_KEY] = errorMessage;
-      control.$ngModelCtrl.$setValidity(CUSTOM_ERROR_KEY, false);
-    }
-  }
-
-
-  /**
-   * Sets the "custom" validity state of the provided control to true, and
-   * clears the custom error message.
-   *
-   * TODO: Move this to the FormationControl class.
-   *
-   * @private
-   *
-   * @param  {object} control
-   */
-  function clearCustomErrorOnControl (control) {
-    if (R.path([NG_MODEL_CTRL, '$error', CUSTOM_ERROR_KEY], control)) {
-      Form.$debug(`Clearing custom error on control "${control.name}".`);
-      control[NG_MODEL_CTRL].$setValidity(CUSTOM_ERROR_KEY, true);
-      Reflect.deleteProperty(control, CUSTOM_ERROR_MESSAGE_KEY);
-    }
-  }
-
-
-  /**
-   * Resets the provided contol to an untouched, pristine state. Does not change
-   * the control's model value.
-   *
-   * TODO: Move this to the FormationControl class.
-   *
-   * @private
-   *
-   * @param  {object} control
-   */
-  function resetControl (control) {
-    const ngModelCtrl = control[NG_MODEL_CTRL];
-
-    if (ngModelCtrl) {
-      ngModelCtrl.$setUntouched();
-      ngModelCtrl.$setPristine();
-    }
-  }
-
-
-  /**
    * Wraps an ngModel controller instance in a mock control instance, allowing
    * users to use ngModel outside of Formation controls.
    *
@@ -456,7 +264,13 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
   function initiateSubmit () {
     // We need to clear all custom errors set from the last submission in
     // order for the form's $valid flag to be true so we can proceed.
-    mapControls(clearCustomErrorOnControl);
+    mapControls(control => {
+      if (!control.$clearCustomError) {
+        console.warn('This control doesnt have a clearcustom error function:', control);
+      } else {
+        control.$clearCustomError();
+      }
+    });
 
     // Form.$debug('Broadcasting BEGIN_SUBMIT on $scope:', $scope.$parent);
     Form[NG_FORM_CONTROLLER].$setSubmitted(true);
@@ -687,15 +501,16 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
       throwError(`Cannot register control "${controlName}"; a child form with this name already exists.`);
     }
 
-    const config = controlConfiguration[controlName];
-
     Form.$debug(`Registering control "${controlName}".`);
     control.$uid = `${name}-${getNextId()}`;
     controlRegistry = R.append(control, controlRegistry);
 
-    // If the control was configured by the user, apply its configuration.
+    // Determine if we have any form-level configuration for this control.
+    const config = controlConfiguration[controlName];
+
+    // If so, apply its configuration.
     if (config) {
-      applyConfigurationToControl(config, control);
+      control[APPLY_CONFIGURATION](config);
     }
   };
 
@@ -717,12 +532,13 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
       throwError(`Cannot register child form "${childFormName}"; a control with this name already exists.`);
     }
 
-    const config = controlConfiguration[childFormName];
-
     Form.$debug(`Registering child form "${childFormName}".`);
     formRegistry = R.append(childForm, formRegistry);
 
-    // If the form was configured by the user, apply its configuration.
+    // Determine if we have any form configuration for the child form.
+    const config = controlConfiguration[childFormName];
+
+    // If so, apply its configuration.
     if (config) {
       childForm.configure(config);
     }
@@ -771,59 +587,6 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
 
 
   /**
-   * If the named control should be displaying errors (based on configured
-   * error behavior) returns the controls' `$error` object. Otherwise, returns
-   * `false`.
-   *
-   * TODO: Move to FormationControl class.
-   *
-   * @private
-   *
-   * @param  {string} controlName
-   * @return {object}
-   */
-  Form.$getErrorsForControl = controlName => {
-    const ngModelCtrl = R.pathOr({}, [NG_MODEL_CTRL], R.find(R.propEq('name', controlName), controlRegistry));
-
-    // If the control is valid, return.
-    if (ngModelCtrl.$valid) {
-      return false;
-    }
-
-    // If the user did not configure error behavior, return the control's errors
-    // if it is invalid.
-    if (R.isNil(Form.showErrorsOn) || Form.showErrorsOn === '') {
-      return !ngModelCtrl.$valid && ngModelCtrl.$error;
-    }
-
-    // Otherwise, determine if the control should show errors.
-    const errorState = Form.showErrorsOn.reduce((accumulator, state) => {
-      const controlHasState = ngModelCtrl[state];
-      const formHasState = Form[NG_FORM_CONTROLLER][state];
-      return accumulator || controlHasState || formHasState;
-    }, false);
-
-    return errorState ? ngModelCtrl.$error : false;
-  };
-
-
-  /**
-   * Returns the copy for the current custom error message on the named control,
-   * if set.
-   *
-   * TODO: Move to FormationControl class.
-   *
-   * @private
-   *
-   * @param  {string} controlName
-   * @return {string}
-   */
-  Form.$getCustomErrorMessageForControl = controlName => {
-    return R.find(R.propEq('name', controlName), controlRegistry)[CUSTOM_ERROR_MESSAGE_KEY];
-  };
-
-
-  /**
    * Handles form submission.
    *
    * Once all validators have finished, clears all custom errors and then
@@ -864,8 +627,8 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
       }
     } catch (err) {
       // Re-throw errors when testing so we know what caused the submit to fail.
-      if (typeof process !== 'undefined' && process.env.NODE_ENV === 'test') {
-        throw err;
+      if (true || typeof process !== 'undefined' && process.env.NODE_ENV === 'test') {
+        Form.$debug('[Logged During Development Only]', err);
       }
     }
 
@@ -896,7 +659,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
         const childForm = Form.getForm(controlOrFormName);
 
         if (control && R.is(String, messageOrObject)) {
-          applyCustomErrorOnControl(control, messageOrObject);
+          control.$setCustomError(messageOrObject);
         } else if (childForm && R.is(Object, messageOrObject)) {
           childForm.$applyCustomErrors(messageOrObject);
         } else {
@@ -955,7 +718,8 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
       const childForm = Form.getForm(controlOrFormName);
 
       if (control) {
-        applyConfigurationToControl(config, control);
+        // THIS HAS MOVED TO CONTROL CLASS, BUT MERGE FORM-LEVEL CONFIG WITH IT FIRST
+        control[APPLY_CONFIGURATION](config);
       } else if (childForm) {
         childForm.configure(config);
       }
@@ -1048,7 +812,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
    * model value of each control to the provided value, and validates all
    * controls.
    *
-   * TODO: This needs to support child forms.
+   * TODO: This needs to support child forms. (better)
    *
    * @example
    *
@@ -1060,14 +824,17 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
    * @param  {object} [modelValues] - Map of control names to model values.
    */
   Form.reset = modelValues => {
-    mapControls(resetControl);
+    mapControls(control => {
+      if (control.$resetControl) {
+        control.$resetControl();
+      }
+    });
 
     if (R.is(Object, modelValues)) {
       Form.setModelValues(modelValues);
     }
 
     Form[NG_FORM_CONTROLLER].$setPristine();
-    mapControls(control => control[NG_MODEL_CTRL].$validate());
     formRegistry.forEach(childForm => childForm.reset());
   };
 }

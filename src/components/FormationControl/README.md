@@ -27,7 +27,7 @@ vm.myForm.getControl('firstName').getControlId()
 
 ----
 
-### `getControlErrors() => Object`
+### `getErrors() => Object`
 
 Returns the control's `$error` object, or `false` if the control is valid.
 
@@ -38,7 +38,7 @@ Returns the control's `$error` object, or `false` if the control is valid.
 **Example:**
 
 ```js
-vm.myForm.getControl('age').getControlErrors()
+vm.myForm.getControl('age').getErrors()
 // => {required: false, min: true}
 ```
 

@@ -50,7 +50,7 @@ app.run(Formation => {
     template: `
       <label for="{{::Textarea.getControlId() }}"
         ng-class="{
-          'has-error': Input.getControlErrors(),
+          'has-error': Input.getErrors(),
           'is-pending': Input.${NG_MODEL_CTRL}.$pending
         }"
         ng-transclude>
@@ -61,7 +61,7 @@ app.run(Formation => {
         placeholder="{{::Textarea.placeholder }}"
         ng-model="Textarea.$ngModelGetterSetter"
         ng-class="{
-          'has-error': Textarea.getControlErrors(),
+          'has-error': Textarea.getErrors(),
           'is-pending': Textarea.${NG_MODEL_CTRL}.$pending
         }"
         ng-disabled="Textarea.$isDisabled()">

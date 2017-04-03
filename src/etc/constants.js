@@ -46,6 +46,12 @@ export const FORM_COMPONENT_NAME = 'fm';
 export const FORM_GROUP_COMPONENT_NAME = 'fmGroup';
 
 
+/* ----- BEGIN INTERFACES --------------------------------------------------- */
+
+
+export const APPLY_CONFIGURATION = '$applyConfiguration';
+
+
 /**
  * @memberOf constants
  * @alias REGISTER_FORM_CALLBACK
@@ -72,6 +78,9 @@ export const REGISTER_FORM_CALLBACK = '$fmRegisterForm';
  * @type {string}
  */
 export const REGISTER_NG_MODEL_CALLBACK = '$fmRegisterNgModel';
+
+
+/* ----- END INTERFACES ----------------------------------------------------- */
 
 
 /**

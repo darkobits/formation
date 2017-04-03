@@ -50,8 +50,8 @@ app.run(Formation => {
     controllerAs: 'Errors',
     template: `
       <label for="{{::Errors.$getCanonicalControlId() }}"
-        ng-if="Errors.getControlErrors()"
-        ng-messages="Errors.getControlErrors()">
+        ng-if="Errors.getErrors()"
+        ng-messages="Errors.getErrors()">
         <span ng-repeat="error in Errors.getErrorMessages()"
           ng-message="{{::error[0] }}">
           {{::error[1] }}

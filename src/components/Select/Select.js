@@ -78,7 +78,7 @@ app.run(Formation => {
       template: `
         <label for="{{::Select.getControlId() }}"
           ng-class="{
-            'has-error': Select.getControlErrors(),
+            'has-error': Select.getErrors(),
             'is-pending': Select.${NG_MODEL_CTRL}.$pending
           }"
           ng-transclude>
@@ -89,7 +89,7 @@ app.run(Formation => {
           ng-if="::!Select.multiple"
           ng-disabled="Select.$isDisabled()"
           ng-class="{
-            'has-error': Select.getControlErrors(),
+            'has-error': Select.getErrors(),
             'is-pending': Select.${NG_MODEL_CTRL}.$pending
           }">
           <option value=""
@@ -104,7 +104,7 @@ app.run(Formation => {
           ng-if="::Select.multiple"
           ng-disabled="Select.$isDisabled()"
           ng-class="{
-            'has-error': Select.getControlErrors(),
+            'has-error': Select.getErrors(),
             'is-pending': Select.${NG_MODEL_CTRL}.$pending
           }"
           multiple>

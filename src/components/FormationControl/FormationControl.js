@@ -5,8 +5,16 @@
 import R from 'ramda';
 
 import {
+  APPLY_CONFIGURATION,
+  CONFIGURABLE_VALIDATOR,
+  CUSTOM_ERROR_KEY,
   REGISTER_NG_MODEL_CALLBACK
 } from '../../etc/constants';
+
+import {
+  mergeDeep,
+  throwError
+} from '../../etc/utils';
 
 
 /**
@@ -64,6 +72,16 @@ export const NG_MESSAGES = '$ngMessages';
 
 
 /**
+ * Key at which the control will store custom error messags.
+ *
+ * @private
+ *
+ * @type {string}
+ */
+export const CUSTOM_ERROR_MESSAGE_KEY = '$customError';
+
+
+/**
  * This class provides the functionality necessary for a component to interact
  * with a Formation form controller. It can be extended by component controllers
  * to create custom controls. All built-in Formation controls extend this class.
@@ -115,6 +133,12 @@ export const NG_MESSAGES = '$ngMessages';
  */
 export class FormationControl {
 
+  constructor () {
+    this[NG_MESSAGES] = [];
+  }
+
+  /* ----- Interfaces ------------------------------------------------------- */
+
   /**
    * Implement a callback for ngModel.
    *
@@ -130,6 +154,116 @@ export class FormationControl {
       // Register the control with the form.
       this[FORM_CONTROLLER].$registerControl(this);
     }
+  }
+
+
+  /**
+   * Applies form-level configuration to a control (or mock control).
+   *
+   * TODO: Move to FormationControl class. Determine why it was here, probably a
+   * reason.
+   *
+   * @private
+   *
+   * @param  {object} configuration - Configuration to apply.
+   * @param  {object} control - Control instance.
+   */
+  [APPLY_CONFIGURATION] (configuration) {
+    if (!this[NG_MODEL_CTRL]) {
+      return;
+    }
+
+    // Merge provided configuration with local configuration.
+    const mergedConfig = mergeDeep(R.pathOr({}, [COMPONENT_CONFIGURATION], this), configuration);
+
+    const {
+      errors,
+      parsers,
+      formatters,
+      validators,
+      asyncValidators,
+      ngModelOptions
+    } = mergedConfig;
+
+    this[FORM_CONTROLLER].$debug(`Applying configuration to "${this.$getName()}":`, mergedConfig);
+
+    // Set up error messages.
+    if (Array.isArray(errors)) {
+      errors.forEach(error => {
+        if (!Array.isArray(error) || error.length !== 2) {
+          throwError(`Expected error message tuple to be an array of length 2, got "${typeof error}".`);
+        } else if (!R.contains(error, this[NG_MESSAGES])) {
+          this[NG_MESSAGES].push(error);
+        }
+      });
+    }
+
+
+    // Set up parsers.
+    if (Array.isArray(parsers)) {
+      parsers.forEach(parser => {
+        if (R.is(Function, parser)) {
+          this[NG_MODEL_CTRL].$parsers.push(parser.bind(this[NG_MODEL_CTRL]));
+        } else {
+          throwError(`Expected parser to be a function, got "${typeof parser}".`);
+        }
+      });
+    }
+
+
+    // Set up formatters.
+    if (Array.isArray(formatters)) {
+      formatters.forEach(formatter => {
+        if (R.is(Function, formatter)) {
+          this[NG_MODEL_CTRL].$formatters.push(formatter.bind(this[NG_MODEL_CTRL]));
+        } else {
+          throwError(`Expected formatter to be a function, got "${typeof formatter}".`);
+        }
+      });
+    }
+
+
+    // Set up validators.
+    if (R.is(Object, validators)) {
+      R.mapObjIndexed((validator, name) => {
+        if (!R.is(Function, validator)) {
+          throwError(`Expected validator to be a function, got "${typeof validator}".`);
+        } else if (!R.has(name, this[NG_MODEL_CTRL].$validators)) {
+          if (validator[CONFIGURABLE_VALIDATOR]) {
+            this[NG_MODEL_CTRL].$validators[name] = validator(this[FORM_CONTROLLER]).bind(this[NG_MODEL_CTRL]);
+          } else {
+            this[NG_MODEL_CTRL].$validators[name] = validator.bind(this[NG_MODEL_CTRL]);
+          }
+        }
+      }, validators);
+    }
+
+
+    // Set up asyncronous validators.
+    if (R.is(Object, asyncValidators)) {
+      R.mapObjIndexed((asyncValidator, name) => {
+        if (!R.is(Function, asyncValidator)) {
+          throwError(`Expected validator to be a function, got "${typeof asyncValidator}".`);
+        } else if (!R.has(name, this[NG_MODEL_CTRL].$asyncValidators)) {
+          if (asyncValidator[CONFIGURABLE_VALIDATOR]) {
+            this[NG_MODEL_CTRL].$asyncValidators[name] = asyncValidator(this[FORM_CONTROLLER]).bind(this[NG_MODEL_CTRL]);
+          } else {
+            this[NG_MODEL_CTRL].$asyncValidators[name] = asyncValidator.bind(this[NG_MODEL_CTRL]);
+          }
+        }
+      }, asyncValidators);
+    }
+
+
+    // Configure ngModelOptions.
+    if (R.is(Object, ngModelOptions)) {
+      this[NG_MODEL_CTRL].$options = this[NG_MODEL_CTRL].$options.createChild(ngModelOptions);
+    }
+
+
+    // Validate the control to ensure any new parsers/formatters/validators
+    // are run.
+    this[NG_MODEL_CTRL].$validate();
   }
 
 
@@ -203,6 +337,62 @@ export class FormationControl {
 
 
   /**
+   * Resets the provided contol to an untouched, pristine state. Does not change
+   * the control's model value.
+   *
+   * @private
+   *
+   * @param  {object} control
+   */
+  $resetControl () {
+    if (this[NG_MODEL_CTRL]) {
+      this[NG_MODEL_CTRL].$setUntouched();
+      this[NG_MODEL_CTRL].$setPristine();
+      this[NG_MODEL_CTRL].$validate();
+    }
+  }
+
+
+  /**
+   * Sets a custom error on the provided control and sets the "custom" validity
+   * state to false.
+   *
+   * @private
+   *
+   * @param  {object} control
+   * @param  {string} errorMessage
+   */
+  $setCustomError (errorMessage) {
+    if (!R.is(String, errorMessage)) {
+      throwError(`Expected error key to be of type "string" but got "${typeof errorMessage}".`);
+    }
+
+    this[FORM_CONTROLLER].$debug(`Setting custom error "${errorMessage}" on control "${this.$getName()}".`);
+    this[CUSTOM_ERROR_MESSAGE_KEY] = errorMessage;
+    this[NG_MODEL_CTRL].$setValidity(CUSTOM_ERROR_KEY, false);
+  }
+
+
+  /**
+   * Sets the "custom" validity state of the provided control to true, and
+   * clears the custom error message.
+   *
+   * TODO: Move this to the FormationControl class.
+   *
+   * @private
+   *
+   * @param  {object} control
+   */
+  $clearCustomError () {
+    if (R.path([NG_MODEL_CTRL, '$error', CUSTOM_ERROR_KEY], this)) {
+      this[FORM_CONTROLLER].$debug(`Clearing custom error on control "${this.$getName()}".`);
+      this[NG_MODEL_CTRL].$setValidity(CUSTOM_ERROR_KEY, true);
+      Reflect.deleteProperty(this, CUSTOM_ERROR_MESSAGE_KEY);
+    }
+  }
+
+
+  /**
    * Used by ngModel (via ngModelOptions) to set and retreive model values.
    *
    * See: https://docs.angularjs.org/api/ng/directive/ngModelOptions
@@ -239,19 +429,37 @@ export class FormationControl {
 
 
   /**
-   * Returns an object containing errors present on the control, or false.
+   * If the named control should be displaying errors (based on configured
+   * error behavior) returns the controls' `$error` object. Otherwise, returns
+   * `false`.
    *
-   * @example
+   * @private
    *
-   * vm.myForm.getControl('name').getControlErrors() => {
-   *   required: true,
-   *   minLength: true
-   * }
-   *
-   * @return {object|boolean}
+   * @param  {string} controlName
+   * @return {object}
    */
-  getControlErrors () {
-    return this[FORM_CONTROLLER].$getErrorsForControl(this.$getName());
+  getErrors () {
+    const ngModelCtrl = this.$getControl()[NG_MODEL_CTRL];
+
+    // If the control is valid, return.
+    if (ngModelCtrl.$valid) {
+      return false;
+    }
+
+    // If the user did not configure error behavior, return the control's errors
+    // if it is invalid.
+    if (R.isNil(this[FORM_CONTROLLER].showErrorsOn) || this[FORM_CONTROLLER].showErrorsOn === '') {
+      return !ngModelCtrl.$valid && ngModelCtrl.$error;
+    }
+
+    // Otherwise, determine if the control should show errors.
+    const errorState = this[FORM_CONTROLLER].showErrorsOn.reduce((accumulator, state) => {
+      const controlHasState = ngModelCtrl[state];
+      const formHasState = this[FORM_CONTROLLER][state];
+      return accumulator || controlHasState || formHasState;
+    }, false);
+
+    return errorState ? ngModelCtrl.$error : false;
   }
 
 
@@ -283,7 +491,7 @@ export class FormationControl {
    * @return {string}
    */
   getCustomErrorMessage () {
-    return this[FORM_CONTROLLER].$getCustomErrorMessageForControl(this.$getName());
+    return this[FORM_CONTROLLER].getControl(this.$getName())[CUSTOM_ERROR_MESSAGE_KEY];
   }
 
 

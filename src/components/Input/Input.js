@@ -60,7 +60,7 @@ app.run(Formation => {
       <label for="{{::Input.getControlId() }}"
         ng-if="Input.type !== 'radio' && Input.type !== 'checkbox'"
         ng-class="{
-          'has-error': Input.getControlErrors(),
+          'has-error': Input.getErrors(),
           'is-pending': Input.${NG_MODEL_CTRL}.$pending
         }"
         ng-transclude>
@@ -72,14 +72,14 @@ app.run(Formation => {
         ng-model="Input.$ngModelGetterSetter"
         ng-value="Input.ngValue"
         ng-class="{
-          'has-error': Input.getControlErrors(),
+          'has-error': Input.getErrors(),
           'is-pending': Input.${NG_MODEL_CTRL}.$pending
         }"
         ng-disabled="Input.$isDisabled()">
       <label for="{{::Input.getControlId() }}"
         ng-if="Input.type === 'radio' || Input.type === 'checkbox'"
         ng-class="{
-          'has-error': Input.getControlErrors(),
+          'has-error': Input.getErrors(),
           'is-pending': Input.${NG_MODEL_CTRL}.$pending
         }"
         ng-transclude>
