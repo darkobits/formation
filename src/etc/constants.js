@@ -46,43 +46,6 @@ export const FORM_COMPONENT_NAME = 'fm';
 export const FORM_GROUP_COMPONENT_NAME = 'fmGroup';
 
 
-/* ----- BEGIN INTERFACES --------------------------------------------------- */
-
-
-export const APPLY_CONFIGURATION = '$applyConfiguration';
-
-
-/**
- * @memberOf constants
- * @alias REGISTER_FORM_CALLBACK
- *
- * @description
- *
- * Key at which controllers should implement a function to handle ngForm
- * registration.
- *
- * @type {string}
- */
-export const REGISTER_FORM_CALLBACK = '$fmRegisterForm';
-
-
-/**
- * @memberOf constants
- * @alias REGISTER_NG_MODEL_CALLBACK
- *
- * @description
- *
- * Key at which controllers should implement a function to handle ngModel
- * registration.
- *
- * @type {string}
- */
-export const REGISTER_NG_MODEL_CALLBACK = '$fmRegisterNgModel';
-
-
-/* ----- END INTERFACES ----------------------------------------------------- */
-
-
 /**
  * @memberOf constants
  * @alias DEFAULT_PREFIX

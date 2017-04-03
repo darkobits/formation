@@ -12,11 +12,16 @@ import {
 } from '../../etc/utils';
 
 import {
-  APPLY_CONFIGURATION,
-  FORM_COMPONENT_NAME,
-  REGISTER_FORM_CALLBACK,
-  REGISTER_NG_MODEL_CALLBACK
+  FORM_COMPONENT_NAME
 } from '../../etc/constants';
+
+import {
+  Configure,
+  RegisterControl,
+  RegisterForm,
+  RegisterNgForm,
+  RegisterNgModel
+} from '../../etc/interfaces';
 
 
 /**
@@ -64,8 +69,9 @@ export const END_SUBMIT_EVENT = '$fmTerminateSubmit';
  * - `ng-disabled`: Expression to evaluate that, if truthy, will disable all
  *   Formation controls in the form.
  */
-export function FormController ($attrs, $compile, $element, $log, $parse, $q, $scope, $transclude, Formation) {
+export function FormController ($attrs, $compile, $element, $log, $parse, $scope, $transclude, Formation) {
   const Form = this;
+
 
   /**
    * Counter for getNextId(). This is used to assign unique IDs to controls
@@ -76,6 +82,16 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
    * @type {number}
    */
   let counter = -1;
+
+
+  /**
+   * Configured error behavior for the form.
+   *
+   * @private
+   *
+   * @type {array}
+   */
+  let errorBehavior;
 
 
   /**
@@ -115,7 +131,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
    *
    * @type {Object}
    */
-  const modelValues = {};
+  const modelValues = new Map();
 
 
   // ----- Private Methods -----------------------------------------------------
@@ -265,9 +281,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
     // We need to clear all custom errors set from the last submission in
     // order for the form's $valid flag to be true so we can proceed.
     mapControls(control => {
-      if (!control.$clearCustomError) {
-        console.warn('This control doesnt have a clearcustom error function:', control);
-      } else {
+      if (control.$clearCustomError) {
         control.$clearCustomError();
       }
     });
@@ -294,17 +308,15 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
   }
 
 
-  // ----- Semi-Private Methods ------------------------------------------------
+  // ----- Interfaces ------------------------------------------------------------
 
   /**
    * Implement a callback that decorated form/ngForm directives will use to
    * register with this controller.
    *
-   * @private
-   *
    * @param {object} ngFormController - Form/ngForm controller instance.
    */
-  Form[REGISTER_FORM_CALLBACK] = ngFormController => {
+  RegisterNgForm.implementedBy(Form).as(function (ngFormController) {
     if (Form[NG_FORM_CONTROLLER]) {
       throwError('ngForm already registered with Formation.');
     }
@@ -317,7 +329,63 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
         get: () => Form[NG_FORM_CONTROLLER][prop]
       });
     }, ['$dirty', '$invalid', '$pending', '$pristine', '$submitted', '$valid']);
-  };
+  });
+
+
+  /**
+   * Adds the provided child form to the registry and applies model values and
+   * configuration.
+   *
+   * @param  {object} childForm
+   */
+  RegisterForm.implementedBy(Form).as(function (childForm) {
+    const childFormName = childForm.name;
+
+    // Ensure there is not a registered control with the same name as the form
+    // being registered.
+    if (Form.getControl(childFormName)) {
+      throwError(`Cannot register child form "${childFormName}"; a control with this name already exists.`);
+    }
+
+    Form.$debug(`Registering child form "${childFormName}".`);
+    formRegistry.push(childForm);
+
+    // Determine if we have any form configuration for the child form.
+    const config = controlConfiguration[childFormName];
+
+    // If so, apply its configuration.
+    if (config) {
+      childForm.configure(config);
+    }
+  });
+
+
+  /**
+   * Adds the provided control to the registry and applies configuration.
+   *
+   * @param  {object} control
+   */
+  RegisterControl.implementedBy(Form).as(function (control) {
+    const controlName = control.name;
+
+    // Ensure there is not a registered child form with the same name as the
+    // control being registered.
+    if (Form.getForm(controlName)) {
+      throwError(`Cannot register control "${controlName}"; a child form with this name already exists.`);
+    }
+
+    Form.$debug(`Registering control "${controlName}".`);
+    control.$uid = `${controlName}-${getNextId()}`;
+    controlRegistry = R.append(control, controlRegistry);
+
+    // Determine if we have any form-level configuration for this control.
+    const config = controlConfiguration[controlName];
+
+    // If so, apply its configuration.
+    if (config && control[Configure]) {
+      control[Configure](config);
+    }
+  });
 
 
   /**
@@ -325,12 +393,14 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
    * with this controller. This is used primarily to support instances of
    * ngModel used in a Formation form without a Formation control.
    *
-   * @param  {object} ngModelController
+   * @param  {object} ngModelCtrl
    */
-  Form[REGISTER_NG_MODEL_CALLBACK] = ngModelController => {
-    Form.$registerControl(createMockInputControl(ngModelController));
-  };
+  RegisterNgModel.implementedBy(Form).as(function (ngModelCtrl) {
+    Form[RegisterControl](createMockInputControl(ngModelCtrl));
+  });
 
+
+  // ----- Semi-Private Methods ------------------------------------------------
 
   /**
    * Determines whether to use a form or ngForm element based on whether this
@@ -390,7 +460,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
     if (Form.$parentForm) {
       // If we are a child form, register with our parent form and set up submit
       // listeners.
-      Form.$parentForm.$registerForm(Form);
+      Form.$parentForm[RegisterForm](Form);
 
       $scope.$on(BEGIN_SUBMIT_EVENT, () => {
         if (!Form.$submitting) {
@@ -409,9 +479,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
     }
 
     // Parse error behavior.
-    // TODO: Swap this so that local show-errors-on supercedes global config.
-    Form.showErrorsOn = parseFlags(Formation.$getShowErrorsOnStr() || Form.$showErrorsOn);
-    Form.$debug('Using show error scheme:', Form.showErrorsOn);
+    errorBehavior = parseFlags(Form.$showErrorsOn || Formation.$getShowErrorsOnStr());
   };
 
 
@@ -431,6 +499,11 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
       const {currentValue, previousValue} = changes.name;
       Form.$debug(`Name changed from "${previousValue}" to "${currentValue}".`);
       assignToExpression(currentValue);
+    }
+
+    if (changes.$showErrorsOn && !changes.$showErrorsOn.isFirstChange()) {
+      const {currentValue} = changes.$showErrorsOn;
+      errorBehavior = parseFlags(currentValue || Formation.$getShowErrorsOnStr());
     }
   };
 
@@ -468,12 +541,12 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
    * @return {*}
    */
   Form.$getModelValue = controlName => {
-    return modelValues[controlName];
+    return modelValues.get(controlName);
   };
 
 
   /**
-   * Sets the model value for the named control to the provided value.
+   * Sets the model value for the named control to a copy of the provided value.
    *
    * @private
    *
@@ -481,67 +554,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
    * @param  {*} newValue
    */
   Form.$setModelValue = (controlName, newValue) => {
-    modelValues[controlName] = newValue;
-  };
-
-
-  /**
-   * Adds the provided control to the registry and applies configuration.
-   *
-   * @private
-   *
-   * @param  {object} control
-   */
-  Form.$registerControl = control => {
-    const controlName = control.name;
-
-    // Ensure there is not a registered child form with the same name as the
-    // control being registered.
-    if (Form.getForm(controlName)) {
-      throwError(`Cannot register control "${controlName}"; a child form with this name already exists.`);
-    }
-
-    Form.$debug(`Registering control "${controlName}".`);
-    control.$uid = `${name}-${getNextId()}`;
-    controlRegistry = R.append(control, controlRegistry);
-
-    // Determine if we have any form-level configuration for this control.
-    const config = controlConfiguration[controlName];
-
-    // If so, apply its configuration.
-    if (config) {
-      control[APPLY_CONFIGURATION](config);
-    }
-  };
-
-
-  /**
-   * Adds the provided form to the registry and applies model values and
-   * configuration.
-   *
-   * @private
-   *
-   * @param  {object} form
-   */
-  Form.$registerForm = childForm => {
-    const childFormName = childForm.name;
-
-    // Ensure there is not a registered control with the same name as the form
-    // being registered.
-    if (Form.getControl(childFormName)) {
-      throwError(`Cannot register child form "${childFormName}"; a control with this name already exists.`);
-    }
-
-    Form.$debug(`Registering child form "${childFormName}".`);
-    formRegistry = R.append(childForm, formRegistry);
-
-    // Determine if we have any form configuration for the child form.
-    const config = controlConfiguration[childFormName];
-
-    // If so, apply its configuration.
-    if (config) {
-      childForm.configure(config);
-    }
+    modelValues.set(controlName, R.clone(newValue));
   };
 
 
@@ -627,7 +640,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
       }
     } catch (err) {
       // Re-throw errors when testing so we know what caused the submit to fail.
-      if (true || typeof process !== 'undefined' && process.env.NODE_ENV === 'test') {
+      if (typeof process !== 'undefined' && process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'development') {
         Form.$debug('[Logged During Development Only]', err);
       }
     }
@@ -638,6 +651,10 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
     });
   };
 
+
+  Form.$getErrorBehavior = () => {
+    return R.clone(errorBehavior);
+  };
 
   /**
    * Applies "$custom" errors returned from the consumer's submit handler.
@@ -719,7 +736,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
 
       if (control) {
         // THIS HAS MOVED TO CONTROL CLASS, BUT MERGE FORM-LEVEL CONFIG WITH IT FIRST
-        control[APPLY_CONFIGURATION](config);
+        control[Configure](config);
       } else if (childForm) {
         childForm.configure(config);
       }
@@ -734,9 +751,9 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
    *
    * @description
    *
-   * Returns a new object containing the current non-`null` and non-`undefined`
-   * model values for each registered control. This is the same method used to
-   * generate model values that are passed to submit handlers.
+   * Returns a new object containing the current non-null, non-NaN, and
+   * non-undefined model values for each registered control. This is the same
+   * method used to generate model values that are passed to submit handlers.
    *
    * @return {object} - Map of control names to model values.
    */
@@ -749,11 +766,11 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
     }, formRegistry));
 
     // Model values for the local form.
-    const localModelValues = R.reject(modelValue => {
+    const localModelValues = R.fromPairs(R.reject(([, modelValue]) => {
       return R.isNil(modelValue) || modelValue === '';
-    }, modelValues);
+    }, Array.from(modelValues)));
 
-    return mergeDeep(childFormModelValues, localModelValues);
+    return mergeDeep(localModelValues, childFormModelValues);
   };
 
 
@@ -772,20 +789,18 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
    * @param  {object} modelValues - Map of control names to model values.
    */
   Form.setModelValues = modelValues => {
-    if (R.is(Object, modelValues)) {
-      R.forEach(([controlOrFormName, modelData]) => {
-        const control = Form.getControl(controlOrFormName);
-        const childForm = Form.getForm(controlOrFormName);
+    R.forEach(([controlOrFormName, modelData]) => {
+      const control = Form.getControl(controlOrFormName);
+      const childForm = Form.getForm(controlOrFormName);
 
-        if (control) {
-          Form.$setModelValue(controlOrFormName, modelData);
-        } else if (childForm && R.is(Object, modelData)) {
-          childForm.setModelValues(modelData);
-        } else {
-          throwError('Unsure what to do with model data fragment:', modelData);
-        }
-      }, Object.entries(R.clone(modelValues)));
-    }
+      if (control) {
+        Form.$setModelValue(controlOrFormName, modelData);
+      } else if (childForm && R.is(Object, modelData)) {
+        childForm.setModelValues(modelData);
+      } else {
+        Form.$debug('Unsure what to do with model data fragment:', modelData);
+      }
+    }, Object.entries(modelValues));
   };
 
 
@@ -840,7 +855,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $q, $s
 }
 
 
-FormController.$inject = ['$attrs', '$compile', '$element', '$log', '$parse', '$q', '$scope', '$transclude', 'Formation'];
+FormController.$inject = ['$attrs', '$compile', '$element', '$log', '$parse', '$scope', '$transclude', 'Formation'];
 
 
 app.run(Formation => {

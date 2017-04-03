@@ -5,16 +5,20 @@
 import R from 'ramda';
 
 import {
-  APPLY_CONFIGURATION,
   CONFIGURABLE_VALIDATOR,
-  CUSTOM_ERROR_KEY,
-  REGISTER_NG_MODEL_CALLBACK
+  CUSTOM_ERROR_KEY
 } from '../../etc/constants';
 
 import {
   mergeDeep,
   throwError
 } from '../../etc/utils';
+
+import {
+  Configure,
+  RegisterControl,
+  RegisterNgModel
+} from '../../etc/interfaces';
 
 
 /**
@@ -137,135 +141,8 @@ export class FormationControl {
     this[NG_MESSAGES] = [];
   }
 
-  /* ----- Interfaces ------------------------------------------------------- */
 
-  /**
-   * Implement a callback for ngModel.
-   *
-   * @private
-   *
-   * @param {object} ngModelController
-   */
-  [REGISTER_NG_MODEL_CALLBACK] (ngModelController) {
-    if (this[FORM_CONTROLLER]) {
-      // Create a reference to the control's ngModel controller.
-      this[NG_MODEL_CTRL] = ngModelController;
-
-      // Register the control with the form.
-      this[FORM_CONTROLLER].$registerControl(this);
-    }
-  }
-
-
-  /**
-   * Applies form-level configuration to a control (or mock control).
-   *
-   * TODO: Move to FormationControl class. Determine why it was here, probably a
-   * reason.
-   *
-   * @private
-   *
-   * @param  {object} configuration - Configuration to apply.
-   * @param  {object} control - Control instance.
-   */
-  [APPLY_CONFIGURATION] (configuration) {
-    if (!this[NG_MODEL_CTRL]) {
-      return;
-    }
-
-    // Merge provided configuration with local configuration.
-    const mergedConfig = mergeDeep(R.pathOr({}, [COMPONENT_CONFIGURATION], this), configuration);
-
-    const {
-      errors,
-      parsers,
-      formatters,
-      validators,
-      asyncValidators,
-      ngModelOptions
-    } = mergedConfig;
-
-    this[FORM_CONTROLLER].$debug(`Applying configuration to "${this.$getName()}":`, mergedConfig);
-
-    // Set up error messages.
-    if (Array.isArray(errors)) {
-      errors.forEach(error => {
-        if (!Array.isArray(error) || error.length !== 2) {
-          throwError(`Expected error message tuple to be an array of length 2, got "${typeof error}".`);
-        } else if (!R.contains(error, this[NG_MESSAGES])) {
-          this[NG_MESSAGES].push(error);
-        }
-      });
-    }
-
-
-    // Set up parsers.
-    if (Array.isArray(parsers)) {
-      parsers.forEach(parser => {
-        if (R.is(Function, parser)) {
-          this[NG_MODEL_CTRL].$parsers.push(parser.bind(this[NG_MODEL_CTRL]));
-        } else {
-          throwError(`Expected parser to be a function, got "${typeof parser}".`);
-        }
-      });
-    }
-
-
-    // Set up formatters.
-    if (Array.isArray(formatters)) {
-      formatters.forEach(formatter => {
-        if (R.is(Function, formatter)) {
-          this[NG_MODEL_CTRL].$formatters.push(formatter.bind(this[NG_MODEL_CTRL]));
-        } else {
-          throwError(`Expected formatter to be a function, got "${typeof formatter}".`);
-        }
-      });
-    }
-
-
-    // Set up validators.
-    if (R.is(Object, validators)) {
-      R.mapObjIndexed((validator, name) => {
-        if (!R.is(Function, validator)) {
-          throwError(`Expected validator to be a function, got "${typeof validator}".`);
-        } else if (!R.has(name, this[NG_MODEL_CTRL].$validators)) {
-          if (validator[CONFIGURABLE_VALIDATOR]) {
-            this[NG_MODEL_CTRL].$validators[name] = validator(this[FORM_CONTROLLER]).bind(this[NG_MODEL_CTRL]);
-          } else {
-            this[NG_MODEL_CTRL].$validators[name] = validator.bind(this[NG_MODEL_CTRL]);
-          }
-        }
-      }, validators);
-    }
-
-
-    // Set up asyncronous validators.
-    if (R.is(Object, asyncValidators)) {
-      R.mapObjIndexed((asyncValidator, name) => {
-        if (!R.is(Function, asyncValidator)) {
-          throwError(`Expected validator to be a function, got "${typeof asyncValidator}".`);
-        } else if (!R.has(name, this[NG_MODEL_CTRL].$asyncValidators)) {
-          if (asyncValidator[CONFIGURABLE_VALIDATOR]) {
-            this[NG_MODEL_CTRL].$asyncValidators[name] = asyncValidator(this[FORM_CONTROLLER]).bind(this[NG_MODEL_CTRL]);
-          } else {
-            this[NG_MODEL_CTRL].$asyncValidators[name] = asyncValidator.bind(this[NG_MODEL_CTRL]);
-          }
-        }
-      }, asyncValidators);
-    }
-
-
-    // Configure ngModelOptions.
-    if (R.is(Object, ngModelOptions)) {
-      this[NG_MODEL_CTRL].$options = this[NG_MODEL_CTRL].$options.createChild(ngModelOptions);
-    }
-
-
-    // Validate the control to ensure any new parsers/formatters/validators
-    // are run.
-    this[NG_MODEL_CTRL].$validate();
-  }
-
+  // ----- Semi-Private Methods ------------------------------------------------
 
   /**
    * Returns the name of the control, or the name of the control that this
@@ -440,6 +317,7 @@ export class FormationControl {
    */
   getErrors () {
     const ngModelCtrl = this.$getControl()[NG_MODEL_CTRL];
+    const errorBehavior = this[FORM_CONTROLLER].$getErrorBehavior();
 
     // If the control is valid, return.
     if (ngModelCtrl.$valid) {
@@ -448,12 +326,12 @@ export class FormationControl {
 
     // If the user did not configure error behavior, return the control's errors
     // if it is invalid.
-    if (R.isNil(this[FORM_CONTROLLER].showErrorsOn) || this[FORM_CONTROLLER].showErrorsOn === '') {
+    if (R.isNil(errorBehavior) || errorBehavior === '') {
       return !ngModelCtrl.$valid && ngModelCtrl.$error;
     }
 
     // Otherwise, determine if the control should show errors.
-    const errorState = this[FORM_CONTROLLER].showErrorsOn.reduce((accumulator, state) => {
+    const errorState = errorBehavior.reduce((accumulator, state) => {
       const controlHasState = ngModelCtrl[state];
       const formHasState = this[FORM_CONTROLLER][state];
       return accumulator || controlHasState || formHasState;
@@ -540,6 +418,134 @@ export class FormationControl {
     this[FORM_CONTROLLER].$setModelValue(this.$getName(), R.clone(newValue));
   }
 }
+
+
+// ----- Interfaces ------------------------------------------------------------
+
+/**
+ * Configures the control by merging the provided configuration object with
+ * the control's local configuration object.
+ *
+ * @param  {object} configuration - Configuration to apply.
+ */
+Configure.implementedBy(FormationControl).as(function (configuration) {
+  if (!this[NG_MODEL_CTRL]) {
+    return;
+  }
+
+  // Merge provided configuration with local configuration.
+  const mergedConfig = mergeDeep(R.pathOr({}, [COMPONENT_CONFIGURATION], this), configuration);
+
+  const {
+    errors,
+    parsers,
+    formatters,
+    validators,
+    asyncValidators,
+    ngModelOptions
+  } = mergedConfig;
+
+  this[FORM_CONTROLLER].$debug(`Applying configuration to "${this.$getName()}":`, mergedConfig);
+
+  // Set up error messages.
+  if (Array.isArray(errors)) {
+    errors.forEach(error => {
+      if (!Array.isArray(error) || error.length !== 2) {
+        throwError(`Expected error message tuple to be an array of length 2, got "${typeof error}".`);
+      } else if (!R.contains(error, this[NG_MESSAGES])) {
+        this[NG_MESSAGES].push(error);
+      }
+    });
+  }
+
+
+  // Set up parsers.
+  if (Array.isArray(parsers)) {
+    parsers.forEach(parser => {
+      if (R.is(Function, parser)) {
+        this[NG_MODEL_CTRL].$parsers.push(parser.bind(this[NG_MODEL_CTRL]));
+      } else {
+        throwError(`Expected parser to be a function, got "${typeof parser}".`);
+      }
+    });
+  }
+
+
+  // Set up formatters.
+  if (Array.isArray(formatters)) {
+    formatters.forEach(formatter => {
+      if (R.is(Function, formatter)) {
+        this[NG_MODEL_CTRL].$formatters.push(formatter.bind(this[NG_MODEL_CTRL]));
+      } else {
+        throwError(`Expected formatter to be a function, got "${typeof formatter}".`);
+      }
+    });
+  }
+
+
+  // Set up validators.
+  if (R.is(Object, validators)) {
+    R.mapObjIndexed((validator, name) => {
+      if (!R.is(Function, validator)) {
+        throwError(`Expected validator to be a function, got "${typeof validator}".`);
+      } else if (!R.has(name, this[NG_MODEL_CTRL].$validators)) {
+        if (validator[CONFIGURABLE_VALIDATOR]) {
+          this[NG_MODEL_CTRL].$validators[name] = validator(this[FORM_CONTROLLER]).bind(this[NG_MODEL_CTRL]);
+        } else {
+          this[NG_MODEL_CTRL].$validators[name] = validator.bind(this[NG_MODEL_CTRL]);
+        }
+      }
+    }, validators);
+  }
+
+
+  // Set up asyncronous validators.
+  if (R.is(Object, asyncValidators)) {
+    R.mapObjIndexed((asyncValidator, name) => {
+      if (!R.is(Function, asyncValidator)) {
+        throwError(`Expected validator to be a function, got "${typeof asyncValidator}".`);
+      } else if (!R.has(name, this[NG_MODEL_CTRL].$asyncValidators)) {
+        if (asyncValidator[CONFIGURABLE_VALIDATOR]) {
+          this[NG_MODEL_CTRL].$asyncValidators[name] = asyncValidator(this[FORM_CONTROLLER]).bind(this[NG_MODEL_CTRL]);
+        } else {
+          this[NG_MODEL_CTRL].$asyncValidators[name] = asyncValidator.bind(this[NG_MODEL_CTRL]);
+        }
+      }
+    }, asyncValidators);
+  }
+
+
+  // Configure ngModelOptions.
+  if (R.is(Object, ngModelOptions)) {
+    this[NG_MODEL_CTRL].$options = this[NG_MODEL_CTRL].$options.createChild(ngModelOptions);
+  }
+
+
+  // Validate the control to ensure any new parsers/formatters/validators
+  // are run.
+  this[NG_MODEL_CTRL].$validate();
+});
+
+
+/**
+ * Register and configure the provided ngModel controller.
+ *
+ * @param  {object} ngModelCtrl
+ */
+RegisterNgModel.implementedBy(FormationControl).as(function (ngModelCtrl) {
+  // Configure the control.
+  if (this[COMPONENT_CONFIGURATION]) {
+    this[Configure]();
+  }
+
+  if (this[FORM_CONTROLLER]) {
+    // Create a reference to the control's ngModel controller.
+    this[NG_MODEL_CTRL] = ngModelCtrl;
+
+    // Register the control with the form.
+    this[FORM_CONTROLLER][RegisterControl](this);
+  }
+});
 
 
 export default {

@@ -10,10 +10,13 @@ import {
 } from '../components/FormationControl';
 
 import {
-  FORM_COMPONENT_NAME,
-  REGISTER_FORM_CALLBACK,
-  REGISTER_NG_MODEL_CALLBACK
+  FORM_COMPONENT_NAME
 } from './constants';
+
+import {
+  RegisterNgForm,
+  RegisterNgModel
+} from './interfaces';
 
 
 app.config(($provide, FormationProvider) => {
@@ -50,8 +53,8 @@ app.config(($provide, FormationProvider) => {
             // Get a reference to the Formation form controller.
             const fmFormController = R.find(R.is(FormController), controllers);
 
-            if (fmFormController && R.is(Function, fmFormController[REGISTER_FORM_CALLBACK])) {
-              fmFormController[REGISTER_FORM_CALLBACK](ngFormController);
+            if (fmFormController && R.is(Function, fmFormController[RegisterNgForm])) {
+              fmFormController[RegisterNgForm](ngFormController);
             }
           }
         };
@@ -97,14 +100,14 @@ app.config(($provide, FormationProvider) => {
           // Get a reference to parent Formation forms, if any.
           const fmFormController = R.find(R.is(FormController), controllers);
 
-          if (fmComponentController && R.is(Function, fmComponentController[REGISTER_NG_MODEL_CALLBACK])) {
+          if (fmComponentController && R.is(Function, fmComponentController[RegisterNgModel])) {
             // If we are the child of a Formation control, register with the
             // control.
-            fmComponentController[REGISTER_NG_MODEL_CALLBACK](ngModelController);
-          } else if (fmFormController && R.is(Function, fmFormController[REGISTER_NG_MODEL_CALLBACK])) {
+            fmComponentController[RegisterNgModel](ngModelController);
+          } else if (fmFormController && R.is(Function, fmFormController[RegisterNgModel])) {
             // Otherwise, if we are the child of a Formation form, register with
-            // the form.a
-            fmFormController[REGISTER_NG_MODEL_CALLBACK](ngModelController);
+            // the form.
+            fmFormController[RegisterNgModel](ngModelController);
           }
         }
       };
