@@ -175,10 +175,81 @@ export function onReady (obj, key, timeout = 10000) {
 }
 
 
+/**
+ * Generates a list of pairs/entries from a collection using the provided
+ * key/value generation functions.
+ *
+ * If called with 2 arguments, they will be interpreted as [keyFn, collection],
+ * and values will be each member in the collection.
+ *
+ * If called with 3 arguments, they will be interpreted as
+ * [keyFn, valueFn, collection].
+ *
+ * @param  {arglist} args - Key generation function, optional value generation
+ *   function, and collection.
+ * @return {array}
+ */
+export function toPairsWith (...args) {
+  let keyFn = R.identity;
+  let valueFn = R.identity;
+  let collection = [];
+
+  switch (args.length) {
+    case 1:
+      throw new Error('toPairsWith expects at least 2 arguments.');
+    case 3:
+      [keyFn, valueFn, collection] = args;
+      break;
+    case 2:
+    default:
+      [keyFn, collection] = args;
+      break;
+  }
+
+  return collection.map(item => [keyFn(item), valueFn(item)]);
+}
+
+
+/**
+ * Provided two lists of [key, value] entries, such as those generated using
+ * Object.entries or Map.prototype.entries, returns a list of
+ * [key, valueA, valueB] triplets by matching each entry in the source list with
+ * each of its corresponding entries in the destination list. Extraneous entries
+ * in the source list will be dropped.
+ *
+ * @param  {array}  dest - Destination set of entries.
+ * @param  {array}  src  - Source set of entries.
+ * @return {array}
+ */
+export function mergeEntries (dest = [], src = []) {
+  return dest.map(destEntry => {
+    const match = src.find(srcEntry => srcEntry[0] === destEntry[0]);
+    return [destEntry[0], destEntry[1], match ? match[1] : undefined];
+  });
+}
+
+
+/**
+ * Invokes the named method on the provided object (if it exists), optionally
+ * passing any additional arguments as parameters to the method.
+ *
+ * @param  {string}    method - Method name to invoke.
+ * @param  {object}    obj    - Target object.
+ * @param  {arglist}   [args] - Additional arguments to pass to 'method'.
+ * @return {*}
+ */
+export function invoke (method, obj, ...args) {
+  return obj && R.is(Function, obj[method]) && obj[method](...args);
+}
+
+
 export default {
   capitalize,
   mergeWithDeep,
   mergeDeep,
   throwError,
-  onReady
+  onReady,
+  toPairsWith,
+  mergeEntries,
+  invoke
 };

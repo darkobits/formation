@@ -67,7 +67,7 @@ app.run(Formation => {
       </label>
       <input id="{{::Input.getControlId() }}"
         type="{{::Input.type }}"
-        name="{{::Input.name }}"
+        name="{{::Input.type === 'radio' ? Input.$getFormName() + '-' + Input.name : Input.name }}"
         placeholder="{{::Input.placeholder }}"
         ng-model="Input.$ngModelGetterSetter"
         ng-value="Input.ngValue"

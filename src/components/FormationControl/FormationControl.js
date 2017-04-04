@@ -15,9 +15,14 @@ import {
 } from '../../etc/utils';
 
 import {
+  ClearCustomErrorMessage,
   Configure,
+  GetModelValue,
   RegisterControl,
-  RegisterNgModel
+  RegisterNgModel,
+  Reset,
+  SetCustomErrorMessage,
+  SetModelValue
 } from '../../etc/interfaces';
 
 
@@ -158,6 +163,18 @@ export class FormationControl {
 
 
   /**
+   * Returns the name of the form that this control belongs to.
+   *
+   * @private
+   *
+   * @return {string}
+   */
+  $getFormName () {
+    return this[FORM_CONTROLLER] && this[FORM_CONTROLLER].name;
+  }
+
+
+  /**
    * Returns true if the control should be disabled.
    *
    * @private
@@ -214,62 +231,6 @@ export class FormationControl {
 
 
   /**
-   * Resets the provided contol to an untouched, pristine state. Does not change
-   * the control's model value.
-   *
-   * @private
-   *
-   * @param  {object} control
-   */
-  $resetControl () {
-    if (this[NG_MODEL_CTRL]) {
-      this[NG_MODEL_CTRL].$setUntouched();
-      this[NG_MODEL_CTRL].$setPristine();
-      this[NG_MODEL_CTRL].$validate();
-    }
-  }
-
-
-  /**
-   * Sets a custom error on the provided control and sets the "custom" validity
-   * state to false.
-   *
-   * @private
-   *
-   * @param  {object} control
-   * @param  {string} errorMessage
-   */
-  $setCustomError (errorMessage) {
-    if (!R.is(String, errorMessage)) {
-      throwError(`Expected error key to be of type "string" but got "${typeof errorMessage}".`);
-    }
-
-    this[FORM_CONTROLLER].$debug(`Setting custom error "${errorMessage}" on control "${this.$getName()}".`);
-    this[CUSTOM_ERROR_MESSAGE_KEY] = errorMessage;
-    this[NG_MODEL_CTRL].$setValidity(CUSTOM_ERROR_KEY, false);
-  }
-
-
-  /**
-   * Sets the "custom" validity state of the provided control to true, and
-   * clears the custom error message.
-   *
-   * TODO: Move this to the FormationControl class.
-   *
-   * @private
-   *
-   * @param  {object} control
-   */
-  $clearCustomError () {
-    if (R.path([NG_MODEL_CTRL, '$error', CUSTOM_ERROR_KEY], this)) {
-      this[FORM_CONTROLLER].$debug(`Clearing custom error on control "${this.$getName()}".`);
-      this[NG_MODEL_CTRL].$setValidity(CUSTOM_ERROR_KEY, true);
-      Reflect.deleteProperty(this, CUSTOM_ERROR_MESSAGE_KEY);
-    }
-  }
-
-
-  /**
    * Used by ngModel (via ngModelOptions) to set and retreive model values.
    *
    * See: https://docs.angularjs.org/api/ng/directive/ngModelOptions
@@ -282,9 +243,9 @@ export class FormationControl {
   $ngModelGetterSetter (...args) {
     if (args.length > 0) {
       const [newValue] = args;
-      this.setModelValue(newValue);
+      this[SetModelValue](newValue);
     } else {
-      return this.getModelValue();
+      return this[GetModelValue]();
     }
   }
 
@@ -301,7 +262,7 @@ export class FormationControl {
    * @return {string}
    */
   getControlId () {
-    return `${this[FORM_CONTROLLER].$name}-${this.$uid}`;
+    return `${this[FORM_CONTROLLER].name}-${this.$uid}`;
   }
 
 
@@ -392,30 +353,18 @@ export class FormationControl {
 
 
   /**
-   * Returns the control's model value.
-   *
-   * @example
-   *
-   * vm.myForm.getControl('age').getModelValue() => 42
-   *
-   * @return {*}
+   * Expose our GetModelValue implementation.
    */
   getModelValue () {
-    return this[FORM_CONTROLLER].$getModelValue(this.$getName());
+    return this[GetModelValue]();
   }
 
 
   /**
-   * Sets the control's model value.
-   *
-   * @example
-   *
-   * vm.myForm.getControl('name').setModelValue('Frodo');
-   *
-   * @param  {*} newValue - Value to set.
+   * Expose our SetModelValue implementation.
    */
   setModelValue (newValue) {
-    this[FORM_CONTROLLER].$setModelValue(this.$getName(), R.clone(newValue));
+    this[SetModelValue](newValue);
   }
 }
 
@@ -544,6 +493,95 @@ RegisterNgModel.implementedBy(FormationControl).as(function (ngModelCtrl) {
 
     // Register the control with the form.
     this[FORM_CONTROLLER][RegisterControl](this);
+  }
+});
+
+
+/**
+ * Returns the control's model value.
+ *
+ * @example
+ *
+ * vm.myForm.getControl('age').getModelValue() => 42
+ *
+ * @return {*}
+ */
+GetModelValue.implementedBy(FormationControl).as(function () {
+  return this[FORM_CONTROLLER].$getModelValue(this.$getName());
+});
+
+
+/**
+ * Sets the control's model value.
+ *
+ * @example
+ *
+ * vm.myForm.getControl('name').setModelValue('Frodo');
+ *
+ * @param  {*} newValue - Value to set.
+ */
+SetModelValue.implementedBy(FormationControl).as(function (newValue) {
+  this[FORM_CONTROLLER].$setModelValue(this.$getName(), R.clone(newValue));
+});
+
+
+/**
+ * Formerly: $setCustomError
+ *
+ * Sets a custom error on the control and sets the "custom" validity state to
+ * false.
+ *
+ * @private
+ *
+ * @param  {string} errorMessage
+ */
+SetCustomErrorMessage.implementedBy(FormationControl).as(function (errorMessage) {
+  if (!R.is(String, errorMessage)) {
+    throwError(`Expected error message to be of type "String" but got "${typeof errorMessage}".`);
+  }
+
+  this[FORM_CONTROLLER].$debug(`Setting custom error "${errorMessage}" on control "${this.$getName()}".`);
+  this[CUSTOM_ERROR_MESSAGE_KEY] = errorMessage;
+  this[NG_MODEL_CTRL].$setValidity(CUSTOM_ERROR_KEY, false);
+});
+
+
+/**
+ * Sets the "custom" validity state of the provided control to true, and
+ * clears the custom error message.
+ *
+ * TODO: Move this to the FormationControl class.
+ *
+ * @private
+ *
+ * @param  {object} control
+ */
+ClearCustomErrorMessage.implementedBy(FormationControl).as(function () {
+  if (R.path([NG_MODEL_CTRL, '$error', CUSTOM_ERROR_KEY], this)) {
+    this[FORM_CONTROLLER].$debug(`Clearing custom error on control "${this.$getName()}".`);
+    this[NG_MODEL_CTRL].$setValidity(CUSTOM_ERROR_KEY, true);
+    Reflect.deleteProperty(this, CUSTOM_ERROR_MESSAGE_KEY);
+  }
+});
+
+
+/**
+ * Resets the contol to an untouched, pristine state.
+ *
+ * @private
+ *
+ * @param  {object} control
+ */
+Reset.implementedBy(FormationControl).as(function (modelValue) {
+  if (this[NG_MODEL_CTRL]) {
+    this[NG_MODEL_CTRL].$setUntouched();
+    this[NG_MODEL_CTRL].$setPristine();
+
+    if (modelValue !== undefined) {
+      this.setModelValue(modelValue);
+    }
+
+    this[NG_MODEL_CTRL].$validate();
   }
 });
 

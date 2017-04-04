@@ -2,6 +2,14 @@ import R from 'ramda';
 
 
 /**
+ * Placeholder used in interface definitions to denote any value may be passed.
+ *
+ * @type {string}
+ */
+export const Any = 'Any';
+
+
+/**
  * Provides a fluent API for registering interface implementations on classes.
  * Enforces naive runtime checks to ensure interfaces are used as intended.
  *
@@ -22,7 +30,7 @@ import R from 'ramda';
  * const myBar = new Bar();
  * myBar[Foo]('baz');
  */
-export default class Interface {
+export class Interface {
   constructor (name, argTypes) {
     this.name = `@@${name}`;
     this.argTypes = argTypes || [];
@@ -31,15 +39,26 @@ export default class Interface {
   test (...args) {
     if (args && args.length >= this.argTypes.length) {
       args.forEach((arg, index) => {
-        if (this.argTypes[index] && !R.is(this.argTypes[index], arg)) {
-          throw new Error(`[Interface ${this.name}] Expected argument ${index + 1} to be of type "${this.argTypes[index].name}".`);
+        if (this.argTypes[index] === Any) {
+          // Simple arity-check using Any as a placeholder.
+          return;
+        } else if (this.argTypes[index] && !R.is(this.argTypes[index], arg)) {
+          throw new Error([
+            `[${this.name}]`,
+            `Expected argument ${index + 1} to be of type "${this.argTypes[index].name}"`,
+            `but got "${typeof arg}".`
+          ].join(' '));
         }
       });
 
       return true;
     }
 
-    throw new Error(`[Interface ${this.name}] Should be invoked with at least ${this.argTypes.length} arguments.`);
+    throw new Error([
+      `[${this.name}]`,
+      `Must be invoked with at least ${this.argTypes.length}`,
+      `argument${this.argTypes.length > 1 ? 's' : ''}.`
+    ].join(' '));
   }
 
   implementedBy (obj) {
@@ -52,15 +71,15 @@ export default class Interface {
         const delegate = R.is(Function, obj) ? obj.prototype : obj;
 
         if (delegate[Interface.name]) {
-          throw new Error(`[Interface ${Interface.name}] Delegate object already implements ${Interface.name}.`);
-        }
-
-        if (implementation.length < Interface.argTypes.length) {
-          throw new Error(`[Interface ${Interface.name}] Expected implementation to have arity ${Interface.argTypes.length}.`);
+          throw new Error(`[Interface] Delegate object already implements ${Interface.name}.`);
         }
 
         if (!R.is(Function, implementation)) {
-          throw new Error(`[Interface ${Interface.name}] Implementation must be a function.`);
+          throw new Error(`[${Interface.name}] Implementation must be a function.`);
+        }
+
+        if (implementation.length < Interface.argTypes.length) {
+          throw new Error(`[${Interface.name}] Expected implementation to have arity ${Interface.argTypes.length}.`);
         }
 
         Object.defineProperty(delegate, Interface.name, {
@@ -81,3 +100,9 @@ export default class Interface {
     return this.name;
   }
 }
+
+
+export default {
+  Any,
+  Interface
+};

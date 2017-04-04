@@ -8,19 +8,28 @@ import app from '../../app';
 
 import {
   mergeDeep,
-  throwError
+  mergeEntries,
+  throwError,
+  toPairsWith,
+  invoke
 } from '../../etc/utils';
 
 import {
-  FORM_COMPONENT_NAME
+  FORM_COMPONENT_NAME,
+  FORM_GROUP_COMPONENT_NAME
 } from '../../etc/constants';
 
 import {
+  ClearCustomErrorMessage,
   Configure,
+  GetModelValue,
   RegisterControl,
   RegisterForm,
   RegisterNgForm,
-  RegisterNgModel
+  RegisterNgModel,
+  Reset,
+  SetCustomErrorMessage,
+  SetModelValue
 } from '../../etc/interfaces';
 
 
@@ -91,7 +100,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    *
    * @type {array}
    */
-  let errorBehavior;
+  let errorBehavior = [];
 
 
   /**
@@ -105,23 +114,13 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
 
 
   /**
-   * Tracks registered controls.
+   * Tracks registered controls and child forms.
    *
    * @private
    *
-   * @type {Array}
+   * @type {array}
    */
-  let controlRegistry = [];
-
-
-  /**
-   * Tracks registered child forms.
-   *
-   * @private
-   *
-   * @type {Array}
-   */
-  let formRegistry = [];
+  let registry = [];
 
 
   /**
@@ -145,6 +144,20 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    */
   function getNextId () {
     return ++counter;
+  }
+
+
+  /**
+   * Provided two objects that implement a '$getScopeId' method, returns the
+   * object with the greater $scope id. This is used to determine which object
+   * is likely to be a descendant of the other in the scope hierarchy.
+   *
+   * @param  {object} a
+   * @param  {object} b
+   * @return {object}
+   */
+  function greaterScopeId (a, b) {
+    return invoke('$getScopeId', a) > invoke('$getScopeId', b) ? a : b;
   }
 
 
@@ -201,10 +214,10 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
     return {
       name: controlName,
       $ngModelCtrl: ngModelCtrl,
-      getModelValue () {
+      [GetModelValue] () {
         return Form.$getModelValue(controlName);
       },
-      setModelValue () { }
+      [SetModelValue] () { }
     };
   }
 
@@ -258,39 +271,18 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
 
 
   /**
-   * Applies each registered control to the provided function.
-   *
-   * TODO: Make this more generic to support child forms. mapRegistry?
-   *
-   * @private
-   *
-   * @param  {function} fn
-   * @return {object}
-   */
-  function mapControls (fn) {
-    return R.map(control => fn(control), controlRegistry);
-  }
-
-
-  /**
    * Sets related form attributes to the correct state for submitting.
    *
    * @private
    */
   function initiateSubmit () {
-    // We need to clear all custom errors set from the last submission in
-    // order for the form's $valid flag to be true so we can proceed.
-    mapControls(control => {
-      if (control.$clearCustomError) {
-        control.$clearCustomError();
-      }
-    });
+    Form[ClearCustomErrorMessage]();
 
-    // Form.$debug('Broadcasting BEGIN_SUBMIT on $scope:', $scope.$parent);
     Form[NG_FORM_CONTROLLER].$setSubmitted(true);
     Form.$submitting = true;
     Form.disable();
 
+    // TODO: This could be replaced with an interface.
     $scope.$parent.$broadcast(BEGIN_SUBMIT_EVENT);
   }
 
@@ -308,11 +300,13 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
   }
 
 
-  // ----- Interfaces ------------------------------------------------------------
+  // ----- Interfaces ----------------------------------------------------------
 
   /**
    * Implement a callback that decorated form/ngForm directives will use to
    * register with this controller.
+   *
+   * @private
    *
    * @param {object} ngFormController - Form/ngForm controller instance.
    */
@@ -336,6 +330,8 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    * Adds the provided child form to the registry and applies model values and
    * configuration.
    *
+   * @private
+   *
    * @param  {object} childForm
    */
   RegisterForm.implementedBy(Form).as(function (childForm) {
@@ -348,20 +344,17 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
     }
 
     Form.$debug(`Registering child form "${childFormName}".`);
-    formRegistry.push(childForm);
+    registry.push(childForm);
 
-    // Determine if we have any form configuration for the child form.
-    const config = controlConfiguration[childFormName];
-
-    // If so, apply its configuration.
-    if (config) {
-      childForm.configure(config);
-    }
+    // Configure the child form/form group.
+    invoke(Configure, childForm, controlConfiguration[childFormName]);
   });
 
 
   /**
    * Adds the provided control to the registry and applies configuration.
+   *
+   * @private
    *
    * @param  {object} control
    */
@@ -375,16 +368,14 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
     }
 
     Form.$debug(`Registering control "${controlName}".`);
+
+    // Controls need unique IDs, as radio buttons will share the same name.
     control.$uid = `${controlName}-${getNextId()}`;
-    controlRegistry = R.append(control, controlRegistry);
 
-    // Determine if we have any form-level configuration for this control.
-    const config = controlConfiguration[controlName];
+    registry.push(control);
 
-    // If so, apply its configuration.
-    if (config && control[Configure]) {
-      control[Configure](config);
-    }
+    // Configure the control.
+    invoke(Configure, control, controlConfiguration[controlName]);
   });
 
 
@@ -393,6 +384,8 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    * with this controller. This is used primarily to support instances of
    * ngModel used in a Formation form without a Formation control.
    *
+   * @private
+   *
    * @param  {object} ngModelCtrl
    */
   RegisterNgModel.implementedBy(Form).as(function (ngModelCtrl) {
@@ -400,7 +393,118 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
   });
 
 
+  /**
+   * Updates the form's configuration data and configures each registered
+   * control, child form, or child form group.
+   */
+  Configure.implementedBy(Form).as(function (config) {
+    if (config && !R.is(Object, config)) {
+      throwError(`Expected configuration to be of type "Object" but got "${typeof config}".`);
+    }
+
+    // Update our local configuration object so that controls can pull from it
+    // as they come online.
+    controlConfiguration = mergeDeep(controlConfiguration, config);
+
+    // Delegate to each existing member's Configure method.
+    R.forEach(([, delegate, config]) => {
+      invoke(Configure, delegate, config);
+    }, mergeEntries(toPairsWith(R.prop('name'), registry), Object.entries(controlConfiguration || {})));
+  });
+
+
+  /**
+   * Returns the form's aggregate model values by delegating to the
+   * GetModelValue method of each control, child form, or child form group.
+   *
+   * @return {object}
+   */
+  GetModelValue.implementedBy(Form).as(function () {
+    return R.fromPairs(toPairsWith(R.prop('name'), R.partial(invoke, [GetModelValue]), registry));
+  });
+
+
+  /**
+   * Sets the the model value(s) for each registered control, child form, or
+   * child form group.
+   *
+   * @param  {object} newValues - Values to set.
+   */
+  SetModelValue.implementedBy(Form).as(function (newValues) {
+    if (newValues && !R.is(Object, newValues)) {
+      throwError(`Expected model values to be of type "Object" but got "${typeof newValues}".`);
+    }
+
+    // Delegate to each member's SetModelValue method.
+    R.forEach(([, delegate, modelValues]) => {
+      invoke(SetModelValue, delegate, modelValues);
+    }, mergeEntries(toPairsWith(R.prop('name'), registry), Object.entries(newValues || {})));
+  });
+
+
+  /**
+   * Applies "$custom" errors returned from the consumer's submit handler.
+   * Expects a mapping of field names to error messages or child forms.
+   *
+   * @private
+   *
+   * @param  {object} errorData
+   */
+  SetCustomErrorMessage.implementedBy(Form).as(function (errorData) {
+    if (errorData && !R.is(Object, errorData)) {
+      throwError(`Expected error message data to be of type "Object" but got "${typeof errorData}".`);
+    }
+
+    // Delegate to each member's SetCustomErrorMessage method.
+    R.forEach(([, delegate, errorData]) => {
+      if (errorData) {
+        invoke(SetCustomErrorMessage, delegate, errorData);
+      }
+    }, mergeEntries(toPairsWith(R.prop('name'), registry), Object.entries(errorData || {})));
+  });
+
+
+  /**
+   * Clear custom error messages on all registered controls, child forms, and
+   * child form groups that also implement ClearCustomErrorMessage.
+   *
+   * @private
+   */
+  ClearCustomErrorMessage.implementedBy(Form).as(function () {
+    R.forEach(member => {
+      invoke(ClearCustomErrorMessage, member);
+    }, registry);
+  });
+
+
+  /**
+   * Resets each control and the form to a pristine state. Optionally resets the
+   * model value of each control to the provided value, and validates all
+   * controls.
+   *
+   * @param  {object} [modelValues]
+   */
+  Reset.implementedBy(Form).as(function (modelValues) {
+    if (modelValues && !R.is(Object, modelValues)) {
+      throwError(`Expected model data to be of type "Object", but got "${typeof modelValues}".`);
+    }
+
+    Form[NG_FORM_CONTROLLER].$setPristine();
+
+    // Delegate to each member's Reset method, passing related model value data.
+    R.forEach(([, delegate, modelValues]) => {
+      invoke(Reset, delegate, modelValues);
+    }, mergeEntries(toPairsWith(R.prop('name'), registry), Object.entries(modelValues)));
+  });
+
+
   // ----- Semi-Private Methods ------------------------------------------------
+
+
+  Form.$getScopeId = () => {
+    return $scope.$id;
+  };
+
 
   /**
    * Determines whether to use a form or ngForm element based on whether this
@@ -446,6 +550,8 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    * @private
    */
   Form.$onInit = () => {
+    const parent = greaterScopeId(Form.$parentForm, Form.$parentFormGroup);
+
     // Auto-generate name if one was not supplied.
     Form.name = Form.name || `Form-${Formation.$getNextId()}`;
 
@@ -457,10 +563,10 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
       Form.$debugging = true;
     }
 
-    if (Form.$parentForm) {
+    if (parent) {
       // If we are a child form, register with our parent form and set up submit
       // listeners.
-      Form.$parentForm[RegisterForm](Form);
+      parent[RegisterForm](Form);
 
       $scope.$on(BEGIN_SUBMIT_EVENT, () => {
         if (!Form.$submitting) {
@@ -533,7 +639,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
 
 
   /**
-   * Returns the model value for the named control.
+   * Returns a copy of the model value for the named control.
    *
    * @private
    *
@@ -541,7 +647,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    * @return {*}
    */
   Form.$getModelValue = controlName => {
-    return modelValues.get(controlName);
+    return R.clone(modelValues.get(controlName));
   };
 
 
@@ -567,7 +673,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    */
   Form.$unregisterControl = control => {
     Form.$debug(`Unregistering control "${control.name}".`);
-    controlRegistry = R.reject(R.propEq('$uid', control.$uid), controlRegistry);
+    registry = R.reject(R.propEq('$uid', control.$uid), registry);
   };
 
 
@@ -580,7 +686,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    */
   Form.$unregisterForm = childForm => {
     Form.$debug(`Unregistering child form "${childForm.name}".`);
-    formRegistry = R.reject(R.propEq('name', childForm.name), formRegistry);
+    registry = R.reject(R.propEq('name', childForm.name), registry);
   };
 
 
@@ -636,7 +742,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
       if (typeof Form.$onSubmit === 'function') {
         // Invoke the consumer's onSubmit callback with current model data.
         const customErrors = await Promise.resolve(Form.$onSubmit(Form.getModelValues()));
-        Form.$applyCustomErrors(customErrors);
+        Form[SetCustomErrorMessage](customErrors);
       }
     } catch (err) {
       // Re-throw errors when testing so we know what caused the submit to fail.
@@ -656,36 +762,6 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
     return R.clone(errorBehavior);
   };
 
-  /**
-   * Applies "$custom" errors returned from the consumer's submit handler.
-   * Expects a mapping of field names to error messages or child forms.
-   *
-   * TODO: Make this a more abstract interaction with a "registry" that can be
-   * done from mapControls, which will make it easier to delegate field errors
-   * to child forms.
-   *
-   * @private
-   *
-   * @param  {object} customErrors
-   */
-  Form.$applyCustomErrors = customErrors => {
-    if (R.is(Object, customErrors)) {
-      R.forEach(error => {
-        const [controlOrFormName, messageOrObject] = error;
-        const control = Form.getControl(controlOrFormName);
-        const childForm = Form.getForm(controlOrFormName);
-
-        if (control && R.is(String, messageOrObject)) {
-          control.$setCustomError(messageOrObject);
-        } else if (childForm && R.is(Object, messageOrObject)) {
-          childForm.$applyCustomErrors(messageOrObject);
-        } else {
-          throwError('Unsure what to do with custom error object fragment:', messageOrObject);
-        }
-      }, Object.entries(customErrors));
-    }
-  };
-
 
   // ----- Public Methods ------------------------------------------------------
 
@@ -700,7 +776,8 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    * @return {object} - Control instance.
    */
   Form.getControl = controlName => {
-    return R.find(R.propEq('name', controlName), controlRegistry);
+    const control = R.find(R.propEq('name', controlName), registry);
+    return !R.is(FormController, control) && control;
   };
 
 
@@ -712,95 +789,8 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    * @return {object} - Child form instance, if found.
    */
   Form.getForm = formName => {
-    return R.find(R.propEq('name', formName), formRegistry);
-  };
-
-
-  /**
-   * Accepts a control configuration object and applies it to each control in
-   * the form.
-   *
-   * TODO: Add $onChanges support for this.
-   *
-   * @param  {object} formConfiguration
-   */
-  Form.configure = config => {
-    // [1] Update out local configuration object.
-    controlConfiguration = mergeDeep(controlConfiguration, config);
-
-    // [2] Apply configuration to any existing registered controls and child
-    // forms.
-    R.forEach((controlOrFormName, config) => {
-      const control = Form.getControl(controlOrFormName);
-      const childForm = Form.getForm(controlOrFormName);
-
-      if (control) {
-        // THIS HAS MOVED TO CONTROL CLASS, BUT MERGE FORM-LEVEL CONFIG WITH IT FIRST
-        control[Configure](config);
-      } else if (childForm) {
-        childForm.configure(config);
-      }
-    }, Object.entries(controlConfiguration));
-  };
-
-
-  /**
-   * @function getModelValues
-   * @memberOf FormController
-   * @instance
-   *
-   * @description
-   *
-   * Returns a new object containing the current non-null, non-NaN, and
-   * non-undefined model values for each registered control. This is the same
-   * method used to generate model values that are passed to submit handlers.
-   *
-   * @return {object} - Map of control names to model values.
-   */
-  Form.getModelValues = () => {
-    // Find a better way to map over a "registry" (collection) and build an
-    // object with values consisting of calling a function on each member of the
-    // registry.
-    const childFormModelValues = R.fromPairs(R.map(childForm => {
-      return [childForm.name, childForm.getModelValues()];
-    }, formRegistry));
-
-    // Model values for the local form.
-    const localModelValues = R.fromPairs(R.reject(([, modelValue]) => {
-      return R.isNil(modelValue) || modelValue === '';
-    }, Array.from(modelValues)));
-
-    return mergeDeep(localModelValues, childFormModelValues);
-  };
-
-
-  /**
-   * @description
-   *
-   * Sets the model value of each control to the provided value.
-   *
-   * @example
-   *
-   * $http.get('/api/someData').then(response => {
-   *   // response = {data: {name: 'Rick', occupation: 'Scientist'}}
-   *   vm.myForm.setModelValues(response.data);
-   * });
-   *
-   * @param  {object} modelValues - Map of control names to model values.
-   */
-  Form.setModelValues = modelValues => {
-    R.forEach(([controlOrFormName, modelData]) => {
-      const control = Form.getControl(controlOrFormName);
-      const childForm = Form.getForm(controlOrFormName);
-
-      if (control) {
-        Form.$setModelValue(controlOrFormName, modelData);
-      } else if (childForm && R.is(Object, modelData)) {
-        childForm.setModelValues(modelData);
-      } else {
-        Form.$debug('Unsure what to do with model data fragment:', modelData);
-      }
-    }, Object.entries(modelValues));
+    const form = R.find(R.propEq('name', formName), registry);
+    return R.is(FormController, form) && form;
   };
 
 
@@ -822,36 +812,11 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
   };
 
 
-  /**
-   * Resets each control and the form to a pristine state. Optionally resets the
-   * model value of each control to the provided value, and validates all
-   * controls.
-   *
-   * TODO: This needs to support child forms. (better)
-   *
-   * @example
-   *
-   * vm.myForm.reset({
-   *   name: null,
-   *   email: null
-   * });
-   *
-   * @param  {object} [modelValues] - Map of control names to model values.
-   */
-  Form.reset = modelValues => {
-    mapControls(control => {
-      if (control.$resetControl) {
-        control.$resetControl();
-      }
-    });
-
-    if (R.is(Object, modelValues)) {
-      Form.setModelValues(modelValues);
-    }
-
-    Form[NG_FORM_CONTROLLER].$setPristine();
-    formRegistry.forEach(childForm => childForm.reset());
-  };
+  // Expose select interfaces.
+  Form.configure = Form[Configure];
+  Form.getModelValues = Form[GetModelValue];
+  Form.reset = Form[Reset];
+  Form.setModelValues = Form[SetModelValue];
 }
 
 
@@ -861,7 +826,8 @@ FormController.$inject = ['$attrs', '$compile', '$element', '$log', '$parse', '$
 app.run(Formation => {
   Formation.$registerComponent(FORM_COMPONENT_NAME, {
     require: {
-      $parentForm: `?^^${FORM_COMPONENT_NAME}`
+      $parentForm: `?^^${FORM_COMPONENT_NAME}`,
+      $parentFormGroup: `?^^${FORM_GROUP_COMPONENT_NAME}`
     },
     bindings: {
       name: '@',
