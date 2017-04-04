@@ -176,7 +176,7 @@ Feel free to explore the [source](/src) -- most of the core components are docum
 - Classes:
   - [FormationControl](/src/components/FormationControl)
 
-[travis-img]: https://img.shields.io/travis/darkobits/formation.svg?style=flat-square
+[travis-img]: https://img.shields.io/travis/darkobits/formation/master.svg?style=flat-square
 [travis-url]: https://travis-ci.org/darkobits/formation
 [david-img]: https://img.shields.io/david/darkobits/formation.svg?style=flat-square
 [david-url]: https://david-dm.org/darkobits/formation
