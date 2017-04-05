@@ -6,3 +6,10 @@ import './services';
 import './filters';
 
 export default module.name;
+
+
+/**
+ * TODO:
+ *
+ * - Make a ConfigurableValidator class.
+ */

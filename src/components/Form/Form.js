@@ -7,11 +7,11 @@ import R from 'ramda';
 import app from '../../app';
 
 import {
+  invoke,
   mergeDeep,
   mergeEntries,
   throwError,
-  toPairsWith,
-  invoke
+  toPairsWith
 } from '../../etc/utils';
 
 import {
