@@ -66,6 +66,9 @@ fm[name="vm.mainForm"]
       fm-input[name="name"]
 
 
+
+
+
 // Future release:
 // Add a form-builder that maps the structure of a model to components that will
 // be rendered:
@@ -75,16 +78,24 @@ fm[name="vm.mainForm"]
 // Object: controls/name of sub-form.
 // Array: Spec for sub-form.
 
-[
-  'fm',
-  {
-    foo: 'fm-input',
-    addresses: [
-      'fm', [
-        'fm', {
-          name: 'fm-input'
-        }
-      ]
-    ]
-  }
-]
+
+const form = {component: 'fm', name: 'vm.addressForm', children: [
+  // Name Control
+  {component: 'fmInput', name: 'name', config: {}},
+
+  // Address Form Group
+  {component: 'fmGroup', name: 'addresses', children: [
+
+    // Address Form (Repeated)
+    {component: 'fm', config: {}, repeat: true, children: [
+      // Street Address Control
+      {component: 'fmInput', name: 'streetAddress', config: {}},
+
+      // City Control
+      {component: 'fmInput', name: 'city', config: {}},
+
+      // Postal Code Control
+      {component: 'fmInput', name: 'postalCode', config: {}}
+    ]}
+  ]}
+]};

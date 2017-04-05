@@ -243,6 +243,26 @@ export function invoke (method, obj, ...args) {
 }
 
 
+
+export function delegateToRegistry (registry, methodToInvoke, data) {
+  // Convert registry array to registry entries in the format [name, member].
+  const registryAsEntries = toPairsWith(R.prop('name'), registry);
+
+  // Convert data object to entries in the format [key, data].
+  const dataAsEntries = Object.entries(data || {});
+
+  // Correlate data to registry members by common name/key, generating
+  // triplets in the format [name, member, data].
+  const mergedEntries = mergeEntries(registryAsEntries, dataAsEntries);
+
+  // For each triplet, invoke the provided method name on the member, passing
+  // it its matching data.
+  R.forEach(([, member, data]) => {
+    invoke(methodToInvoke, member, data);
+  }, mergedEntries);
+}
+
+
 export default {
   capitalize,
   mergeWithDeep,
@@ -251,5 +271,6 @@ export default {
   onReady,
   toPairsWith,
   mergeEntries,
-  invoke
+  invoke,
+  delegateToRegistry
 };

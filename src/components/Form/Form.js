@@ -9,9 +9,9 @@ import app from '../../app';
 import {
   invoke,
   mergeDeep,
-  mergeEntries,
   throwError,
-  toPairsWith
+  toPairsWith,
+  delegateToRegistry
 } from '../../etc/utils';
 
 import {
@@ -152,6 +152,8 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    * object with the greater $scope id. This is used to determine which object
    * is likely to be a descendant of the other in the scope hierarchy.
    *
+   * TODO: Move to utils.
+   *
    * @param  {object} a
    * @param  {object} b
    * @return {object}
@@ -247,6 +249,8 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
   /**
    * Accepts a comma/space-delimited list of strings and returns an array of
    * $-prefixed strings.
+   *
+   * TODO: Move to utils.
    *
    * @example
    *
@@ -407,9 +411,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
     controlConfiguration = mergeDeep(controlConfiguration, config);
 
     // Delegate to each existing member's Configure method.
-    R.forEach(([, delegate, config]) => {
-      invoke(Configure, delegate, config);
-    }, mergeEntries(toPairsWith(R.prop('name'), registry), Object.entries(controlConfiguration || {})));
+    delegateToRegistry(registry, Configure, controlConfiguration);
   });
 
 
@@ -436,9 +438,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
     }
 
     // Delegate to each member's SetModelValue method.
-    R.forEach(([, delegate, modelValues]) => {
-      invoke(SetModelValue, delegate, modelValues);
-    }, mergeEntries(toPairsWith(R.prop('name'), registry), Object.entries(newValues || {})));
+    delegateToRegistry(registry, SetModelValue, newValues);
   });
 
 
@@ -456,11 +456,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
     }
 
     // Delegate to each member's SetCustomErrorMessage method.
-    R.forEach(([, delegate, errorData]) => {
-      if (errorData) {
-        invoke(SetCustomErrorMessage, delegate, errorData);
-      }
-    }, mergeEntries(toPairsWith(R.prop('name'), registry), Object.entries(errorData || {})));
+    delegateToRegistry(registry, SetCustomErrorMessage, errorData);
   });
 
 
@@ -471,9 +467,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    * @private
    */
   ClearCustomErrorMessage.implementedBy(Form).as(function () {
-    R.forEach(member => {
-      invoke(ClearCustomErrorMessage, member);
-    }, registry);
+    delegateToRegistry(registry, ClearCustomErrorMessage);
   });
 
 
@@ -492,19 +486,11 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
     Form[NG_FORM_CONTROLLER].$setPristine();
 
     // Delegate to each member's Reset method, passing related model value data.
-    R.forEach(([, delegate, modelValues]) => {
-      invoke(Reset, delegate, modelValues);
-    }, mergeEntries(toPairsWith(R.prop('name'), registry), Object.entries(modelValues)));
+    delegateToRegistry(registry, Reset, modelValues);
   });
 
 
-  // ----- Semi-Private Methods ------------------------------------------------
-
-
-  Form.$getScopeId = () => {
-    return $scope.$id;
-  };
-
+  // ----- Angular Lifecycle Hooks ---------------------------------------------
 
   /**
    * Determines whether to use a form or ngForm element based on whether this
@@ -626,6 +612,34 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
   };
 
 
+  // ----- Semi-Private Methods ------------------------------------------------
+
+  /**
+   * Passes provided arguments to $log.log if the "debug" attribute is
+   * present on the form element.
+   *
+   * @private
+   *
+   * @param  {...arglist} args
+   */
+  Form.$debug = (...args) => {
+    if (Form.$debugging) {
+      $log.log(`[${Form.name}]`, ...args);
+    }
+  };
+
+
+  /**
+   * Returns the ID of the component's $scope. Used by child components to infer
+   * ancestry in the scope tree.
+   *
+   * @return {number}
+   */
+  Form.$getScopeId = () => {
+    return $scope.$id;
+  };
+
+
   /**
    * Returns true if the form should be disabled.
    *
@@ -691,21 +705,6 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
 
 
   /**
-   * Passes provided arguments to $log.log if the "debug" attribute is
-   * present on the form element.
-   *
-   * @private
-   *
-   * @param  {...arglist} args
-   */
-  Form.$debug = (...args) => {
-    if (Form.$debugging) {
-      $log.log(`[${Form.name}]`, ...args);
-    }
-  };
-
-
-  /**
    * Handles form submission.
    *
    * Once all validators have finished, clears all custom errors and then
@@ -766,10 +765,6 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
   // ----- Public Methods ------------------------------------------------------
 
   /**
-   * @alias module:FormController.getControl
-   *
-   * @description
-   *
    * Returns the first control whose name matches the provided value.
    *
    * @param  {string} controlName

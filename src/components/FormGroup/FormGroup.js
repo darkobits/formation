@@ -7,9 +7,7 @@ import app from '../../app';
 
 import {
   invoke,
-  mergeEntries,
-  throwError,
-  toPairsWith
+  delegateToRegistry
 } from '../../etc/utils';
 
 import {
@@ -138,9 +136,7 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
     }
 
     // Delegate to each existing member's Configure method.
-    R.forEach(([, delegate, config]) => {
-      invoke(Configure, delegate, config);
-    }, mergeEntries(toPairsWith(R.prop('name'), registry), Object.entries(controlConfiguration || [])));
+    delegateToRegistry(registry, Configure, controlConfiguration);
   });
 
 
@@ -165,12 +161,8 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
       throwError(`Expected model values to be of type "Array" but got "${typeof newValues}".`);
     }
 
-    console.log('FORM GROUP MODEL VALUES', newValues);
-
     // Delegate to each child form's SetModelValue method.
-    R.forEach(([, delegate, modelValues]) => {
-      invoke(SetModelValue, delegate, modelValues);
-    }, mergeEntries(Object.entries(registry), Object.entries(newValues || [])));
+    delegateToRegistry(registry, SetModelValue, newValues);
   });
 
 
@@ -188,9 +180,7 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
     }
 
     // Delegate to each child form's SetCustomErrorMessage method.
-    R.forEach(([, delegate, errorData]) => {
-      invoke(SetCustomErrorMessage, delegate, errorData);
-    }, mergeEntries(Object.entries(registry), Object.entries(errorData || [])));
+    delegateToRegistry(registry, SetCustomErrorMessage, errorData);
   });
 
 
@@ -200,9 +190,7 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
    * @private
    */
   ClearCustomErrorMessage.implementedBy(FormGroup).as(function () {
-    R.forEach(member => {
-      invoke(ClearCustomErrorMessage, member);
-    }, registry);
+    delegateToRegistry(registry, ClearCustomErrorMessage);
   });
 
 
@@ -218,17 +206,11 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
     }
 
     // Delegate to each child form's Reset method.
-    R.forEach(([, delegate, modelValues]) => {
-      invoke(Reset, delegate, modelValues);
-    }, mergeEntries(Object.entries(registry), Object.entries(modelValues || [])));
+    delegateToRegistry(registry, Reset, modelValues);
   });
 
 
-  // ----- Semi-Private Methods ------------------------------------------------
-
-  FormGroup.$getScopeId = () => {
-    return $scope.$id;
-  };
+  // ----- Angular Lifecycle Hooks ---------------------------------------------
 
   /**
    * Determines whether to use a form or ngForm element based on whether this
@@ -299,6 +281,34 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
   };
 
 
+  // ----- Semi-Private Methods ------------------------------------------------
+
+  /**
+   * Passes provided arguments to $log.log if the "debug" attribute is
+   * present on the form element.
+   *
+   * @private
+   *
+   * @param  {...arglist} args
+   */
+  FormGroup.$debug = (...args) => {
+    if (FormGroup.$debugging) {
+      $log.log(`[${FormGroup.name}]`, ...args);
+    }
+  };
+
+
+  /**
+   * Returns the ID of the component's $scope. Used by child components to infer
+   * ancestry in the scope tree.
+   *
+   * @return {number}
+   */
+  FormGroup.$getScopeId = () => {
+    return $scope.$id;
+  };
+
+
   /**
    * Returns true if the form should be disabled.
    *
@@ -321,21 +331,6 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
   FormGroup.$unregisterForm = childForm => {
     FormGroup.$debug(`Unregistering child form "${childForm.name}".`);
     registry = R.without(childForm, registry);
-  };
-
-
-  /**
-   * Passes provided arguments to $log.log if the "debug" attribute is
-   * present on the form element.
-   *
-   * @private
-   *
-   * @param  {...arglist} args
-   */
-  FormGroup.$debug = (...args) => {
-    if (FormGroup.$debugging) {
-      $log.log(`[${FormGroup.name}]`, ...args);
-    }
   };
 
 

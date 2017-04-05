@@ -536,13 +536,15 @@ SetModelValue.implementedBy(FormationControl).as(function (newValue) {
  * @param  {string} errorMessage
  */
 SetCustomErrorMessage.implementedBy(FormationControl).as(function (errorMessage) {
-  if (!R.is(String, errorMessage)) {
-    throwError(`Expected error message to be of type "String" but got "${typeof errorMessage}".`);
-  }
+  if (errorMessage) {
+    if (!R.is(String, errorMessage)) {
+      throwError(`Expected error message to be of type "String" but got "${typeof errorMessage}".`);
+    }
 
-  this[FORM_CONTROLLER].$debug(`Setting custom error "${errorMessage}" on control "${this.$getName()}".`);
-  this[CUSTOM_ERROR_MESSAGE_KEY] = errorMessage;
-  this[NG_MODEL_CTRL].$setValidity(CUSTOM_ERROR_KEY, false);
+    this[FORM_CONTROLLER].$debug(`Setting custom error "${errorMessage}" on control "${this.$getName()}".`);
+    this[CUSTOM_ERROR_MESSAGE_KEY] = errorMessage;
+    this[NG_MODEL_CTRL].$setValidity(CUSTOM_ERROR_KEY, false);
+  }
 });
 
 
