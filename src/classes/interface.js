@@ -1,12 +1,14 @@
 import R from 'ramda';
 
+// Note: Consider using Symbols when they are better supported in IE11.
+
 
 /**
  * Placeholder used in interface definitions to denote any value may be passed.
  *
  * @type {string}
  */
-export const Any = 'Any';
+export const Any = 'ANY';
 
 
 /**
@@ -21,8 +23,9 @@ export const Any = 'Any';
  *
  * class Bar { }
  *
- * // Bar can them implement Foo:
+ * // Bar can then implement Foo:
  * Foo.implementedBy(Bar).as(function (str) {
+ *   // 'this' is bound to the current instance of Bar.
  *   // Do something with 'str'.
  * });
  *
@@ -36,7 +39,15 @@ export class Interface {
     this.argTypes = argTypes || [];
   }
 
-  test (...args) {
+
+  /**
+   * Performs simple runtime check on the arguments passed to an interface's
+   * implementation.
+   *
+   * @param  {arglist} args
+   * @return {boolean} - True if the arguments are valid.
+   */
+  checkArguments (...args) {
     if (args && args.length >= this.argTypes.length) {
       args.forEach((arg, index) => {
         if (this.argTypes[index] === Any) {
@@ -61,6 +72,15 @@ export class Interface {
     ].join(' '));
   }
 
+
+  /**
+   * Accepts an object, constructor function, or class and returns an object
+   * which provides the 'as' method, which is then passed the interface
+   * implementation for the provided object.
+   *
+   * @param  {object|function|class} obj
+   * @return {object}
+   */
   implementedBy (obj) {
     const Interface = this;
 
@@ -87,7 +107,7 @@ export class Interface {
           configurable: false,
           writable: false,
           value: function (...args) {
-            if (Interface.test(...args)) {
+            if (Interface.checkArguments(...args)) {
               return implementation.call(this, ...args);
             }
           }
@@ -96,6 +116,14 @@ export class Interface {
     };
   }
 
+
+  /**
+   * Implement a toString method that returns the interface's name. This allows
+   * the interface instance to be used directly as a method name on objects that
+   * implement it.
+   *
+   * @return {string}
+   */
   toString () {
     return this.name;
   }
