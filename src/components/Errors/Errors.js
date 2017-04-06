@@ -2,11 +2,13 @@
 // ----- Errors Component ------------------------------------------------------
 // -----------------------------------------------------------------------------
 
-import app from '../../app';
+import {
+  registerControl
+} from '../../etc/config';
 
 import {
   FormationControl
-} from '../FormationControl';
+} from '../../classes/FormationControl';
 
 import {
   CUSTOM_ERROR_KEY
@@ -39,27 +41,23 @@ class Errors extends FormationControl {
 }
 
 
-app.run(Formation => {
-  const NAME = Formation.$getPrefixedName('Errors');
-
-  Formation.registerControl(NAME, {
-    bindings: {
-      for: '@'
-    },
-    controller: Errors,
-    controllerAs: 'Errors',
-    template: `
-      <label for="{{::Errors.$getCanonicalControlId() }}"
-        ng-if="Errors.getErrors()"
-        ng-messages="Errors.getErrors()">
-        <span ng-repeat="error in Errors.getErrorMessages()"
-          ng-message="{{::error[0] }}">
-          {{::error[1] }}
-        </span>
-        <span ng-message="${CUSTOM_ERROR_KEY}">
-          {{ Errors.getCustomErrorMessage() }}
-        </span>
-      </label>
-    `
-  });
+registerControl('Errors', {
+  bindings: {
+    for: '@'
+  },
+  controller: Errors,
+  controllerAs: 'Errors',
+  template: `
+    <label for="{{::Errors.$getCanonicalControlId() }}"
+      ng-if="Errors.getErrors()"
+      ng-messages="Errors.getErrors()">
+      <span ng-repeat="error in Errors.getErrorMessages()"
+        ng-message="{{::error[0] }}">
+        {{::error[1] }}
+      </span>
+      <span ng-message="${CUSTOM_ERROR_KEY}">
+        {{ Errors.getCustomErrorMessage() }}
+      </span>
+    </label>
+  `
 });

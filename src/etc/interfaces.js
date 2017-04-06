@@ -1,7 +1,7 @@
 import {
   Any,
   Interface
-} from '../classes/interface';
+} from '../classes/Interface';
 
 
 /**

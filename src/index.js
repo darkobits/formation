@@ -1,9 +1,12 @@
 import module from './app';
 
-import './etc/config';
 import './components';
-import './services';
 import './filters';
+
+// Re-export configurator.
+export {
+  FormationConfigurator
+} from './etc/config';
 
 export default module.name;
 

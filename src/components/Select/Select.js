@@ -2,18 +2,20 @@
 // ----- Select Component ------------------------------------------------------
 // -----------------------------------------------------------------------------
 
-import app from '../../app';
+import {
+  $registerComponent
+} from '../../etc/config';
 
 import {
-  FORM_COMPONENT_NAME
+  COMPONENT_CONFIGURATION,
+  FORM_COMPONENT_NAME,
+  FORM_CONTROLLER
 } from '../../etc/constants';
 
 import {
   FormationControl,
-  COMPONENT_CONFIGURATION,
-  FORM_CONTROLLER,
   NG_MODEL_CTRL
-} from '../FormationControl';
+} from '../../classes/FormationControl';
 
 
 /**
@@ -50,66 +52,62 @@ class SelectControl extends FormationControl {
 }
 
 
-app.run(Formation => {
-  const NAME = Formation.$getPrefixedName('Select');
-
-  Formation.$registerDirective(NAME, () => {
-    return {
-      restrict: 'E',
-      scope: true,
-      bindToController: {
-        [COMPONENT_CONFIGURATION]: '<config',
-        name: '@',
-        placeholder: '@',
-        multiple: '@',
-        $ngDisabled: '<ngDisabled'
-      },
-      require: {
-        [FORM_CONTROLLER]: `^^${FORM_COMPONENT_NAME}`
-      },
-      transclude: true,
-      compile (tElement, tAttributes) {
-        // We need to set ngOptions during compilation, or Angular will not use
-        // them.
-        tElement.find('select').attr('ng-options', tAttributes.options);
-      },
-      controller: SelectControl,
-      controllerAs: 'Select',
-      template: `
-        <label for="{{::Select.getControlId() }}"
-          ng-class="{
-            'has-error': Select.getErrors(),
-            'is-pending': Select.${NG_MODEL_CTRL}.$pending
-          }"
-          ng-transclude>
-        </label>
-        <select id="{{::Select.getControlId() }}"
-          name="{{::Select.name }}"
-          ng-model="Select.$ngModelGetterSetter"
-          ng-if="::!Select.multiple"
-          ng-disabled="Select.$isDisabled()"
-          ng-class="{
-            'has-error': Select.getErrors(),
-            'is-pending': Select.${NG_MODEL_CTRL}.$pending
-          }">
-          <option value=""
-            ng-if="::Select.placeholder"
-            hidden>
-            {{::Select.placeholder }}
-          </option>
-        </select>
-        <select id="{{::Select.getControlId() }}"
-          name="{{::Select.name }}"
-          ng-model="Select.$ngModelGetterSetter"
-          ng-if="::Select.multiple"
-          ng-disabled="Select.$isDisabled()"
-          ng-class="{
-            'has-error': Select.getErrors(),
-            'is-pending': Select.${NG_MODEL_CTRL}.$pending
-          }"
-          multiple>
-        </select>
-      `
-    };
-  });
+$registerComponent('Select', () => {
+  return {
+    restrict: 'E',
+    scope: true,
+    bindToController: {
+      [COMPONENT_CONFIGURATION]: '<config',
+      name: '@',
+      placeholder: '@',
+      multiple: '@',
+      $ngDisabled: '<ngDisabled'
+    },
+    require: {
+      [FORM_CONTROLLER]: `^^${FORM_COMPONENT_NAME}`
+    },
+    transclude: true,
+    compile (tElement, tAttributes) {
+      // We need to set ngOptions during compilation, or Angular will not use
+      // them.
+      tElement.find('select').attr('ng-options', tAttributes.options);
+    },
+    controller: SelectControl,
+    controllerAs: 'Select',
+    template: `
+      <label for="{{::Select.getControlId() }}"
+        ng-class="{
+          'has-error': Select.getErrors(),
+          'is-pending': Select.${NG_MODEL_CTRL}.$pending
+        }"
+        ng-transclude>
+      </label>
+      <select id="{{::Select.getControlId() }}"
+        name="{{::Select.name }}"
+        ng-model="Select.$ngModelGetterSetter"
+        ng-if="::!Select.multiple"
+        ng-disabled="Select.$isDisabled()"
+        ng-class="{
+          'has-error': Select.getErrors(),
+          'is-pending': Select.${NG_MODEL_CTRL}.$pending
+        }">
+        <option value=""
+          ng-if="::Select.placeholder"
+          hidden>
+          {{::Select.placeholder }}
+        </option>
+      </select>
+      <select id="{{::Select.getControlId() }}"
+        name="{{::Select.name }}"
+        ng-model="Select.$ngModelGetterSetter"
+        ng-if="::Select.multiple"
+        ng-disabled="Select.$isDisabled()"
+        ng-class="{
+          'has-error': Select.getErrors(),
+          'is-pending': Select.${NG_MODEL_CTRL}.$pending
+        }"
+        multiple>
+      </select>
+    `
+  };
 });

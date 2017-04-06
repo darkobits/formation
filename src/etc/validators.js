@@ -18,15 +18,15 @@
 import R from 'ramda';
 
 import {
-  NG_MODEL_CTRL
-} from '../components/FormationControl';
+  ConfigurableValidator
+} from '../classes/ConfigurableValidator';
 
 import {
-  capitalize
+  capitalizeFirst
 } from './utils';
 
 import {
-  CONFIGURABLE_VALIDATOR
+  NG_MODEL_CTRL
 } from './constants';
 
 
@@ -235,53 +235,46 @@ export function pattern (pattern) {
  * @return {function}
  */
 export function match (independentControlName) {
-  // Validator configuration function.
-  function configureMatch (form) {
-    // Return validator function.
-    function matchValidator (modelValue) {
-      const ngModelCtrl = this;
-      const independentNgModelCtrl = R.path([NG_MODEL_CTRL], form.getControl(independentControlName));
+  return new ConfigurableValidator(function (modelValue) {
+    const {scope, form, ngModelCtrl} = this;
+    const independentNgModelCtrl = R.path([NG_MODEL_CTRL], form.getControl(independentControlName));
 
-      // Ensure both controls use ngModel.
-      if (!ngModelCtrl || !independentNgModelCtrl) {
-        form.$debug(`[match] Both controls must use ngModel.`);
-        return false;
-      }
-
-      // Ensure we are not trying to match ourselves.
-      if (ngModelCtrl.$name === independentNgModelCtrl.$name) {
-        form.$debug(`Control "${ngModelCtrl.$name}" is trying to match itself.`);
-        return true;
-      }
-
-      // Compute the name to use for the complementary validator to install on
-      // the independent control.
-      const validatorName = `$match${capitalize(ngModelCtrl.$name)}`;
-
-      // If not present, install complementary validator. This validator always
-      // returns true, but ensures that when the independent control is
-      // modified, this control will re-validate.
-      if (!independentNgModelCtrl.$validators[validatorName]) {
-        independentNgModelCtrl.$validators[validatorName] = () => {
-          ngModelCtrl.$validate();
-          return true;
-        };
-      }
-
-      // When the above validator on the independent control fires, the
-      // independent control will be in the middle of a validation cycle,
-      // meaning it's new model value will not have been written to $modelValue
-      // yet. Therefore, we need to compare our model value to the independent
-      // control's raw model value.
-      return modelValue === independentNgModelCtrl.$$rawModelValue;
+    // Ensure both controls use ngModel.
+    if (!ngModelCtrl || !independentNgModelCtrl) {
+      form.$debug(`[match] Both controls must use ngModel.`);
+      return false;
     }
 
-    return matchValidator;
-  }
+    // Ensure we are not trying to match ourself.
+    if (ngModelCtrl.$name === independentNgModelCtrl.$name) {
+      form.$debug(`Control "${ngModelCtrl.$name}" is trying to match itself.`);
+      return true;
+    }
 
-  configureMatch[CONFIGURABLE_VALIDATOR] = true;
+    // Compute the name to use for the complementary validator to install on
+    // the independent control. Ex: '$matchPassword'
+    const validatorName = `$match${capitalizeFirst(ngModelCtrl.$name)}`;
 
-  return configureMatch;
+    // If not present, install complementary validator. This validator always
+    // returns true, but ensures that when the independent control is
+    // modified, this control will re-validate.
+    if (!independentNgModelCtrl.$validators[validatorName]) {
+      independentNgModelCtrl.$validators[validatorName] = () => {
+        // When this validator is triggered, the control will be in the middle
+        // of a validation cycle, and its model value will temporarily be
+        // undefined until the cycle completes. Therefore, we need to wait until
+        // the next digest cycle, then tell the dependent control to
+        // re-validate.
+        scope.$applyAsync(() => {
+          ngModelCtrl.$validate();
+        });
+
+        return true;
+      };
+    }
+
+    return modelValue === independentNgModelCtrl.$modelValue;
+  });
 }
 
 

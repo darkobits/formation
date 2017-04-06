@@ -2,6 +2,12 @@
 // ----- Utilities -------------------------------------------------------------
 // -----------------------------------------------------------------------------
 
+/**
+ * TODO: Consider replacing mergeDeep with webpack-merge, especially if it can
+ * be used with tree-shaking.
+ */
+
+
 import R from 'ramda';
 
 import {
@@ -10,46 +16,28 @@ import {
 
 
 /**
- * @memberOf utils
- * @function capitalize
- * @private
- *
- * @description
- *
  * Capitalizes the first character in the provided string.
  *
  * @param  {string} str
  * @return {string}
  */
-export function capitalize (str) {
+export function capitalizeFirst (str) {
   return str && String(str).substr(0, 1).toUpperCase() + String(str).substr(1);
 }
 
 
 /**
- * @memberOf utils
- * @function lowercase
- * @private
- *
- * @description
- *
  * Lowercases the first character in the provided string.
  *
  * @param  {string} str
  * @return {string}
  */
-export function lowercase (str) {
+export function lowercaseFirst (str) {
   return str && String(str).substr(0, 1).toLowerCase() + String(str).substr(1);
 }
 
 
 /**
- * @memberOf utils
- * @function mergeWithDeep
- * @private
- *
- * @description
- *
  * Recursive version of R.mergeWith.
  *
  * @param  {function} f - Merging function.
@@ -77,12 +65,6 @@ export function mergeWithDeep (f, ...objs) {
 
 
 /**
- * @memberOf utils
- * @function DEFAULT_MERGER
- * @private
- *
- * @description
- *
  * Default merging function.
  *
  * - If values are primitives, use the value from source object, overwriting the
@@ -107,12 +89,6 @@ const DEFAULT_MERGER = (d, s) => {
 
 
 /**
- * @memberOf utils
- * @function mergeDeep
- * @private
- *
- * @description
- *
  * Partially-applied version of mergeWithDeep using the default merger.
  *
  * @param  {arglist} objs - Objects to merge.
@@ -124,12 +100,6 @@ export const mergeDeep = (...objs) => {
 
 
 /**
- * @memberOf utils
- * @function throwError
- * @private
- *
- * @description
- *
  * Throws a new error with the provided message, prefixed with the module
  * name.
  *
@@ -140,19 +110,39 @@ export function throwError (message) {
 }
 
 
+/**
+ * Accepts a comma/space-delimited list of strings and returns an array of
+ * $-prefixed strings.
+ *
+ * @example
+ *
+ * "touched, submitted" => ['$touched', '$submitted']
+ *
+ * @private
+ *
+ * @param  {string} string
+ * @return {array}
+ */
+export function parseFlags (string) {
+  if (!string || string === '') {
+    return;
+  }
+
+  const states = R.map(state => {
+    return state.length && `$${state.replace(/[, ]/g, '')}`;
+  }, String(string).split(' '));
+
+  return R.filter(R.identity, states);
+}
+
 
 /**
- * @memberOf utils
- * @function onReady
- *
- * @description
- *
  * Spies on a key in the provided object and returns a promise that resolves
  * when the value becomes defined or rejects when a timeout is reached.
  *
  * @param  {object} obj - Base object.
  * @param  {string} key - Key in base object to spy on.
- * @param  {Number} [timeout=10000] - Timeout period. Default is 10 seconds.
+ * @param  {number} [timeout=10000] - Timeout period. Default is 10 seconds.
  * @return {promise<*>} - Promise that resolves with the value at the named key
  *   once it is defined.
  */
@@ -173,6 +163,27 @@ export function onReady (obj, key, timeout = 10000) {
     }, 1);
   });
 }
+
+
+/**
+ * Assigns a value to an expression on the provided scope.
+ *
+ * @param {object} $parse - Angular $parse service.
+ * @param {object} scope - Angular scope to assign to.
+ * @param {*}      value - Value to assign to scope.
+ * @param {string} expression - Expression in scope's parent to assign value to.
+ */
+export const assignToScope = R.curry(($parse, scope, value, expression) => {
+  let setter;
+
+  if (expression === '') {
+    setter = $parse('this[""]').assign;
+  } else {
+    setter = $parse(expression).assign;
+  }
+
+  setter(scope, value);
+});
 
 
 /**
@@ -206,7 +217,7 @@ export function toPairsWith (...args) {
       break;
   }
 
-  return collection.map(item => [keyFn(item), valueFn(item)]);
+  return collection.map((...args) => [String(keyFn(...args)), valueFn(...args)]);
 }
 
 
@@ -243,34 +254,88 @@ export function invoke (method, obj, ...args) {
 }
 
 
-
-export function delegateToRegistry (registry, methodToInvoke, data) {
-  // Convert registry array to registry entries in the format [name, member].
-  const registryAsEntries = toPairsWith(R.prop('name'), registry);
-
-  // Convert data object to entries in the format [key, data].
-  const dataAsEntries = Object.entries(data || {});
-
-  // Correlate data to registry members by common name/key, generating
-  // triplets in the format [name, member, data].
-  const mergedEntries = mergeEntries(registryAsEntries, dataAsEntries);
-
-  // For each triplet, invoke the provided method name on the member, passing
-  // it its matching data.
-  R.forEach(([, member, data]) => {
-    invoke(methodToInvoke, member, data);
-  }, mergedEntries);
+/**
+ * Provided two objects that implement a '$getScope' method, returns the
+ * object with the greater $scope id. This is used to determine which object
+ * is likely to be a descendant of the other in the scope hierarchy.
+ *
+ * @param  {object} a
+ * @param  {object} b
+ * @return {object}
+ */
+export function greaterScopeId (a, b) {
+  const aId = R.path(['$id'], invoke('$getScope', a));
+  const bId = R.path(['$id'], invoke('$getScope', b));
+  return aId > bId ? a : b;
 }
 
 
+/**
+ * Applies a set of data to each member in a collection by matching data to
+ * members and invoking a method on each member, passing it a data fragment.
+ *
+ * @example
+ *
+ * const collection = [
+ *   {
+ *     id: '1',
+ *     setName: name => {
+ *       this.name = name;
+ *     }
+ *   },
+ *   {
+ *     id: '2',
+ *     setName => {
+ *       this.name = name;
+ *     }
+ *   }
+ * ];
+ *
+ * const data = {
+ *   '1': 'foo',
+ *   '2': 'bar'
+ * };
+ *
+ * // This will set the first item's name to 'foo', and the second item's name
+ * // to 'bar', based on matching keys in 'data' to 'id' in collection members.
+ * applyToCollection(collection, R.prop('id'), 'setName', data);
+ *
+ * @param {array} collection - Collection to apply data to.
+ * @param {function} entryFn - Function to pass to toPairsWith to generate the
+ *   key (left hand side) for each entry in 'collection'.
+ * @param {string} memberFn - The function to invoke on each member in the
+ *   collection to pass matched data fragments to.
+ * @param {object|array} data - Data to disperse to members of 'collection'.
+ */
+export const applyToCollection = R.curry((collection, entryFn, memberFn, data) => {
+  // Convert registry array to registry entries in the format [name, member].
+  const collectionEntries = toPairsWith(entryFn, collection);
+
+  // Convert data object to entries in the format [key, data].
+  const dataEntries = Object.entries(data || {});
+
+  // Correlate data to registry members by common name/key, generating
+  // triplets in the format [name, member, data].
+  const mergedEntries = mergeEntries(collectionEntries, dataEntries);
+
+  // For each triplet, invoke the provided method name on the member, passing
+  // it its matching data.
+  return R.map(([name, member, data]) => [name, invoke(memberFn, member, data)], mergedEntries);
+});
+
+
 export default {
-  capitalize,
-  mergeWithDeep,
-  mergeDeep,
-  throwError,
-  onReady,
-  toPairsWith,
-  mergeEntries,
+  applyToCollection,
+  assignToScope,
+  capitalizeFirst,
+  greaterScopeId,
   invoke,
-  delegateToRegistry
+  lowercaseFirst,
+  mergeDeep,
+  mergeEntries,
+  mergeWithDeep,
+  onReady,
+  parseFlags,
+  throwError,
+  toPairsWith
 };

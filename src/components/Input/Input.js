@@ -2,12 +2,14 @@
 // ----- Input Component -------------------------------------------------------
 // -----------------------------------------------------------------------------
 
-import app from '../../app';
+import {
+  registerControl
+} from '../../etc/config';
 
 import {
   FormationControl,
   NG_MODEL_CTRL
-} from '../FormationControl';
+} from '../../classes/FormationControl';
 
 
 /**
@@ -43,47 +45,43 @@ class InputControl extends FormationControl {
 }
 
 
-app.run(Formation => {
-  const NAME = Formation.$getPrefixedName('Input');
-
-  Formation.registerControl(NAME, {
-    bindings: {
-      name: '@',
-      placeholder: '@',
-      type: '@',
-      ngValue: '<'
-    },
-    transclude: true,
-    controller: InputControl,
-    controllerAs: 'Input',
-    template: `
-      <label for="{{::Input.getControlId() }}"
-        ng-if="Input.type !== 'radio' && Input.type !== 'checkbox'"
-        ng-class="{
-          'has-error': Input.getErrors(),
-          'is-pending': Input.${NG_MODEL_CTRL}.$pending
-        }"
-        ng-transclude>
-      </label>
-      <input id="{{::Input.getControlId() }}"
-        type="{{::Input.type }}"
-        name="{{::Input.type === 'radio' ? Input.$getFormName() + '-' + Input.name : Input.name }}"
-        placeholder="{{::Input.placeholder }}"
-        ng-model="Input.$ngModelGetterSetter"
-        ng-value="Input.ngValue"
-        ng-class="{
-          'has-error': Input.getErrors(),
-          'is-pending': Input.${NG_MODEL_CTRL}.$pending
-        }"
-        ng-disabled="Input.$isDisabled()">
-      <label for="{{::Input.getControlId() }}"
-        ng-if="Input.type === 'radio' || Input.type === 'checkbox'"
-        ng-class="{
-          'has-error': Input.getErrors(),
-          'is-pending': Input.${NG_MODEL_CTRL}.$pending
-        }"
-        ng-transclude>
-      </label>
-    `
-  });
+registerControl('Input', {
+  bindings: {
+    name: '@',
+    placeholder: '@',
+    type: '@',
+    ngValue: '<'
+  },
+  transclude: true,
+  controller: InputControl,
+  controllerAs: 'Input',
+  template: `
+    <label for="{{::Input.getControlId() }}"
+      ng-if="Input.type !== 'radio' && Input.type !== 'checkbox'"
+      ng-class="{
+        'has-error': Input.getErrors(),
+        'is-pending': Input.${NG_MODEL_CTRL}.$pending
+      }"
+      ng-transclude>
+    </label>
+    <input id="{{::Input.getControlId() }}"
+      type="{{::Input.type }}"
+      name="{{::Input.type === 'radio' ? Input.$getFormName() + '-' + Input.name : Input.name }}"
+      placeholder="{{::Input.placeholder }}"
+      ng-model="Input.$ngModelGetterSetter"
+      ng-value="Input.ngValue"
+      ng-class="{
+        'has-error': Input.getErrors(),
+        'is-pending': Input.${NG_MODEL_CTRL}.$pending
+      }"
+      ng-disabled="Input.$isDisabled()">
+    <label for="{{::Input.getControlId() }}"
+      ng-if="Input.type === 'radio' || Input.type === 'checkbox'"
+      ng-class="{
+        'has-error': Input.getErrors(),
+        'is-pending': Input.${NG_MODEL_CTRL}.$pending
+      }"
+      ng-transclude>
+    </label>
+  `
 });

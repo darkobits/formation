@@ -4,14 +4,21 @@
 
 import angular from 'angular';
 import R from 'ramda';
-import app from '../../app';
 
 import {
+  $getNextId,
+  $getShowErrorsOnStr,
+  $registerComponent
+} from '../../etc/config';
+
+import {
+  applyToCollection,
+  assignToScope,
+  greaterScopeId,
   invoke,
   mergeDeep,
-  throwError,
-  toPairsWith,
-  delegateToRegistry
+  parseFlags,
+  throwError
 } from '../../etc/utils';
 
 import {
@@ -78,7 +85,7 @@ export const END_SUBMIT_EVENT = '$fmTerminateSubmit';
  * - `ng-disabled`: Expression to evaluate that, if truthy, will disable all
  *   Formation controls in the form.
  */
-export function FormController ($attrs, $compile, $element, $log, $parse, $scope, $transclude, Formation) {
+export function FormController ($attrs, $compile, $element, $log, $parse, $scope, $transclude) {
   const Form = this;
 
 
@@ -136,6 +143,29 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
   // ----- Private Methods -----------------------------------------------------
 
   /**
+   * Curried applyToCollection using our local registry and generating entries
+   * using each member's 'name' property.
+   *
+   * Remaining arguments:
+   *
+   * @param {string} methodName - Method name to invoke on each member.
+   * @param {object|array} [data] - Optional data to disperse to members.
+   */
+  const applyToRegistry = applyToCollection(registry)(R.prop('name'));
+
+
+  /**
+   * Curried assignToScope that will assign the form controller instance to the
+   * provided expression in the controller's parent scope.
+   *
+   * Remaining arguments:
+   *
+   * @param {string} expression - Expression to assign to.
+   */
+  const assignName = assignToScope($parse)($scope.$parent)(Form);
+
+
+  /**
    * Returns the next available ID.
    *
    * @private
@@ -144,43 +174,6 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    */
   function getNextId () {
     return ++counter;
-  }
-
-
-  /**
-   * Provided two objects that implement a '$getScopeId' method, returns the
-   * object with the greater $scope id. This is used to determine which object
-   * is likely to be a descendant of the other in the scope hierarchy.
-   *
-   * TODO: Move to utils.
-   *
-   * @param  {object} a
-   * @param  {object} b
-   * @return {object}
-   */
-  function greaterScopeId (a, b) {
-    return invoke('$getScopeId', a) > invoke('$getScopeId', b) ? a : b;
-  }
-
-
-  /**
-   * Assigns the controller instance to the parsed expression in the parent
-   * scope.
-   *
-   * @private
-   *
-   * @param  {string} expression
-   */
-  function assignToExpression (expression) {
-    let setter;
-
-    if (expression === '') {
-      setter = $parse('this[""]').assign;
-    } else {
-      setter = $parse(expression).assign;
-    }
-
-    setter($scope.$parent, Form);
   }
 
 
@@ -243,34 +236,6 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
         }
       });
     });
-  }
-
-
-  /**
-   * Accepts a comma/space-delimited list of strings and returns an array of
-   * $-prefixed strings.
-   *
-   * TODO: Move to utils.
-   *
-   * @example
-   *
-   * "touched, submitted" => ['$touched', '$submitted']
-   *
-   * @private
-   *
-   * @param  {string} string
-   * @return {array}
-   */
-  function parseFlags (string) {
-    if (!string || string === '') {
-      return;
-    }
-
-    const states = R.map(state => {
-      return state.length && `$${state.replace(/[, ]/g, '')}`;
-    }, String(string).split(' '));
-
-    return R.filter(R.identity, states);
   }
 
 
@@ -403,7 +368,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    */
   Configure.implementedBy(Form).as(function (config) {
     if (config && !R.is(Object, config)) {
-      throwError(`Expected configuration to be of type "Object" but got "${typeof config}".`);
+      throwError(`Form expected configuration to be of type "Object" but got "${typeof config}".`);
     }
 
     // Update our local configuration object so that controls can pull from it
@@ -411,7 +376,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
     controlConfiguration = mergeDeep(controlConfiguration, config);
 
     // Delegate to each existing member's Configure method.
-    delegateToRegistry(registry, Configure, controlConfiguration);
+    applyToRegistry(Configure, controlConfiguration);
   });
 
 
@@ -422,7 +387,8 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    * @return {object}
    */
   GetModelValue.implementedBy(Form).as(function () {
-    return R.fromPairs(toPairsWith(R.prop('name'), R.partial(invoke, [GetModelValue]), registry));
+    return R.fromPairs(applyToRegistry(GetModelValue, null));
+    // return R.fromPairs(toPairsWith(R.prop('name'), R.partial(invoke, [GetModelValue]), registry));
   });
 
 
@@ -434,11 +400,11 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    */
   SetModelValue.implementedBy(Form).as(function (newValues) {
     if (newValues && !R.is(Object, newValues)) {
-      throwError(`Expected model values to be of type "Object" but got "${typeof newValues}".`);
+      throwError(`Form expected model values to be of type "Object" but got "${typeof newValues}".`);
     }
 
     // Delegate to each member's SetModelValue method.
-    delegateToRegistry(registry, SetModelValue, newValues);
+    applyToRegistry(SetModelValue, newValues);
   });
 
 
@@ -452,11 +418,11 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    */
   SetCustomErrorMessage.implementedBy(Form).as(function (errorData) {
     if (errorData && !R.is(Object, errorData)) {
-      throwError(`Expected error message data to be of type "Object" but got "${typeof errorData}".`);
+      throwError(`Form expected error message data to be of type "Object" but got "${typeof errorData}".`);
     }
 
     // Delegate to each member's SetCustomErrorMessage method.
-    delegateToRegistry(registry, SetCustomErrorMessage, errorData);
+    applyToRegistry(SetCustomErrorMessage, errorData);
   });
 
 
@@ -467,7 +433,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    * @private
    */
   ClearCustomErrorMessage.implementedBy(Form).as(function () {
-    delegateToRegistry(registry, ClearCustomErrorMessage);
+    applyToRegistry(ClearCustomErrorMessage);
   });
 
 
@@ -480,13 +446,13 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    */
   Reset.implementedBy(Form).as(function (modelValues) {
     if (modelValues && !R.is(Object, modelValues)) {
-      throwError(`Expected model data to be of type "Object", but got "${typeof modelValues}".`);
+      throwError(`Form expected model data to be of type "Object", but got "${typeof modelValues}".`);
     }
 
     Form[NG_FORM_CONTROLLER].$setPristine();
 
     // Delegate to each member's Reset method, passing related model value data.
-    delegateToRegistry(registry, Reset, modelValues);
+    applyToRegistry(Reset, modelValues);
   });
 
 
@@ -539,7 +505,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
     const parent = greaterScopeId(Form.$parentForm, Form.$parentFormGroup);
 
     // Auto-generate name if one was not supplied.
-    Form.name = Form.name || `Form-${Formation.$getNextId()}`;
+    Form.name = Form.name || `Form-${$getNextId()}`;
 
     // Merge configuration data from the "config" attribute into our local copy.
     controlConfiguration = mergeDeep(controlConfiguration, Form.$controlConfiguration);
@@ -567,11 +533,11 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
       });
     } else {
       // If we are the top-level form, assign to parent scope expression.
-      assignToExpression(Form.name);
+      assignName(Form.name);
     }
 
     // Parse error behavior.
-    errorBehavior = parseFlags(Form.$showErrorsOn || Formation.$getShowErrorsOnStr());
+    errorBehavior = parseFlags(Form.$showErrorsOn || $getShowErrorsOnStr());
   };
 
 
@@ -590,12 +556,12 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
     if (changes.name && !changes.name.isFirstChange()) {
       const {currentValue, previousValue} = changes.name;
       Form.$debug(`Name changed from "${previousValue}" to "${currentValue}".`);
-      assignToExpression(currentValue);
+      assignName(currentValue);
     }
 
     if (changes.$showErrorsOn && !changes.$showErrorsOn.isFirstChange()) {
       const {currentValue} = changes.$showErrorsOn;
-      errorBehavior = parseFlags(currentValue || Formation.$getShowErrorsOnStr());
+      errorBehavior = parseFlags(currentValue || $getShowErrorsOnStr());
     }
   };
 
@@ -630,13 +596,13 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
 
 
   /**
-   * Returns the ID of the component's $scope. Used by child components to infer
-   * ancestry in the scope tree.
+   * Returns the form's $scope. Used to compare scope IDs for child form
+   * registration, and for configurable validators.
    *
-   * @return {number}
+   * @return {object}
    */
-  Form.$getScopeId = () => {
-    return $scope.$id;
+  Form.$getScope = () => {
+    return $scope;
   };
 
 
@@ -807,7 +773,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
   };
 
 
-  // Expose select interfaces.
+  // Expose select interfaces to the public API.
   Form.configure = Form[Configure];
   Form.getModelValues = Form[GetModelValue];
   Form.reset = Form[Reset];
@@ -815,26 +781,24 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
 }
 
 
-FormController.$inject = ['$attrs', '$compile', '$element', '$log', '$parse', '$scope', '$transclude', 'Formation'];
+FormController.$inject = ['$attrs', '$compile', '$element', '$log', '$parse', '$scope', '$transclude'];
 
 
-app.run(Formation => {
-  Formation.$registerComponent(FORM_COMPONENT_NAME, {
-    require: {
-      $parentForm: `?^^${FORM_COMPONENT_NAME}`,
-      $parentFormGroup: `?^^${FORM_GROUP_COMPONENT_NAME}`
-    },
-    bindings: {
-      name: '@',
-      $controlConfiguration: '<controls',
-      $onSubmit: '<onSubmit',
-      $showErrorsOn: '@showErrorsOn',
-      $ngDisabled: '<ngDisabled'
-    },
-    transclude: true,
-    controller: FormController,
-    controllerAs: 'Form'
-  });
+$registerComponent(FORM_COMPONENT_NAME, {
+  require: {
+    $parentForm: `?^^${FORM_COMPONENT_NAME}`,
+    $parentFormGroup: `?^^${FORM_GROUP_COMPONENT_NAME}`
+  },
+  bindings: {
+    name: '@',
+    $controlConfiguration: '<controls',
+    $onSubmit: '<onSubmit',
+    $showErrorsOn: '@showErrorsOn',
+    $ngDisabled: '<ngDisabled'
+  },
+  transclude: true,
+  controller: FormController,
+  controllerAs: 'Form'
 });
 
 

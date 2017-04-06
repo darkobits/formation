@@ -3,11 +3,16 @@
 // -----------------------------------------------------------------------------
 
 import R from 'ramda';
-import app from '../../app';
 
 import {
+  $getNextId,
+  $registerComponent
+} from '../../etc/config';
+
+import {
+  applyToCollection,
   invoke,
-  delegateToRegistry
+  throwError
 } from '../../etc/utils';
 
 import {
@@ -53,7 +58,7 @@ export const BEGIN_SUBMIT_EVENT = '$fmInitiateSubmit';
 export const END_SUBMIT_EVENT = '$fmTerminateSubmit';
 
 
-export function FormGroupController ($attrs, $compile, $element, $log, $parse, $scope, $transclude, Formation) {
+export function FormGroupController ($attrs, $compile, $element, $log, $parse, $scope, $transclude) {
   const FormGroup = this;
 
 
@@ -80,24 +85,15 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
   // ----- Private Methods -----------------------------------------------------
 
   /**
-   * Assigns the form group instance to the parsed expression in the parent
-   * scope.
+   * Curried applyToCollection using our local registry and generating entries
+   * using each member's index in the registry.
    *
-   * @private
+   * Remaining arguments:
    *
-   * @param  {string} expression
+   * @param {string} methodName - Method name to invoke on each member.
+   * @param {object|array} [data] - Optional data to disperse to members.
    */
-  function assignToExpression (expression) {
-    let setter;
-
-    if (expression === '') {
-      setter = $parse('this[""]').assign;
-    } else {
-      setter = $parse(expression).assign;
-    }
-
-    setter($scope.$parent, FormGroup);
-  }
+  const applyToRegistry = applyToCollection(registry)((m, i) => i);
 
 
   // ----- Interfaces ----------------------------------------------------------
@@ -136,7 +132,7 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
     }
 
     // Delegate to each existing member's Configure method.
-    delegateToRegistry(registry, Configure, controlConfiguration);
+    applyToRegistry(Configure, controlConfiguration);
   });
 
 
@@ -147,7 +143,9 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
    * @return {array}
    */
   GetModelValue.implementedBy(FormGroup).as(function () {
-    return R.map(R.partial(invoke, [GetModelValue]), registry);
+    // Map the [index, modelValuesObject] entries we get from applyToRegistry
+    // into a list of modelValues objects.
+    return R.map(([, modelValues]) => modelValues, applyToRegistry(GetModelValue, null));
   });
 
 
@@ -158,11 +156,11 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
    */
   SetModelValue.implementedBy(FormGroup).as(function (newValues) {
     if (newValues && !R.is(Array, newValues)) {
-      throwError(`Expected model values to be of type "Array" but got "${typeof newValues}".`);
+      throwError(`Form group expected model values to be of type "Array" but got "${typeof newValues}".`);
     }
 
     // Delegate to each child form's SetModelValue method.
-    delegateToRegistry(registry, SetModelValue, newValues);
+    applyToRegistry(SetModelValue, newValues);
   });
 
 
@@ -176,11 +174,11 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
    */
   SetCustomErrorMessage.implementedBy(FormGroup).as(function (errorData) {
     if (errorData && !R.is(Array, errorData)) {
-      throwError(`Expected error message data to be of type "Array" but got "${typeof errorData}".`);
+      throwError(`Form group expected error message data to be of type "Array" but got "${typeof errorData}".`);
     }
 
     // Delegate to each child form's SetCustomErrorMessage method.
-    delegateToRegistry(registry, SetCustomErrorMessage, errorData);
+    applyToRegistry(SetCustomErrorMessage, errorData);
   });
 
 
@@ -190,7 +188,7 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
    * @private
    */
   ClearCustomErrorMessage.implementedBy(FormGroup).as(function () {
-    delegateToRegistry(registry, ClearCustomErrorMessage);
+    applyToRegistry(ClearCustomErrorMessage);
   });
 
 
@@ -202,11 +200,11 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
    */
   Reset.implementedBy(FormGroup).as(function (modelValues) {
     if (modelValues && !R.is(Array, modelValues)) {
-      throwError(`Expected model data to be of type "Array", but got "${typeof modelValues}".`);
+      throwError(`Form group expected model data to be of type "Array", but got "${typeof modelValues}".`);
     }
 
     // Delegate to each child form's Reset method.
-    delegateToRegistry(registry, Reset, modelValues);
+    applyToRegistry(Reset, modelValues);
   });
 
 
@@ -232,7 +230,7 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
    */
   FormGroup.$onInit = () => {
     // Auto-generate name if one was not supplied.
-    FormGroup.name = FormGroup.name || `FormGroup-${Formation.$getNextId()}`;
+    FormGroup.name = FormGroup.name || `FormGroup-${$getNextId()}`;
 
     // Set debug mode if the "debug" attribute is present.
     if (Reflect.has($attrs, 'debug')) {
@@ -243,28 +241,8 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
       // If we are a child form, register with our parent form.
       FormGroup.$parentForm[RegisterForm](FormGroup);
     } else {
-      // If we are the top-level form, assign to parent scope expression.
-      assignToExpression(FormGroup.name);
-    }
-  };
-
-
-  /**
-   * Handle changes to bindings.
-   *
-   * Note: This will only report reassignment to bindings, it will not
-   * deep-watch bound objects.
-   *
-   * @private
-   *
-   * @param  {object} changes
-   */
-  FormGroup.$onChanges = changes => {
-    // Handle changes to name.
-    if (changes.name && !changes.name.isFirstChange()) {
-      const {currentValue, previousValue} = changes.name;
-      FormGroup.$debug(`Name changed from "${previousValue}" to "${currentValue}".`);
-      assignToExpression(currentValue);
+      // If we are the top-level form, throw an error.
+      throwError('Form groups must have a parent form.');
     }
   };
 
@@ -299,13 +277,13 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
 
 
   /**
-   * Returns the ID of the component's $scope. Used by child components to infer
-   * ancestry in the scope tree.
+   * Returns the form group's $scope. Used to compare scope IDs for child form
+   * registration, and for configurable validators.
    *
-   * @return {number}
+   * @return {object}
    */
-  FormGroup.$getScopeId = () => {
-    return $scope.$id;
+  FormGroup.$getScope = () => {
+    return $scope;
   };
 
 
@@ -375,22 +353,20 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
 }
 
 
-FormGroupController.$inject = ['$attrs', '$compile', '$element', '$log', '$parse', '$scope', '$transclude', 'Formation'];
+FormGroupController.$inject = ['$attrs', '$compile', '$element', '$log', '$parse', '$scope', '$transclude'];
 
 
-app.run(Formation => {
-  Formation.$registerComponent(FORM_GROUP_COMPONENT_NAME, {
-    require: {
-      $parentForm: `?^^${FORM_COMPONENT_NAME}`
-    },
-    bindings: {
-      name: '@',
-      $ngDisabled: '<ngDisabled'
-    },
-    transclude: true,
-    controller: FormGroupController,
-    controllerAs: 'FormGroup'
-  });
+$registerComponent(FORM_GROUP_COMPONENT_NAME, {
+  require: {
+    $parentForm: `?^^${FORM_COMPONENT_NAME}`
+  },
+  bindings: {
+    name: '@',
+    $ngDisabled: '<ngDisabled'
+  },
+  transclude: true,
+  controller: FormGroupController,
+  controllerAs: 'FormGroup'
 });
 
 

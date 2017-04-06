@@ -26,7 +26,6 @@
     "build": "babel src --out-dir dist --copy-files",
     "build:watch": "watch \"npm run build\" ./src/",
     "docs:build": "rimraf docs && jsdoc --configure jsdoc.conf.json --destination docs --recurse --verbose",
-    "precommit": "run-p lint test",
     "prerelease": "run-p lint test",
     "release": "npm run build && ncp ./package.json ./dist/package.json && npm publish ./dist",
     "postrelease": "npm dist-tag ls",
@@ -42,6 +41,7 @@
     "space": true,
     "rules": {
       "import/no-unassigned-import": "off",
+      "import/prefer-default-export": "off",
       "max-params": "off",
       "no-multiple-empty-lines": "off",
       "space-before-function-paren": [

@@ -5,8 +5,14 @@
 import R from 'ramda';
 
 import {
-  CONFIGURABLE_VALIDATOR,
-  CUSTOM_ERROR_KEY
+  ConfigurableValidator
+} from '../../classes/ConfigurableValidator';
+
+import {
+  COMPONENT_CONFIGURATION,
+  CUSTOM_ERROR_KEY,
+  FORM_CONTROLLER,
+  NG_MODEL_CTRL
 } from '../../etc/constants';
 
 import {
@@ -24,47 +30,6 @@ import {
   SetCustomErrorMessage,
   SetModelValue
 } from '../../etc/interfaces';
-
-
-/**
- * Key in components' "require" definition that should reference the Formation
- * form controller.
- *
- * Shared between: control base class, control sub-classes.
- *
- * @memberOf FormationControl
- * @alias FORM_CONTROLLER
- *
- * @type {string}
- */
-export const FORM_CONTROLLER = '$formController';
-
-
-/**
- * Key in components' bindings that should contain control configuration.
- *
- * Shared between: form, component sub-classes.
- *
- * @memberOf FormationControl
- * @alias COMPONENT_CONFIGURATION
- *
- * @type {string}
- */
-export const COMPONENT_CONFIGURATION = '$configuration';
-
-
-/**
- * Key at which controls that use ngModel assign a reference to their ngModel
- * controller.
- *
- * Shared beetween: form, control sub-classes.
- *
- * @memberOf FormationControl
- * @alias NG_MODEL_CTRL
- *
- * @type {string}
- */
-export const NG_MODEL_CTRL = '$ngModelCtrl';
 
 
 /**
@@ -435,14 +400,15 @@ Configure.implementedBy(FormationControl).as(function (configuration) {
   // Set up validators.
   if (R.is(Object, validators)) {
     R.mapObjIndexed((validator, name) => {
-      if (!R.is(Function, validator)) {
-        throwError(`Expected validator to be a function, got "${typeof validator}".`);
-      } else if (!R.has(name, this[NG_MODEL_CTRL].$validators)) {
-        if (validator[CONFIGURABLE_VALIDATOR]) {
-          this[NG_MODEL_CTRL].$validators[name] = validator(this[FORM_CONTROLLER]).bind(this[NG_MODEL_CTRL]);
-        } else {
-          this[NG_MODEL_CTRL].$validators[name] = validator.bind(this[NG_MODEL_CTRL]);
-        }
+      if (R.has(name, this[NG_MODEL_CTRL].$validators)) {
+        // Validator with same key already exists on this control, pass.
+        return;
+      } else if (R.is(ConfigurableValidator, validator)) {
+        this[NG_MODEL_CTRL].$validators[name] = validator.configure(this);
+      } else if (R.is(Function, validator)) {
+        this[NG_MODEL_CTRL].$validators[name] = validator.bind(this[NG_MODEL_CTRL]);
+      } else {
+        throwError(`Expected validator to be of type "Function", but got "${typeof validator}".`);
       }
     }, validators);
   }
@@ -451,14 +417,15 @@ Configure.implementedBy(FormationControl).as(function (configuration) {
   // Set up asyncronous validators.
   if (R.is(Object, asyncValidators)) {
     R.mapObjIndexed((asyncValidator, name) => {
-      if (!R.is(Function, asyncValidator)) {
-        throwError(`Expected validator to be a function, got "${typeof asyncValidator}".`);
-      } else if (!R.has(name, this[NG_MODEL_CTRL].$asyncValidators)) {
-        if (asyncValidator[CONFIGURABLE_VALIDATOR]) {
-          this[NG_MODEL_CTRL].$asyncValidators[name] = asyncValidator(this[FORM_CONTROLLER]).bind(this[NG_MODEL_CTRL]);
-        } else {
-          this[NG_MODEL_CTRL].$asyncValidators[name] = asyncValidator.bind(this[NG_MODEL_CTRL]);
-        }
+      if (R.has(name, this[NG_MODEL_CTRL].$asyncValidators)) {
+        // Validator with same key already exists on this control, pass.
+        return;
+      } else if (R.is(ConfigurableValidator, asyncValidator)) {
+        this[NG_MODEL_CTRL].$asyncValidators[name] = asyncValidator.configure(this);
+      } else if (R.is(Function, asyncValidator)) {
+        this[NG_MODEL_CTRL].$asyncValidators[name] = asyncValidator.bind(this[NG_MODEL_CTRL]);
+      } else {
+        throwError(`Expected async validator to be of type "Function", but got "${typeof validator}".`);
       }
     }, asyncValidators);
   }
