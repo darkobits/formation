@@ -9,12 +9,12 @@ import {
 import {
   COMPONENT_CONFIGURATION,
   FORM_COMPONENT_NAME,
-  FORM_CONTROLLER
+  FORM_CONTROLLER,
+  NG_MODEL_CTRL
 } from '../../etc/constants';
 
 import {
-  FormationControl,
-  NG_MODEL_CTRL
+  FormationControl
 } from '../../classes/FormationControl';
 
 

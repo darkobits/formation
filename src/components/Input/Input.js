@@ -7,8 +7,11 @@ import {
 } from '../../etc/config';
 
 import {
-  FormationControl,
   NG_MODEL_CTRL
+} from '../../etc/constants';
+
+import {
+  FormationControl,
 } from '../../classes/FormationControl';
 
 

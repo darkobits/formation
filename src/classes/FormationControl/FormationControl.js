@@ -425,7 +425,7 @@ Configure.implementedBy(FormationControl).as(function (configuration) {
       } else if (R.is(Function, asyncValidator)) {
         this[NG_MODEL_CTRL].$asyncValidators[name] = asyncValidator.bind(this[NG_MODEL_CTRL]);
       } else {
-        throwError(`Expected async validator to be of type "Function", but got "${typeof validator}".`);
+        throwError(`Expected async validator to be of type "Function", but got "${typeof asyncValidator}".`);
       }
     }, asyncValidators);
   }
