@@ -239,6 +239,7 @@ export function match (independentControlName) {
     const {scope, form, ngModelCtrl} = this;
     const independentNgModelCtrl = R.path([NG_MODEL_CTRL], form.getControl(independentControlName));
 
+
     // Ensure both controls use ngModel.
     if (!ngModelCtrl || !independentNgModelCtrl) {
       form.$debug(`[match] Both controls must use ngModel.`);

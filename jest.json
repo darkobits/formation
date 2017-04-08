@@ -1,4 +1,9 @@
 {
+  "moduleDirectories": [
+    "<rootDir>/src",
+    "<rootDir>/tests",
+    "node_modules"
+  ],
   "coveragePathIgnorePatterns": [
     "/tests/"
   ],

@@ -250,20 +250,20 @@ describe('FormController', () => {
     });
   });
 
-  describe('$isDisabled', () => {
+  describe('isDisabled', () => {
     it('should return true when "$disabled" is truthy', () => {
       let form = createForm({$disabled: true});
-      expect(form.$isDisabled()).toBe(true);
+      expect(form.isDisabled()).toBe(true);
     });
 
     it('should return true when "$ngDisabled" is truthy', () => {
       let form = createForm({$ngDisabled: true});
-      expect(form.$isDisabled()).toBe(true);
+      expect(form.isDisabled()).toBe(true);
     });
 
     it('should return a falsy value when neither "$disabled" or "$ngDisabled" are true', () => {
       let form = createForm();
-      expect(form.$isDisabled()).toBeFalsy();
+      expect(form.isDisabled()).toBeFalsy();
     });
   });
 

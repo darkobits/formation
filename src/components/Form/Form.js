@@ -23,6 +23,7 @@ import {
 
 import {
   FORM_COMPONENT_NAME,
+  FORM_CONTROLLER,
   FORM_GROUP_COMPONENT_NAME
 } from '../../etc/constants';
 
@@ -68,10 +69,6 @@ export const END_SUBMIT_EVENT = '$fmTerminateSubmit';
 
 
 /**
- * @module FormController
- *
- * @description
- *
  * The controller for Formation `<fm></fm>` components.
  *
  * This component has the following bindings:
@@ -476,7 +473,10 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
       // Handle transcluded content from the user by appending it to the above
       // form/ngForm template and using a new scope that inherits from our outer
       // scope, mimicing the default Angular behavior.
-      $transclude($scope.$parent.$new(), compiledElement => {
+      $transclude($scope.$parent.$new(), (compiledElement, scope) => {
+        // Assign a reference to the form controller in the transclusion scope.
+        scope.$fm = Form;
+
         $element.find(elementName).append(compiledElement);
       });
     }
@@ -603,18 +603,6 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    */
   Form.$getScope = () => {
     return $scope;
-  };
-
-
-  /**
-   * Returns true if the form should be disabled.
-   *
-   * @private
-   *
-   * @return {boolean}
-   */
-  Form.$isDisabled = () => {
-    return Form.$disabled || Form.$ngDisabled || (Form.$parentForm && Form.$parentForm.$isDisabled());
   };
 
 
@@ -756,7 +744,17 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
 
 
   /**
-   * Disables the form and any controls that use `$isDisabled`.
+   * Returns true if the form is disabled.
+   *
+   * @return {boolean}
+   */
+  Form.isDisabled = () => {
+    return Form.$disabled || Form.$ngDisabled || (Form.$parentForm && Form.$parentForm.isDisabled());
+  };
+
+
+  /**
+   * Disables the form and any controls that implment `isDisabled`.
    */
   Form.disable = () => {
     Form.$disabled = true;
@@ -764,7 +762,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
 
 
   /**
-   * Enables the form and any controls that use `$isDisabled`.
+   * Enables the form and any controls that implement `isDisabled`.
    *
    * Note: The form may still remain disabled via `ngDisabled`.
    */
@@ -780,6 +778,8 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
   Form.setModelValues = Form[SetModelValue];
 }
 
+
+FormController[FORM_CONTROLLER] = true;
 
 FormController.$inject = ['$attrs', '$compile', '$element', '$log', '$parse', '$scope', '$transclude'];
 

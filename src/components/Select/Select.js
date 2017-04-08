@@ -78,7 +78,8 @@ $registerComponent('Select', () => {
       <label for="{{::Select.getControlId() }}"
         ng-class="{
           'has-error': Select.getErrors(),
-          'is-pending': Select.${NG_MODEL_CTRL}.$pending
+          'is-pending': Select.${NG_MODEL_CTRL}.$pending,
+          'is-disabled': Select.isDisabled()
         }"
         ng-transclude>
       </label>
@@ -86,10 +87,11 @@ $registerComponent('Select', () => {
         name="{{::Select.name }}"
         ng-model="Select.$ngModelGetterSetter"
         ng-if="::!Select.multiple"
-        ng-disabled="Select.$isDisabled()"
+        ng-disabled="Select.isDisabled()"
         ng-class="{
           'has-error': Select.getErrors(),
-          'is-pending': Select.${NG_MODEL_CTRL}.$pending
+          'is-pending': Select.${NG_MODEL_CTRL}.$pending,
+          'is-disabled': Select.isDisabled()
         }">
         <option value=""
           ng-if="::Select.placeholder"
@@ -101,10 +103,11 @@ $registerComponent('Select', () => {
         name="{{::Select.name }}"
         ng-model="Select.$ngModelGetterSetter"
         ng-if="::Select.multiple"
-        ng-disabled="Select.$isDisabled()"
+        ng-disabled="Select.isDisabled()"
         ng-class="{
           'has-error': Select.getErrors(),
-          'is-pending': Select.${NG_MODEL_CTRL}.$pending
+          'is-pending': Select.${NG_MODEL_CTRL}.$pending,
+          'is-disabled': Select.isDisabled()
         }"
         multiple>
       </select>

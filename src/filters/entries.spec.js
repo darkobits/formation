@@ -1,4 +1,4 @@
-import NgUnit from '../helpers';
+import NgUnit from '../../tests/helpers';
 import '../../src/index';
 
 

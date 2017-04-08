@@ -2,10 +2,6 @@ import R from 'ramda';
 import app from '../app';
 
 import {
-  FormController
-} from '../components/Form/Form';
-
-import {
   FormationControl
 } from '../classes/FormationControl';
 
@@ -18,7 +14,8 @@ import {
 
 import {
   RegisterNgForm,
-  RegisterNgModel
+  RegisterNgModel,
+  RegisterForm
 } from './interfaces';
 
 import {
@@ -68,7 +65,7 @@ let counter = -1;
  *
  * @type {array}
  */
-let registeredComponents;
+const registeredComponents = [];
 
 
 // ----- Semi-Private Functions ------------------------------------------------
@@ -79,7 +76,7 @@ let registeredComponents;
  * @param  {string} name
  */
 export function $registerComponent (name, definition) {
-  registeredComponents = (registeredComponents || []).concat(String(name));
+  registeredComponents.push(name);
 
   app.config($compileProvider => {
     if (typeof definition === 'function') {
@@ -178,98 +175,91 @@ export function FormationConfigurator (opts) {
 // ----- Form & ngModel Decorators ---------------------------------------------
 
 app.config($provide => {
-  // Decorate form and ngForm.
-  ['formDirective', 'ngFormDirective'].forEach(directiveName => {
-    $provide.decorator(directiveName, $delegate => {
-      const [ngFormDirective] = $delegate;
-      const compile = ngFormDirective.compile;
+  const decorate = [
+    // Decoration spec for form/ngForm.
+    {
+      directives: ['formDirective', 'ngFormDirective'],
+      require: [`?^^fm`],
+      postLink: function (scope, element, attributes, controllers) {
+        // Get a reference to the Angular Form controller.
+        const [ngFormController] = controllers;
 
-      // Add the Formation form controller as an optional parent require.
-      ngFormDirective.require = ngFormDirective.require.concat(`?^${FORM_COMPONENT_NAME}`);
+        // Get a reference to parent Formation forms, if any. Use 'propEq'
+        // here rather than 'is' to avoid a circular dependence between this
+        // module and Form.js.
+        const fmFormController = R.find(controller => R.path(['constructor', FORM_CONTROLLER], controller), controllers);
 
-      ngFormDirective.compile = function () {
-        // Invoke original compile function to get link object it returns.
-        const link = Reflect.apply(compile, this, arguments);
-
-        // Return new link object.
-        return {
-          pre () {
-            // Invoke original pre-link.
-            if (R.is(Function, link.pre)) {
-              Reflect.apply(link.pre, this, arguments);
-            }
-          },
-          post (scope, element, attributes, controllers) {
-            // Invoke original post-link.
-            if (R.is(Function, link.post)) {
-              Reflect.apply(link.post, this, arguments);
-            }
-
-            // Get a reference to the Angular Form controller.
-            const [ngFormController] = controllers;
-
-            // Get a reference to the Formation form controller.
-            const fmFormController = R.find(R.is(FormController), controllers);
-
-            if (fmFormController && R.is(Function, fmFormController[RegisterNgForm])) {
-              fmFormController[RegisterNgForm](ngFormController);
-            }
-          }
-        };
-      };
-
-      return $delegate;
-    });
-  });
-
-
-  // Decorate ngModel.
-  $provide.decorator('ngModelDirective', $delegate => {
-    const [ngModelDirective] = $delegate;
-    const compile = ngModelDirective.compile;
-
-    // Add each registered component as an optional parent require on ngModel.
-    ngModelDirective.require = R.concat(
-      ngModelDirective.require,
-      R.map(component => `?^^${component}`, registeredComponents)
-    );
-
-    ngModelDirective.compile = function () {
-      // Invoke original compile to get link object.
-      const link = Reflect.apply(compile, this, arguments);
-
-      // Return new link object.
-      return {
-        pre () {
-          // Invoke original pre-link.
-          Reflect.apply(link.pre, this, arguments);
-        },
-        post (scope, element, attributes, controllers) {
-          // Invoke original post-link.
-          Reflect.apply(link.post, this, arguments);
-
-          // Get a reference to the ngModel controller.
-          const [ngModelController] = controllers;
-
-          // Get a reference to parent Formation controls, if any.
-          const fmComponentController = R.find(R.is(FormationControl), controllers);
-
-          // Get a reference to parent Formation forms, if any.
-          const fmFormController = R.find(R.is(FormController), controllers);
-
-          if (fmComponentController && R.is(Function, fmComponentController[RegisterNgModel])) {
-            // If we are the child of a Formation control, register with the
-            // control.
-            fmComponentController[RegisterNgModel](ngModelController);
-          } else if (fmFormController && R.is(Function, fmFormController[RegisterNgModel])) {
-            // Otherwise, if we are the child of a Formation form, register with
-            // the form.
-            fmFormController[RegisterNgModel](ngModelController);
-          }
+        if (fmFormController && R.is(Function, fmFormController[RegisterNgForm])) {
+          fmFormController[RegisterNgForm](ngFormController);
         }
-      };
-    };
+      }
+    },
 
-    return $delegate;
+    // Decoration spec for ngModel.
+    {
+      directives: ['ngModelDirective'],
+      require: R.map(component => `?^^${component}`, registeredComponents),
+      postLink (scope, element, attributes, controllers) {
+        // Get a reference to the ngModel controller.
+        const [ngModelController] = controllers;
+
+        // Get a reference to parent Formation controls, if any.
+        const fmComponentController = R.find(R.is(FormationControl), controllers);
+
+        // Get a reference to parent Formation forms, if any. Use 'propEq'
+        // here rather than 'is' to avoid a circular dependence between this
+        // module and Form.js.
+        const fmFormController = R.find(controller => R.path(['constructor', FORM_CONTROLLER], controller), controllers);
+
+        if (fmComponentController && R.is(Function, fmComponentController[RegisterNgModel])) {
+          // If we are the child of a Formation control, register with the
+          // control.
+          fmComponentController[RegisterNgModel](ngModelController);
+        } else if (fmFormController && R.is(Function, fmFormController[RegisterNgModel])) {
+          // Otherwise, if we are the child of a Formation form, register with
+          // the form.
+          fmFormController[RegisterNgModel](ngModelController);
+        }
+      }
+    }
+  ];
+
+
+  decorate.forEach(({directives, require, postLink} = {}) => {
+    directives.forEach(directiveName => {
+      $provide.decorator(directiveName, $delegate => {
+        const [directiveSpec] = $delegate;
+        const compile = directiveSpec.compile;
+
+        // Add requires.
+        directiveSpec.require = R.concat(directiveSpec.require || [], require);
+
+        directiveSpec.compile = function () {
+          // Invoke original compile to get link object.
+          const link = Reflect.apply(compile, this, arguments);
+
+          // Return new link object.
+          return {
+            pre () {
+              if (R.is(Function, link.pre)) {
+                // Invoke original pre-link.
+                Reflect.apply(link.pre, this, arguments);
+              }
+            },
+            post () {
+              if (R.is(Function, link.post)) {
+                // Invoke original post-link.
+                Reflect.apply(link.post, this, arguments);
+              }
+
+              // Invoke new post-link.
+              Reflect.apply(postLink, this, arguments);
+            }
+          };
+        };
+
+        return $delegate;
+      });
+    });
   });
 });

@@ -1,6 +1,9 @@
 import R from 'ramda';
 
 export default {
+  $applyAsync (fn) {
+    fn();
+  },
   $watch (expression, cb) {
     let getValue = () => R.path(expression.split('.'), this);
     let oldValue;

@@ -63,7 +63,8 @@ registerControl('Input', {
       ng-if="Input.type !== 'radio' && Input.type !== 'checkbox'"
       ng-class="{
         'has-error': Input.getErrors(),
-        'is-pending': Input.${NG_MODEL_CTRL}.$pending
+        'is-pending': Input.${NG_MODEL_CTRL}.$pending,
+        'is-disabled': Input.isDisabled()
       }"
       ng-transclude>
     </label>
@@ -75,14 +76,16 @@ registerControl('Input', {
       ng-value="Input.ngValue"
       ng-class="{
         'has-error': Input.getErrors(),
-        'is-pending': Input.${NG_MODEL_CTRL}.$pending
+        'is-pending': Input.${NG_MODEL_CTRL}.$pending,
+        'is-disabled': Input.isDisabled()
       }"
-      ng-disabled="Input.$isDisabled()">
+      ng-disabled="Input.isDisabled()">
     <label for="{{::Input.getControlId() }}"
       ng-if="Input.type === 'radio' || Input.type === 'checkbox'"
       ng-class="{
         'has-error': Input.getErrors(),
-        'is-pending': Input.${NG_MODEL_CTRL}.$pending
+        'is-pending': Input.${NG_MODEL_CTRL}.$pending,
+        'is-disabled': Input.isDisabled()
       }"
       ng-transclude>
     </label>

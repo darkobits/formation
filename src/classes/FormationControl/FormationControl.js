@@ -140,18 +140,6 @@ export class FormationControl {
 
 
   /**
-   * Returns true if the control should be disabled.
-   *
-   * @private
-   *
-   * @return {boolean}
-   */
-  $isDisabled () {
-    return this.$ngDisabled || this.$disabled || this[FORM_CONTROLLER].$isDisabled();
-  }
-
-
-  /**
    * If the component has an ngModel controller, unregister it when the scope is
    * destroyed.
    *
@@ -232,7 +220,7 @@ export class FormationControl {
 
 
   /**
-   * If the named control should be displaying errors (based on configured
+   * If the canonical control should be displaying errors (based on configured
    * error behavior) returns the controls' `$error` object. Otherwise, returns
    * `false`.
    *
@@ -296,6 +284,16 @@ export class FormationControl {
    */
   getCustomErrorMessage () {
     return this[FORM_CONTROLLER].getControl(this.$getName())[CUSTOM_ERROR_MESSAGE_KEY];
+  }
+
+
+  /**
+   * Returns true if the control is disabled.
+   *
+   * @return {boolean}
+   */
+  isDisabled () {
+    return this.$ngDisabled || this.$disabled || this[FORM_CONTROLLER].isDisabled();
   }
 
 

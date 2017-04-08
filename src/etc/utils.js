@@ -16,6 +16,51 @@ import {
 
 
 /**
+ * Throws a new error with the provided message, prefixed with the module
+ * name.
+ *
+ * @param  {string} message
+ */
+export function throwError (message) {
+  throw new Error(`[${MODULE_NAME}] ${message}`);
+}
+
+
+/**
+ * Throws an error if the provided value is not an array. Otherwise, returns
+ * true.
+ *
+ * @param  {*} value
+ * @param  {string} [desc] - Optional descriptor.
+ * @return {boolean}
+ */
+function assertIsArray (value, desc) {
+  if (!Array.isArray(value)) {
+    throwError(`Expected ${desc ? desc + ' to be of type ' : ''}"Array", but got "${typeof value}".`);
+  }
+
+  return true;
+}
+
+
+/**
+ * Throws an error if the provided value is not a [key, value] entry. Otherwise,
+ * returns true.
+ *
+ * @param  {*} value
+ * @param  {string} [desc] - Optional descriptor.
+ * @return {boolean}
+ */
+function assertIsEntry (value, desc) {
+  if (!Array.isArray(value) || value.length !== 2) {
+    throwError(`Expected ${desc ? desc + ' to be of type ' : ''}[key, value] entry, but got "${JSON.stringify(value)}".`);
+  }
+
+  return true;
+}
+
+
+/**
  * Capitalizes the first character in the provided string.
  *
  * @param  {string} str
@@ -99,15 +144,7 @@ export const mergeDeep = (...objs) => {
 };
 
 
-/**
- * Throws a new error with the provided message, prefixed with the module
- * name.
- *
- * @param  {string} message
- */
-export function throwError (message) {
-  throw new Error(`[${MODULE_NAME}] ${message}`);
-}
+
 
 
 /**
@@ -130,7 +167,7 @@ export function parseFlags (string) {
 
   const states = R.map(state => {
     return state.length && `$${state.replace(/[, ]/g, '')}`;
-  }, String(string).split(' '));
+  }, String(string).split(/, ?| /g));
 
   return R.filter(R.identity, states);
 }
@@ -146,12 +183,12 @@ export function parseFlags (string) {
  * @return {promise<*>} - Promise that resolves with the value at the named key
  *   once it is defined.
  */
-export function onReady (obj, key, timeout = 10000) {
-  const start = performance.now();
+export function onReady (obj, key, timeout = 1000) {
+  const start = new Date().getTime() / 1000;
 
   return new Promise((resolve, reject) => {
     const cancel = setInterval(() => {
-      const now = performance.now();
+      const now = new Date().getTime() / 1000;
 
       if (obj[key] !== undefined) {
         resolve(obj[key]);
@@ -182,7 +219,9 @@ export const assignToScope = R.curry(($parse, scope, value, expression) => {
     setter = $parse(expression).assign;
   }
 
-  setter(scope, value);
+  if (setter) {
+    setter(scope, value);
+  }
 });
 
 
@@ -217,6 +256,18 @@ export function toPairsWith (...args) {
       break;
   }
 
+  if (!R.is(Function, keyFn)) {
+    throwError(`Expected key generation function to be of type "Function", but got "${typeof keyFn}".`);
+  }
+
+  if (!R.is(Function, valueFn)) {
+    throwError(`Expected key value generation function to be of type "Function", but got "${typeof valueFn}".`);
+  }
+
+  if (!Array.isArray(collection)) {
+    throwError(`Expected collection to be of type "Array", but got "${typeof collection}".`);
+  }
+
   return collection.map((...args) => [String(keyFn(...args)), valueFn(...args)]);
 }
 
@@ -233,8 +284,12 @@ export function toPairsWith (...args) {
  * @return {array}
  */
 export function mergeEntries (dest = [], src = []) {
+  assertIsArray(dest, 'first argument');
+  assertIsArray(src, 'second argument');
+
   return dest.map(destEntry => {
-    const match = src.find(srcEntry => srcEntry[0] === destEntry[0]);
+    assertIsEntry(destEntry);
+    const match = src.find(srcEntry => assertIsEntry(srcEntry) && (srcEntry[0] === destEntry[0]));
     return [destEntry[0], destEntry[1], match ? match[1] : undefined];
   });
 }
@@ -244,9 +299,9 @@ export function mergeEntries (dest = [], src = []) {
  * Invokes the named method on the provided object (if it exists), optionally
  * passing any additional arguments as parameters to the method.
  *
- * @param  {string}    method - Method name to invoke.
- * @param  {object}    obj    - Target object.
- * @param  {arglist}   [args] - Additional arguments to pass to 'method'.
+ * @param  {string}  method - Method name to invoke.
+ * @param  {object}  obj    - Target object.
+ * @param  {arglist} [args] - Additional arguments to pass to 'method'.
  * @return {*}
  */
 export function invoke (method, obj, ...args) {
@@ -257,7 +312,7 @@ export function invoke (method, obj, ...args) {
 /**
  * Provided two objects that implement a '$getScope' method, returns the
  * object with the greater $scope id. This is used to determine which object
- * is likely to be a descendant of the other in the scope hierarchy.
+ * is likely to be lowe in the scope hierarchy.
  *
  * @param  {object} a
  * @param  {object} b
@@ -285,7 +340,7 @@ export function greaterScopeId (a, b) {
  *   },
  *   {
  *     id: '2',
- *     setName => {
+ *     setName: => {
  *       this.name = name;
  *     }
  *   }

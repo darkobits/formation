@@ -53,7 +53,8 @@ registerControl('Textarea', {
     <label for="{{::Textarea.getControlId() }}"
       ng-class="{
         'has-error': Input.getErrors(),
-        'is-pending': Input.${NG_MODEL_CTRL}.$pending
+        'is-pending': Input.${NG_MODEL_CTRL}.$pending,
+        'is-disabled': Textarea.isDisabled()
       }"
       ng-transclude>
     </label>
@@ -64,8 +65,9 @@ registerControl('Textarea', {
       ng-model="Textarea.$ngModelGetterSetter"
       ng-class="{
         'has-error': Textarea.getErrors(),
-        'is-pending': Textarea.${NG_MODEL_CTRL}.$pending
+        'is-pending': Textarea.${NG_MODEL_CTRL}.$pending,
+        'is-disabled': Textarea.isDisabled()
       }"
-      ng-disabled="Textarea.$isDisabled()">
+      ng-disabled="Textarea.isDisabled()">
   `
 });

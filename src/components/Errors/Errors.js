@@ -50,6 +50,9 @@ registerControl('Errors', {
   template: `
     <label for="{{::Errors.$getCanonicalControlId() }}"
       ng-if="Errors.getErrors()"
+      ng-class="{
+        'is-disabled': Errors.isDisabled()
+      }"
       ng-messages="Errors.getErrors()">
       <span ng-repeat="error in Errors.getErrorMessages()"
         ng-message="{{::error[0] }}">

@@ -74,7 +74,7 @@
     "babel-runtime": "6.x",
     "eslint": "3.x",
     "husky": "0.13.x",
-    "jest": "18.x",
+    "jest": "19.x",
     "jsdoc": "3.4.x",
     "ncp": "2.0.x",
     "npm-run-all": "4.x",

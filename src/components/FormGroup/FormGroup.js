@@ -288,18 +288,6 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
 
 
   /**
-   * Returns true if the form should be disabled.
-   *
-   * @private
-   *
-   * @return {boolean}
-   */
-  FormGroup.$isDisabled = () => {
-    return FormGroup.$disabled || FormGroup.$ngDisabled || (FormGroup.$parentForm && FormGroup.$parentForm.$isDisabled());
-  };
-
-
-  /**
    * Removes the provided control from the registry.
    *
    * @private
@@ -328,7 +316,17 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
 
 
   /**
-   * Disables the form and any controls that use `$isDisabled`.
+   * Returns true if the form group is disabled.
+   *
+   * @return {boolean}
+   */
+  FormGroup.isDisabled = () => {
+    return FormGroup.$disabled || FormGroup.$ngDisabled || (FormGroup.$parentForm && FormGroup.$parentForm.isDisabled());
+  };
+
+
+  /**
+   * Disables the form and any controls that implement `isDisabled`.
    */
   FormGroup.disable = () => {
     FormGroup.$disabled = true;
@@ -336,7 +334,7 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
 
 
   /**
-   * Enables the form and any controls that use `$isDisabled`.
+   * Enables the form and any controls that implement `isDisabled`.
    *
    * Note: The form may still remain disabled via `ngDisabled`.
    */
