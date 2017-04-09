@@ -3,15 +3,24 @@
 A data structure like this could be passed to a component, which would then
 render a complex form:
 
+
+- Default "type" is "text".
+- Value will be passed to `ng-value` for radio controls.
+
+
 ```js
 const form = {component: 'fm', name: 'vm.addressForm', children: [
   // Name Control
   {component: 'fmInput', name: 'name', config: {}},
 
+  // Gender Radio Control
+  {component: 'fmInput', type: 'radio', name: 'gender', value: 'M'},
+  {component: 'fmInput', type: 'radio', name: 'gender', value: 'F'}
+
   // Address Form Group
   {component: 'fmGroup', name: 'addresses', children: [
 
-    // Address Form (Repeated)
+    // Address Form (Repeated Form in Form Group)
     {component: 'fm', config: {}, repeat: true, children: [
       // Street Address Control
       {component: 'fmInput', name: 'streetAddress', config: {}},

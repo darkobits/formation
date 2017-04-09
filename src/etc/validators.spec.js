@@ -127,7 +127,10 @@ describe('Validators', () => {
       [FORM_CONTROLLER]: form,
       [NG_MODEL_CTRL]: {
         $name: name,
-        $validators: {}
+        $validators: {},
+        $setValidity () {
+
+        }
       },
       $getName () {
         return name;
@@ -182,16 +185,17 @@ describe('Validators', () => {
       expect(form.$debug.mock.calls[2][0]).toMatch(/Both controls must use ngModel/g);
     });
 
-    it('should return true when provided a model value that matches its complement', () => {
+    it('should return true when provided a view value that matches its complement', () => {
       let matchPassword = Validators.match('password').configure(passwordMatchControl);
-      passwordControl[NG_MODEL_CTRL].$modelValue = 'foo';
-      expect(matchPassword('foo')).toBe(true);
+      passwordControl[NG_MODEL_CTRL].$viewValue = 'foo';
+      passwordMatchControl[NG_MODEL_CTRL].$viewValue = 'foo';
+      expect(matchPassword('foo', 'foo')).toBe(true);
     });
 
-    it('should return false when provided a model value that does not match its complement', () => {
+    it('should return false when provided a view value that does not match its complement', () => {
       let matchPassword = Validators.match('password').configure(passwordMatchControl);
-      passwordControl[NG_MODEL_CTRL].$modelValue = 'foo';
-      expect(matchPassword('bar')).toBe(false);
+      passwordControl[NG_MODEL_CTRL].$viewValue = 'foo';
+      expect(matchPassword('bar', 'bar')).toBe(false);
     });
   });
 });

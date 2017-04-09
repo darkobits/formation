@@ -435,6 +435,10 @@ Configure.implementedBy(FormationControl).as(function (configuration) {
   }
 
 
+  this.$viewOnly = mergedConfig.viewOnly;
+  console.log('view only', this.$viewOnly);
+
+
   // Validate the control to ensure any new parsers/formatters/validators
   // are run.
   this[NG_MODEL_CTRL].$validate();

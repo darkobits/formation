@@ -385,7 +385,6 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    */
   GetModelValue.implementedBy(Form).as(function () {
     return R.fromPairs(applyToRegistry(GetModelValue, null));
-    // return R.fromPairs(toPairsWith(R.prop('name'), R.partial(invoke, [GetModelValue]), registry));
   });
 
 
@@ -711,6 +710,11 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
   };
 
 
+  /**
+   * Returns the configured error behavior for the form.
+   *
+   * @return {array}
+   */
   Form.$getErrorBehavior = () => {
     return R.clone(errorBehavior);
   };
@@ -731,8 +735,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
 
 
   /**
-   * Similar to getControl, returns the first child form from the form registry
-   * that matches the provided name.
+   * Returns the first child form whose name matches the provided name.
    *
    * @param  {string} formName
    * @return {object} - Child form instance, if found.

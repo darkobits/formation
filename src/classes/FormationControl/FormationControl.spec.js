@@ -12,6 +12,9 @@ import {
   RegisterNgModel
 } from '../../etc/interfaces';
 
+
+import createForm from '../../../tests/__mocks__/form.mock';
+
 import {
   NG_MESSAGES,
   FormationControl
@@ -20,7 +23,9 @@ import {
 
 
 
-function createControl (bindings, form = {}, ngModelCtrl = {}) {
+
+// TODO: Move to __mocks__.
+function createControl ({bindings, form = {}, ngModelCtrl = {}} = {}) {
   return Object.assign(new FormationControl(), {
     [FORM_CONTROLLER]: form,
     [NG_MODEL_CTRL]: ngModelCtrl
@@ -59,20 +64,20 @@ describe('FormationControl', () => {
     });
   });
 
-  describe('$isDisabled', () => {
+  describe('isDisabled', () => {
     it('should return true when its "$ngDisabled" binding is true', () => {
       let control = createControl({$ngDisabled: true});
-      expect(control.$isDisabled()).toBe(true);
+      expect(control.isDisabled()).toBe(true);
     });
 
     it('should return true when its "$disabled" binding is true', () => {
       let control = createControl({$disabled: true});
-      expect(control.$isDisabled()).toBe(true);
+      expect(control.isDisabled()).toBe(true);
     });
 
     it('should return true when its form controller is disabled', () => {
-      let control = createControl({}, {$isDisabled: () => true});
-      expect(control.$isDisabled()).toBe(true);
+      let control = createControl({}, {isDisabled: () => true});
+      expect(control.isDisabled()).toBe(true);
     });
   });
 
@@ -141,15 +146,214 @@ describe('FormationControl', () => {
     });
   });
 
-  // describe('getErrors', () => {
-  //   it('should attempt to get errors from its form controller', () => {
-  //     let spy = jest.fn();
-  //     let controlName = 'foo';
-  //     let control = createControl({name: controlName}, {getErrorsForControl: spy});
-  //     control.getControlErrors();
-  //     expect(spy.mock.calls[0]).toContain(controlName);
-  //   });
-  // });
+  describe('getErrors', () => {
+    /**
+     * Scenario 1
+     *
+     * - [ ] Control is invalid
+     * - [X] Show errors on $touched
+     * - [X] Show errors on $submitted
+     * - [ ] Control has been touched
+     * - [ ] Form has been submitted
+     */
+    it('Scenario 1', () => {
+      let ctrlName = 'foo';
+
+      let form = createForm({
+        bindings: {
+          $showErrorsOn: 'touched, submitted',
+          form: {
+            $submitted: false
+          }
+        }
+      });
+
+      let ctrl = createControl({
+        name: ctrlName,
+        [NG_MODEL_CTRL]: {
+          $valid: true,
+          $touched: false
+        }
+      });
+
+      form.$onInit();
+      form.$registerControl(ctrl);
+      expect(form.$getErrorsForControl(ctrlName)).toBe(false);
+    });
+
+
+    /**
+     * Scenario 2
+     *
+     * - [X] Control is invalid
+     * - [X] Show errors on $touched
+     * - [X] Show errors on $submitted
+     * - [ ] Control has been touched
+     * - [ ] Form has been submitted
+     */
+    // it('Scenario 2', () => {
+    //   let ctrlName = 'foo';
+
+    //   let form = createForm({
+    //     $showErrorsOn: 'touched, submitted',
+    //     [NG_FORM_CONTROLLER]: {
+    //       $submitted: false
+    //     }
+    //   });
+
+    //   let ctrl = formationCtrl({
+    //     name: ctrlName,
+    //     [NG_MODEL_CTRL]: {
+    //       $valid: false,
+    //       $touched: false
+    //     }
+    //   });
+
+    //   form.$onInit();
+    //   form.$registerControl(ctrl);
+    //   expect(form.$getErrorsForControl(ctrlName)).toBe(false);
+    // });
+
+
+    /**
+     * Scenario 3
+     *
+     * - [X] Control is invalid
+     * - [X] Show errors on $touched
+     * - [ ] Show errors on $submitted
+     * - [ ] Control has been touched
+     * - [ ] Form has been submitted
+     */
+    // it('Scenario 3', () => {
+    //   let ctrlName = 'foo';
+
+    //   let form = createForm({
+    //     $showErrorsOn: 'touched',
+    //     [NG_FORM_CONTROLLER]: {
+    //       $submitted: false
+    //     }
+    //   });
+
+    //   let ctrl = formationCtrl({
+    //     name: ctrlName,
+    //     [NG_MODEL_CTRL]: {
+    //       $valid: false,
+    //       $touched: false
+    //     }
+    //   });
+
+    //   form.$onInit();
+    //   form.$registerControl(ctrl);
+    //   expect(form.$getErrorsForControl(ctrlName)).toBe(false);
+    // });
+
+
+    /**
+     * Scenario 4
+     *
+     * - [X] Control is invalid
+     * - [ ] Show errors on $touched
+     * - [ ] Show errors on $submitted
+     * - [ ] Control has been touched
+     * - [ ] Form has been submitted
+     */
+    // it('Scenario 4', () => {
+    //   let ctrlName = 'foo';
+    //   let errors = {
+    //     foo: 'bar'
+    //   };
+
+    //   let form = createForm({
+    //     [NG_FORM_CONTROLLER]: {
+    //       $submitted: false
+    //     }
+    //   });
+
+    //   let ctrl = formationCtrl({
+    //     name: ctrlName,
+    //     [NG_MODEL_CTRL]: {
+    //       $valid: false,
+    //       $touched: false,
+    //       $error: errors
+    //     }
+    //   });
+
+    //   form.$onInit();
+    //   form.$registerControl(ctrl);
+    //   expect(form.$getErrorsForControl(ctrlName)).toEqual(expect.objectContaining(errors));
+    // });
+
+
+    /**
+     * Scenario 5
+     *
+     * - [X] Control is invalid
+     * - [ ] Show errors on $touched
+     * - [X] Show errors on $submitted
+     * - [X] Control has been touched
+     * - [ ] Form has been submitted
+     */
+    // it('Scenario 5', () => {
+    //   let ctrlName = 'foo';
+
+    //   let form = createForm({
+    //     $showErrorsOn: 'submitted',
+    //     [NG_FORM_CONTROLLER]: {
+    //       $submitted: false
+    //     }
+    //   });
+
+    //   let ctrl = formationCtrl({
+    //     name: ctrlName,
+    //     [NG_MODEL_CTRL]: {
+    //       $valid: false,
+    //       $touched: true
+    //     }
+    //   });
+
+    //   form.$onInit();
+    //   form.$registerControl(ctrl);
+    //   expect(form.$getErrorsForControl(ctrlName)).toBe(false);
+    // });
+
+
+    /**
+     * Scenario 6
+     *
+     * - [X] Control is invalid
+     * - [ ] Show errors on $touched
+     * - [X] Show errors on $submitted
+     * - [ ] Control has been touched
+     * - [X] Form has been submitted
+     */
+    // it('Scenario 6', () => {
+    //   let ctrlName = 'foo';
+
+    //   let errors = {
+    //     foo: 'bar'
+    //   };
+
+    //   let form = createForm({
+    //     $showErrorsOn: 'submitted',
+    //     [NG_FORM_CONTROLLER]: {
+    //       $submitted: true
+    //     }
+    //   });
+
+    //   let ctrl = formationCtrl({
+    //     name: ctrlName,
+    //     [NG_MODEL_CTRL]: {
+    //       $valid: false,
+    //       $touched: true,
+    //       $error: errors
+    //     }
+    //   });
+
+    //   form.$onInit();
+    //   form.$registerControl(ctrl);
+    //   expect(form.$getErrorsForControl(ctrlName)).toEqual(expect.objectContaining(errors));
+    // });
+  });
 
   // describe('getErrorMessages', () => {
   //   it('should attempt to get error message from its form controller', () => {

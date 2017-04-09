@@ -11,7 +11,7 @@ import {
 } from '../../etc/constants';
 
 import {
-  FormationControl,
+  FormationControl
 } from '../../classes/FormationControl';
 
 

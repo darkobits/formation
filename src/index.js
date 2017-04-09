@@ -1,4 +1,4 @@
-import module from './app';
+import app from './app';
 import './components';
 import './filters';
 
@@ -10,4 +10,4 @@ export {
 } from './etc/config';
 
 
-export default module.name;
+export default app.name;

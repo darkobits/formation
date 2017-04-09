@@ -14,8 +14,7 @@ import {
 
 import {
   RegisterNgForm,
-  RegisterNgModel,
-  RegisterForm
+  RegisterNgModel
 } from './interfaces';
 
 import {
