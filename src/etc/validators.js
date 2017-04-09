@@ -21,9 +21,9 @@ import {
   ConfigurableValidator
 } from '../classes/ConfigurableValidator';
 
-import {
-  capitalizeFirst
-} from './utils';
+// import {
+//   capitalizeFirst
+// } from './utils';
 
 import {
   NG_MODEL_CTRL
@@ -235,10 +235,9 @@ export function pattern (pattern) {
  * @return {function}
  */
 export function match (independentControlName) {
-  return new ConfigurableValidator(function (modelValue) {
+  return new ConfigurableValidator(function (modelValue, viewValue) {
     const {scope, form, ngModelCtrl} = this;
     const independentNgModelCtrl = R.path([NG_MODEL_CTRL], form.getControl(independentControlName));
-
 
     // Ensure both controls use ngModel.
     if (!ngModelCtrl || !independentNgModelCtrl) {
@@ -252,29 +251,34 @@ export function match (independentControlName) {
       return true;
     }
 
-    // Compute the name to use for the complementary validator to install on
-    // the independent control. Ex: '$matchPassword'
-    const validatorName = `$match${capitalizeFirst(ngModelCtrl.$name)}`;
-
-    // If not present, install complementary validator. This validator always
-    // returns true, but ensures that when the independent control is
-    // modified, this control will re-validate.
-    if (!independentNgModelCtrl.$validators[validatorName]) {
-      independentNgModelCtrl.$validators[validatorName] = () => {
-        // When this validator is triggered, the control will be in the middle
-        // of a validation cycle, and its model value will temporarily be
-        // undefined until the cycle completes. Therefore, we need to wait until
-        // the next digest cycle, then tell the dependent control to
-        // re-validate.
-        scope.$applyAsync(() => {
-          ngModelCtrl.$validate();
-        });
-
-        return true;
+    // Install a complementary validator on the independent control. This
+    // validator will always return true until the dependent control has been
+    // filled.
+    if (!independentNgModelCtrl.$validators.match) {
+      independentNgModelCtrl.$validators.match = (modelValue, viewValue) => {
+        return ngModelCtrl.$viewValue ? viewValue === ngModelCtrl.$viewValue : true;
       };
     }
 
-    return modelValue === independentNgModelCtrl.$modelValue;
+    // Watch for changes to the error states of both controls. When either
+    // control enters or leaves its error state, validate the other control.
+    if (!this.$watchersAdded) {
+      scope.$watch(() => form.getControl(ngModelCtrl.$name).getErrors(), (newValue, oldValue) => {
+        if (newValue !== oldValue) {
+          independentNgModelCtrl.$validate();
+        }
+      });
+
+      scope.$watch(() => form.getControl(independentNgModelCtrl.$name).getErrors(), (newValue, oldValue) => {
+        if (newValue !== oldValue) {
+          ngModelCtrl.$validate();
+        }
+      });
+
+      this.$watchersAdded = true;
+    }
+
+    return viewValue === independentNgModelCtrl.$viewValue;
   });
 }
 
