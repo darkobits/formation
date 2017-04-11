@@ -2,7 +2,17 @@
 // ----- Form Group Component --------------------------------------------------
 // -----------------------------------------------------------------------------
 
-import R from 'ramda';
+import {
+  find,
+  is,
+  map,
+  propEq,
+  without
+} from 'ramda';
+
+import {
+  FormController
+} from '../Form/Form';
 
 import {
   $getNextId,
@@ -122,7 +132,7 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
    * child form.
    */
   Configure.implementedBy(FormGroup).as(function (config) {
-    if (config && !R.is(Array, config)) {
+    if (config && !is(Array, config)) {
       throwError(`Expected configuration to be of type "Array" but got "${typeof config}".`);
     }
 
@@ -145,7 +155,7 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
   GetModelValue.implementedBy(FormGroup).as(function () {
     // Map the [index, modelValuesObject] entries we get from applyToRegistry
     // into a list of modelValues objects.
-    return R.map(([, modelValues]) => modelValues, applyToRegistry(GetModelValue, null));
+    return map(([, modelValues]) => modelValues, applyToRegistry(GetModelValue, null));
   });
 
 
@@ -155,7 +165,7 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
    * @param  {array} newValues - Values to set.
    */
   SetModelValue.implementedBy(FormGroup).as(function (newValues) {
-    if (newValues && !R.is(Array, newValues)) {
+    if (newValues && !is(Array, newValues)) {
       throwError(`Form group expected model values to be of type "Array" but got "${typeof newValues}".`);
     }
 
@@ -173,7 +183,7 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
    * @param  {array} errorData
    */
   SetCustomErrorMessage.implementedBy(FormGroup).as(function (errorData) {
-    if (errorData && !R.is(Array, errorData)) {
+    if (errorData && !is(Array, errorData)) {
       throwError(`Form group expected error message data to be of type "Array" but got "${typeof errorData}".`);
     }
 
@@ -199,7 +209,7 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
    * @param  {object} [modelValues]
    */
   Reset.implementedBy(FormGroup).as(function (modelValues) {
-    if (modelValues && !R.is(Array, modelValues)) {
+    if (modelValues && !is(Array, modelValues)) {
       throwError(`Form group expected model data to be of type "Array", but got "${typeof modelValues}".`);
     }
 
@@ -296,7 +306,7 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
    */
   FormGroup.$unregisterForm = childForm => {
     FormGroup.$debug(`Unregistering child form "${childForm.name}".`);
-    registry = R.without(childForm, registry);
+    registry = without(childForm, registry);
   };
 
 
@@ -310,8 +320,8 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
    * @return {object} - Child form instance, if found.
    */
   FormGroup.getForm = formName => {
-    return R.find(R.propEq('name', formName), registry);
-    // return R.is(FormController, form) && form;
+    const form = find(propEq('name', formName), registry);
+    return is(FormController, form) && form;
   };
 
 

@@ -7,8 +7,21 @@
  * be used with tree-shaking.
  */
 
-
-import R from 'ramda';
+import {
+  append,
+  clone,
+  concat,
+  curry,
+  filter,
+  head,
+  identity,
+  is,
+  map,
+  mergeWith,
+  nth,
+  path,
+  slice
+} from 'ramda';
 
 import {
   MODULE_NAME
@@ -91,18 +104,18 @@ export function lowercaseFirst (str) {
  */
 export function mergeWithDeep (f, ...objs) {
   if (objs.length >= 2) {
-    const d = R.clone(R.nth(-2, objs)) || {};
-    const s = R.nth(-1, objs) || {};
-    const merged = R.mergeWith(f, d, s);
+    const d = clone(nth(-2, objs)) || {};
+    const s = nth(-1, objs) || {};
+    const merged = mergeWith(f, d, s);
 
     if (objs.length === 2) {
       return merged;
     }
 
-    const rest = R.slice(0, -2, objs);
-    return mergeWithDeep(f, ...R.append(merged, rest));
+    const rest = slice(0, -2, objs);
+    return mergeWithDeep(f, ...append(merged, rest));
   } else if (objs.length === 1) {
-    return R.head(objs);
+    return head(objs);
   }
 
   return {};
@@ -124,8 +137,8 @@ export function mergeWithDeep (f, ...objs) {
  */
 const DEFAULT_MERGER = (d, s) => {
   if (Array.isArray(d) && Array.isArray(s)) {
-    return R.concat(s, d);
-  } else if (R.is(Object, d) && R.is(Object, s) && !R.is(Function, s)) {
+    return concat(d, s);
+  } else if (is(Object, d) && is(Object, s) && !is(Function, s)) {
     return mergeWithDeep(DEFAULT_MERGER, d, s);
   }
 
@@ -165,11 +178,11 @@ export function parseFlags (string) {
     return;
   }
 
-  const states = R.map(state => {
+  const states = map(state => {
     return state.length && `$${state.replace(/[, ]/g, '')}`;
   }, String(string).split(/, ?| /g));
 
-  return R.filter(R.identity, states);
+  return filter(identity, states);
 }
 
 
@@ -210,7 +223,7 @@ export function onReady (obj, key, timeout = 1000) {
  * @param {*}      value - Value to assign to scope.
  * @param {string} expression - Expression in scope's parent to assign value to.
  */
-export const assignToScope = R.curry(($parse, scope, value, expression) => {
+export const assignToScope = curry(($parse, scope, value, expression) => {
   let setter;
 
   if (expression === '') {
@@ -240,8 +253,8 @@ export const assignToScope = R.curry(($parse, scope, value, expression) => {
  * @return {array}
  */
 export function toPairsWith (...args) {
-  let keyFn = R.identity;
-  let valueFn = R.identity;
+  let keyFn = identity;
+  let valueFn = identity;
   let collection = [];
 
   switch (args.length) {
@@ -256,11 +269,11 @@ export function toPairsWith (...args) {
       break;
   }
 
-  if (!R.is(Function, keyFn)) {
+  if (!is(Function, keyFn)) {
     throwError(`Expected key generation function to be of type "Function", but got "${typeof keyFn}".`);
   }
 
-  if (!R.is(Function, valueFn)) {
+  if (!is(Function, valueFn)) {
     throwError(`Expected key value generation function to be of type "Function", but got "${typeof valueFn}".`);
   }
 
@@ -305,7 +318,7 @@ export function mergeEntries (dest = [], src = []) {
  * @return {*}
  */
 export function invoke (method, obj, ...args) {
-  return obj && R.is(Function, obj[method]) && obj[method](...args);
+  return obj && is(Function, obj[method]) && obj[method](...args);
 }
 
 
@@ -319,8 +332,8 @@ export function invoke (method, obj, ...args) {
  * @return {object}
  */
 export function greaterScopeId (a, b) {
-  const aId = R.path(['$id'], invoke('$getScope', a));
-  const bId = R.path(['$id'], invoke('$getScope', b));
+  const aId = path(['$id'], invoke('$getScope', a));
+  const bId = path(['$id'], invoke('$getScope', b));
   return aId > bId ? a : b;
 }
 
@@ -362,7 +375,7 @@ export function greaterScopeId (a, b) {
  *   collection to pass matched data fragments to.
  * @param {object|array} data - Data to disperse to members of 'collection'.
  */
-export const applyToCollection = R.curry((collection, entryFn, memberFn, data) => {
+export const applyToCollection = curry((collection, entryFn, memberFn, data) => {
   // Convert registry array to registry entries in the format [name, member].
   const collectionEntries = toPairsWith(entryFn, collection);
 
@@ -375,7 +388,7 @@ export const applyToCollection = R.curry((collection, entryFn, memberFn, data) =
 
   // For each triplet, invoke the provided method name on the member, passing
   // it its matching data.
-  return R.map(([name, member, data]) => [name, invoke(memberFn, member, data)], mergedEntries);
+  return map(([name, member, data]) => [name, invoke(memberFn, member, data)], mergedEntries);
 });
 
 

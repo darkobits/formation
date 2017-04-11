@@ -3,7 +3,17 @@
 // -----------------------------------------------------------------------------
 
 import angular from 'angular';
-import R from 'ramda';
+
+import {
+ clone,
+ find,
+ forEach,
+ fromPairs,
+ is,
+ prop,
+ propEq,
+ reject
+} from 'ramda';
 
 import {
   $getNextId,
@@ -148,7 +158,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    * @param {string} methodName - Method name to invoke on each member.
    * @param {object|array} [data] - Optional data to disperse to members.
    */
-  const applyToRegistry = applyToCollection(registry)(R.prop('name'));
+  const applyToRegistry = applyToCollection(registry)(prop('name'));
 
 
   /**
@@ -284,7 +294,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
     Form[NG_FORM_CONTROLLER] = ngFormController;
 
     // Expose common Angular form controller properties.
-    R.forEach(prop => {
+    forEach(prop => {
       Reflect.defineProperty(Form, prop, {
         get: () => Form[NG_FORM_CONTROLLER][prop]
       });
@@ -364,7 +374,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    * control, child form, or child form group.
    */
   Configure.implementedBy(Form).as(function (config) {
-    if (config && !R.is(Object, config)) {
+    if (config && !is(Object, config)) {
       throwError(`Form expected configuration to be of type "Object" but got "${typeof config}".`);
     }
 
@@ -384,7 +394,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    * @return {object}
    */
   GetModelValue.implementedBy(Form).as(function () {
-    return R.fromPairs(applyToRegistry(GetModelValue, null));
+    return fromPairs(applyToRegistry(GetModelValue, null));
   });
 
 
@@ -395,7 +405,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    * @param  {object} newValues - Values to set.
    */
   SetModelValue.implementedBy(Form).as(function (newValues) {
-    if (newValues && !R.is(Object, newValues)) {
+    if (newValues && !is(Object, newValues)) {
       throwError(`Form expected model values to be of type "Object" but got "${typeof newValues}".`);
     }
 
@@ -413,7 +423,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    * @param  {object} errorData
    */
   SetCustomErrorMessage.implementedBy(Form).as(function (errorData) {
-    if (errorData && !R.is(Object, errorData)) {
+    if (errorData && !is(Object, errorData)) {
       throwError(`Form expected error message data to be of type "Object" but got "${typeof errorData}".`);
     }
 
@@ -441,7 +451,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    * @param  {object} [modelValues]
    */
   Reset.implementedBy(Form).as(function (modelValues) {
-    if (modelValues && !R.is(Object, modelValues)) {
+    if (modelValues && !is(Object, modelValues)) {
       throwError(`Form expected model data to be of type "Object", but got "${typeof modelValues}".`);
     }
 
@@ -614,7 +624,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    * @return {*}
    */
   Form.$getModelValue = controlName => {
-    return R.clone(modelValues.get(controlName));
+    return clone(modelValues.get(controlName));
   };
 
 
@@ -627,7 +637,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    * @param  {*} newValue
    */
   Form.$setModelValue = (controlName, newValue) => {
-    modelValues.set(controlName, R.clone(newValue));
+    modelValues.set(controlName, clone(newValue));
   };
 
 
@@ -640,7 +650,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    */
   Form.$unregisterControl = control => {
     Form.$debug(`Unregistering control "${control.name}".`);
-    registry = R.reject(R.propEq('$uid', control.$uid), registry);
+    registry = reject(propEq('$uid', control.$uid), registry);
   };
 
 
@@ -653,7 +663,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    */
   Form.$unregisterForm = childForm => {
     Form.$debug(`Unregistering child form "${childForm.name}".`);
-    registry = R.reject(R.propEq('name', childForm.name), registry);
+    registry = reject(propEq('name', childForm.name), registry);
   };
 
 
@@ -716,7 +726,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    * @return {array}
    */
   Form.$getErrorBehavior = () => {
-    return R.clone(errorBehavior);
+    return clone(errorBehavior);
   };
 
 
@@ -729,8 +739,8 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    * @return {object} - Control instance.
    */
   Form.getControl = controlName => {
-    const control = R.find(R.propEq('name', controlName), registry);
-    return !R.is(FormController, control) && control;
+    const control = find(propEq('name', controlName), registry);
+    return !is(FormController, control) && control;
   };
 
 
@@ -741,8 +751,8 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    * @return {object} - Child form instance, if found.
    */
   Form.getForm = formName => {
-    const form = R.find(R.propEq('name', formName), registry);
-    return R.is(FormController, form) && form;
+    const form = find(propEq('name', formName), registry);
+    return is(FormController, form) && form;
   };
 
 

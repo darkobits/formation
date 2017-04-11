@@ -1,5 +1,5 @@
 import angular from 'angular';
-import ngMessages from 'angular-messages';
+import 'angular-messages';
 
 import {
   MODULE_NAME
@@ -7,7 +7,7 @@ import {
 
 
 const module = angular.module(MODULE_NAME, [
-  ngMessages
+  'ngMessages'
 ]);
 
 

@@ -86,7 +86,7 @@ describe('FormationControl', () => {
 
   describe('$getName', () => {
     describe('when assigned a "name" binding', () => {
-      let name = 'foo';
+      const name = 'foo';
 
       beforeEach(() => {
         T = directive('fmInput', {
@@ -101,7 +101,7 @@ describe('FormationControl', () => {
     });
 
     describe('when assigned a "for" binding', () => {
-      let forStr = 'foo';
+      const forStr = 'foo';
 
       beforeEach(() => {
         T = directive('fmInput', {
@@ -193,7 +193,7 @@ describe('FormationControl', () => {
   });
 
   describe('$getControl', () => {
-    let name = 'foo';
+    const name = 'foo';
     let getControlSpy;
 
     beforeEach(() => {
@@ -212,8 +212,8 @@ describe('FormationControl', () => {
   });
 
   describe('#getControlId', () => {
-    let formName = 'foo';
-    let controlName = 'bar';
+    const formName = 'foo';
+    const controlName = 'bar';
 
     beforeEach(() => {
       wrapper = compile({
@@ -440,8 +440,8 @@ describe('FormationControl', () => {
   });
 
   describe('#getErrorMessages', () => {
-    let controlName = 'foo';
-    let errors = [
+    const controlName = 'foo';
+    const errors = [
       ['foo', 'bar']
     ];
 
@@ -464,7 +464,7 @@ describe('FormationControl', () => {
   });
 
   describe('Custom Error Messages', () => {
-    let errorMessage = 'foo';
+    const errorMessage = 'foo';
 
     beforeEach(() => {
       T = directive('fmInput', {
@@ -492,7 +492,7 @@ describe('FormationControl', () => {
   });
 
   describe('#setModelValue / #getModelValue', () => {
-    let modelValue = 'foo';
+    const modelValue = 'foo';
 
     beforeEach(() => {
       T = directive('fmInput', {

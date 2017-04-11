@@ -1,10 +1,14 @@
-import R from 'ramda';
+import {
+  memoize,
+  is
+} from 'ramda';
+
 import app from '../app';
 
 
 app.filter('entries', () => {
-  return R.memoize(input => {
-    if (R.is(Object, input)) {
+  return memoize(input => {
+    if (is(Object, input)) {
       return Object.entries(input);
     }
 

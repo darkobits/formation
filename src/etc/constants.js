@@ -69,3 +69,12 @@ export const COMPONENT_CONFIGURATION = '$configuration';
  * @type {string}
  */
 export const CUSTOM_ERROR_KEY = '$custom';
+
+
+/**
+ * Property added to configurable validator instances that allows them to be
+ * identified as such across execution contexts, where instanceof will fail.
+ *
+ * @type {string}
+ */
+export const CONFIGURABLE_VALIDATOR = '$configurableValidator';

@@ -29,7 +29,7 @@ describe('Validators', () => {
   });
 
   describe('min', () => {
-    let min = Validators.min(10);
+    const min = Validators.min(10);
 
     it('should return true when provided a number greater than the init value', () => {
       expect(min(12)).toBe(true);
@@ -45,7 +45,7 @@ describe('Validators', () => {
   });
 
   describe('minLength', () => {
-    let minLength = Validators.minLength(3);
+    const minLength = Validators.minLength(3);
 
     it('should return true when provided a string with length greater than the init value', () => {
       expect(minLength('applesauce')).toBe(true);
@@ -61,7 +61,7 @@ describe('Validators', () => {
   });
 
   describe('max', () => {
-    let max = Validators.max(10);
+    const max = Validators.max(10);
 
     it('should return true when provided a number less than the init value', () => {
       expect(max(8)).toBe(true);
@@ -77,7 +77,7 @@ describe('Validators', () => {
   });
 
   describe('maxLength', () => {
-    let maxLength = Validators.maxLength(3);
+    const maxLength = Validators.maxLength(3);
 
     it('should return true when provided a string with length less than the init value', () => {
       expect(maxLength('a')).toBe(true);
@@ -108,7 +108,7 @@ describe('Validators', () => {
   });
 
   describe('pattern', () => {
-    let pattern = Validators.pattern(/\d{5}/g);
+    const pattern = Validators.pattern(/\d{5}/g);
 
     it('should return true when provided a view value that matches the init pattern', () => {
       expect(pattern(null, '23443')).toBe(true);
@@ -151,13 +151,13 @@ describe('Validators', () => {
       }
     });
 
-    let form = mockForm();
+    const form = mockForm();
 
-    let passwordControl = mockControl('password', form);
+    const passwordControl = mockControl('password', form);
 
-    let passwordMatchControl = mockControl('passwordMatch', form);
+    const passwordMatchControl = mockControl('passwordMatch', form);
 
-    let badControl = {
+    const badControl = {
       [FORM_CONTROLLER]: form,
       name: 'badControl',
       $getName: () => 'badControl'
@@ -168,32 +168,32 @@ describe('Validators', () => {
     form.addControl(badControl);
 
     it('should return a null validator when trying to match itself', () => {
-      let nullValidator = Validators.match('password').configure(passwordControl);
+      const nullValidator = Validators.match('password').configure(passwordControl);
       expect(nullValidator('foo')).toEqual(true);
       expect(form.$debug.mock.calls[0][0]).toMatch(/is trying to match itself/g);
     });
 
     it('should return false when the dependent control has no model', () => {
-      let nullValidator = Validators.match('password').configure(badControl);
+      const nullValidator = Validators.match('password').configure(badControl);
       expect(nullValidator('bleh')).toEqual(false);
       expect(form.$debug.mock.calls[1][0]).toMatch(/Both controls must use ngModel./g);
     });
 
     it('should return false when the independent control does not have a model', () => {
-      let nullValidator = Validators.match('badControl').configure(passwordMatchControl);
+      const nullValidator = Validators.match('badControl').configure(passwordMatchControl);
       expect(nullValidator('foo')).toBe(false);
       expect(form.$debug.mock.calls[2][0]).toMatch(/Both controls must use ngModel/g);
     });
 
     it('should return true when provided a view value that matches its complement', () => {
-      let matchPassword = Validators.match('password').configure(passwordMatchControl);
+      const matchPassword = Validators.match('password').configure(passwordMatchControl);
       passwordControl[NG_MODEL_CTRL].$viewValue = 'foo';
       passwordMatchControl[NG_MODEL_CTRL].$viewValue = 'foo';
       expect(matchPassword('foo', 'foo')).toBe(true);
     });
 
     it('should return false when provided a view value that does not match its complement', () => {
-      let matchPassword = Validators.match('password').configure(passwordMatchControl);
+      const matchPassword = Validators.match('password').configure(passwordMatchControl);
       passwordControl[NG_MODEL_CTRL].$viewValue = 'foo';
       expect(matchPassword('bar', 'bar')).toBe(false);
     });

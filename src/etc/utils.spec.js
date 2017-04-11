@@ -1,12 +1,11 @@
 import R from 'ramda';
 import * as Utils from '../../src/etc/utils';
 
-// jest.useFakeTimers();
 
 describe('Utils', () => {
   describe('capitalizeFirst', () => {
     it('should capitalize a string', () => {
-      let input = 'foo';
+      const input = 'foo';
 
       expect(Utils.capitalizeFirst(input)).toBe('Foo');
     });
@@ -14,7 +13,7 @@ describe('Utils', () => {
 
   describe('lowercaseFirst', () => {
     it('should convert the first character of a string to lowercase', () => {
-      let input = 'Foo';
+      const input = 'Foo';
 
       expect(Utils.lowercaseFirst(input)).toBe('foo');
     });
@@ -22,27 +21,27 @@ describe('Utils', () => {
 
   describe('throwError', () => {
     it('should throw an error with the provided message', () => {
-      let message = 'foo';
+      const message = 'foo';
       expect(() => Utils.throwError(message)).toThrow(message);
     });
   });
 
   describe('parseFlags', () => {
     it('should convert a comma-delimited string into an array', () => {
-      let input = 'foo,bar,baz';
-      let expected = ['$foo', '$bar', '$baz'];
+      const input = 'foo,bar,baz';
+      const expected = ['$foo', '$bar', '$baz'];
       expect(Utils.parseFlags(input)).toEqual(expected);
     });
 
     it('should convert a space-delimited string into an array', () => {
-      let input = 'foo bar baz';
-      let expected = ['$foo', '$bar', '$baz'];
+      const input = 'foo bar baz';
+      const expected = ['$foo', '$bar', '$baz'];
       expect(Utils.parseFlags(input)).toEqual(expected);
     });
 
     it('should convert a comma and space-delimited string into an array', () => {
-      let input = 'foo, bar, baz';
-      let expected = ['$foo', '$bar', '$baz'];
+      const input = 'foo, bar, baz';
+      const expected = ['$foo', '$bar', '$baz'];
       expect(Utils.parseFlags(input)).toEqual(expected);
     });
   });
@@ -53,7 +52,7 @@ describe('Utils', () => {
     it('should resolve when the spied value becomes truthy', done => {
       expect.assertions(1);
 
-      let obj = {
+      const obj = {
         foo: false
       };
 
@@ -89,15 +88,15 @@ describe('Utils', () => {
   describe('toPairsWith', () => {
     describe('when passed 2 arguments', () => {
       it('should generate keys using the provided function', () => {
-        let collection = [
+        const collection = [
           {name: 'foo'},
           {name: 'bar'},
           {name: 'baz'}
         ];
 
-        let keyFn = i => i.name;
+        const keyFn = i => i.name;
 
-        let expected = [
+        const expected = [
           [collection[0].name, collection[0]],
           [collection[1].name, collection[1]],
           [collection[2].name, collection[2]]
@@ -109,16 +108,16 @@ describe('Utils', () => {
 
     describe('when passed 3 arguments', () => {
       it('should generate keys and values using the provided functions', () => {
-        let collection = [
+        const collection = [
           {name: 'foo', age: 1},
           {name: 'bar', age: 2},
           {name: 'baz', age: 3}
         ];
 
-        let keyFn = i => i.name;
-        let valueFn = i => i.age;
+        const keyFn = i => i.name;
+        const valueFn = i => i.age;
 
-        let expected = [
+        const expected = [
           [collection[0].name, collection[0].age],
           [collection[1].name, collection[1].age],
           [collection[2].name, collection[2].age]
@@ -149,17 +148,17 @@ describe('Utils', () => {
 
   describe('mergeEntries', () => {
     it('should match source entries to destination entries and return triplets', () => {
-      let dest = [
+      const dest = [
         [1, 'foo'],
         [2, 'bar'],
         [3, 'baz']
       ];
 
-      let src = [
+      const src = [
         [1, 'qux']
       ];
 
-      let expected = [
+      const expected = [
         [1, 'foo', 'qux'],
         [2, 'bar', undefined],
         [3, 'baz', undefined]
@@ -169,17 +168,17 @@ describe('Utils', () => {
     });
 
     it('should duplicate source entries to matching destination entries', () => {
-      let dest = [
+      const dest = [
         [1, 'foo'],
         [1, 'bar'],
         [2, 'baz']
       ];
 
-      let src = [
+      const src = [
         [1, 'qux']
       ];
 
-      let expected = [
+      const expected = [
         [1, 'foo', 'qux'],
         [1, 'bar', 'qux'],
         [2, 'baz', undefined]
@@ -211,14 +210,14 @@ describe('Utils', () => {
       let wasInvoked = false;
       let invokedWith;
 
-      let obj = {
-        getName: function (...args) {
+      const obj = {
+        getName (...args) {
           wasInvoked = true;
           invokedWith = args;
         }
       };
 
-      let args = ['foo'];
+      const args = ['foo'];
       Utils.invoke('getName', obj, ...args);
       expect(wasInvoked).toEqual(true);
       expect(invokedWith).toEqual(args);
@@ -227,11 +226,11 @@ describe('Utils', () => {
 
   describe('greaterScopeId', () => {
     it('should return the object with the greater scope id', () => {
-      let objA = {
+      const objA = {
         $getScope: () => 1
       };
 
-      let objB = {
+      const objB = {
         getScope: () => 2
       };
 
@@ -241,8 +240,8 @@ describe('Utils', () => {
 
   describe('mergeDeep', () => {
     it('should overwrite literals', () => {
-      let objA = {foo: 'bar'};
-      let objB = {foo: 'baz'};
+      const objA = {foo: 'bar'};
+      const objB = {foo: 'baz'};
 
       expect(Utils.mergeDeep(objA, objB)).toEqual({
         foo: 'baz'
@@ -250,11 +249,11 @@ describe('Utils', () => {
     });
 
     it('should append arrays', () => {
-      let objA = {
+      const objA = {
         foo: [1, 2, 3]
       };
 
-      let objB = {
+      const objB = {
         foo: [4, 5, 6]
       };
 
@@ -264,7 +263,7 @@ describe('Utils', () => {
     });
 
     it('should merge objects', () => {
-      let objA = {
+      const objA = {
         foo: {
           bar: {
             baz: 1
@@ -272,7 +271,7 @@ describe('Utils', () => {
         }
       };
 
-      let objB = {
+      const objB = {
         foo: {
           bar: {
             bleep: 2

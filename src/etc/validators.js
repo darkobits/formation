@@ -15,15 +15,15 @@
  * a model value (and/or view value) and returns a boolean.
  */
 
-import R from 'ramda';
+
+import {
+  isNil,
+  path
+} from 'ramda';
 
 import {
   ConfigurableValidator
 } from '../classes/ConfigurableValidator';
-
-// import {
-//   capitalizeFirst
-// } from './utils';
 
 import {
   NG_MODEL_CTRL
@@ -50,7 +50,7 @@ import {
  * @return {boolean}
  */
 export function required (modelValue) {
-  return !R.isNil(modelValue) && modelValue !== '';
+  return !isNil(modelValue) && modelValue !== '';
 }
 
 
@@ -237,7 +237,7 @@ export function pattern (pattern) {
 export function match (independentControlName) {
   return new ConfigurableValidator(function (modelValue, viewValue) {
     const {scope, form, ngModelCtrl} = this;
-    const independentNgModelCtrl = R.path([NG_MODEL_CTRL], form.getControl(independentControlName));
+    const independentNgModelCtrl = path([NG_MODEL_CTRL], form.getControl(independentControlName));
 
     // Ensure both controls use ngModel.
     if (!ngModelCtrl || !independentNgModelCtrl) {

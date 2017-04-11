@@ -2,7 +2,16 @@
 // ----- Control Base Class ----------------------------------------------------
 // -----------------------------------------------------------------------------
 
-import R from 'ramda';
+import {
+  clone,
+  contains,
+  has,
+  is,
+  isNil,
+  mapObjIndexed,
+  path,
+  pathOr
+} from 'ramda';
 
 import {
   ConfigurableValidator
@@ -10,6 +19,7 @@ import {
 
 import {
   COMPONENT_CONFIGURATION,
+  CONFIGURABLE_VALIDATOR,
   CUSTOM_ERROR_KEY,
   FORM_CONTROLLER,
   NG_MODEL_CTRL
@@ -239,7 +249,7 @@ export class FormationControl {
 
     // If the user did not configure error behavior, return the control's errors
     // if it is invalid.
-    if (R.isNil(errorBehavior) || errorBehavior === '') {
+    if (isNil(errorBehavior) || errorBehavior === '') {
       return !ngModelCtrl.$valid && ngModelCtrl.$error;
     }
 
@@ -346,7 +356,7 @@ Configure.implementedBy(FormationControl).as(function (configuration) {
   }
 
   // Merge provided configuration with local configuration.
-  const mergedConfig = mergeDeep(R.pathOr({}, [COMPONENT_CONFIGURATION], this), configuration);
+  const mergedConfig = mergeDeep(pathOr({}, [COMPONENT_CONFIGURATION], this), configuration);
 
   const {
     errors,
@@ -364,7 +374,7 @@ Configure.implementedBy(FormationControl).as(function (configuration) {
     errors.forEach(error => {
       if (!Array.isArray(error) || error.length !== 2) {
         throwError(`Expected error message tuple to be an array of length 2, got "${typeof error}".`);
-      } else if (!R.contains(error, this[NG_MESSAGES])) {
+      } else if (!contains(error, this[NG_MESSAGES])) {
         this[NG_MESSAGES].push(error);
       }
     });
@@ -374,7 +384,7 @@ Configure.implementedBy(FormationControl).as(function (configuration) {
   // Set up parsers.
   if (Array.isArray(parsers)) {
     parsers.forEach(parser => {
-      if (R.is(Function, parser)) {
+      if (is(Function, parser)) {
         this[NG_MODEL_CTRL].$parsers.push(parser.bind(this[NG_MODEL_CTRL]));
       } else {
         throwError(`Expected parser to be a function, got "${typeof parser}".`);
@@ -386,7 +396,7 @@ Configure.implementedBy(FormationControl).as(function (configuration) {
   // Set up formatters.
   if (Array.isArray(formatters)) {
     formatters.forEach(formatter => {
-      if (R.is(Function, formatter)) {
+      if (is(Function, formatter)) {
         this[NG_MODEL_CTRL].$formatters.push(formatter.bind(this[NG_MODEL_CTRL]));
       } else {
         throwError(`Expected formatter to be a function, got "${typeof formatter}".`);
@@ -396,14 +406,16 @@ Configure.implementedBy(FormationControl).as(function (configuration) {
 
 
   // Set up validators.
-  if (R.is(Object, validators)) {
-    R.mapObjIndexed((validator, name) => {
-      if (R.has(name, this[NG_MODEL_CTRL].$validators)) {
+  if (is(Object, validators)) {
+    mapObjIndexed((validator, name) => {
+      if (has(name, this[NG_MODEL_CTRL].$validators)) {
         // Validator with same key already exists on this control, pass.
-        return;
-      } else if (R.is(ConfigurableValidator, validator)) {
+      } else if (validator[CONFIGURABLE_VALIDATOR]) {
+        // Check against the CONFIGURABLE_VALIDATOR constant here rather than
+        // using is() because instanceof does not work across execution
+        // contexts.
         this[NG_MODEL_CTRL].$validators[name] = validator.configure(this);
-      } else if (R.is(Function, validator)) {
+      } else if (is(Function, validator)) {
         this[NG_MODEL_CTRL].$validators[name] = validator.bind(this[NG_MODEL_CTRL]);
       } else {
         throwError(`Expected validator to be of type "Function", but got "${typeof validator}".`);
@@ -413,14 +425,13 @@ Configure.implementedBy(FormationControl).as(function (configuration) {
 
 
   // Set up asyncronous validators.
-  if (R.is(Object, asyncValidators)) {
-    R.mapObjIndexed((asyncValidator, name) => {
-      if (R.has(name, this[NG_MODEL_CTRL].$asyncValidators)) {
+  if (is(Object, asyncValidators)) {
+    mapObjIndexed((asyncValidator, name) => {
+      if (has(name, this[NG_MODEL_CTRL].$asyncValidators)) {
         // Validator with same key already exists on this control, pass.
-        return;
-      } else if (R.is(ConfigurableValidator, asyncValidator)) {
+      } else if (is(ConfigurableValidator, asyncValidator)) {
         this[NG_MODEL_CTRL].$asyncValidators[name] = asyncValidator.configure(this);
-      } else if (R.is(Function, asyncValidator)) {
+      } else if (is(Function, asyncValidator)) {
         this[NG_MODEL_CTRL].$asyncValidators[name] = asyncValidator.bind(this[NG_MODEL_CTRL]);
       } else {
         throwError(`Expected async validator to be of type "Function", but got "${typeof asyncValidator}".`);
@@ -430,7 +441,7 @@ Configure.implementedBy(FormationControl).as(function (configuration) {
 
 
   // Configure ngModelOptions.
-  if (R.is(Object, ngModelOptions)) {
+  if (is(Object, ngModelOptions)) {
     this[NG_MODEL_CTRL].$options = this[NG_MODEL_CTRL].$options.createChild(ngModelOptions);
   }
 
@@ -486,7 +497,7 @@ GetModelValue.implementedBy(FormationControl).as(function () {
  * @param  {*} newValue - Value to set.
  */
 SetModelValue.implementedBy(FormationControl).as(function (newValue) {
-  this[FORM_CONTROLLER].$setModelValue(this.$getName(), R.clone(newValue));
+  this[FORM_CONTROLLER].$setModelValue(this.$getName(), clone(newValue));
 });
 
 
@@ -502,7 +513,7 @@ SetModelValue.implementedBy(FormationControl).as(function (newValue) {
  */
 SetCustomErrorMessage.implementedBy(FormationControl).as(function (errorMessage) {
   if (errorMessage) {
-    if (!R.is(String, errorMessage)) {
+    if (!is(String, errorMessage)) {
       throwError(`Expected error message to be of type "String" but got "${typeof errorMessage}".`);
     }
 
@@ -524,7 +535,7 @@ SetCustomErrorMessage.implementedBy(FormationControl).as(function (errorMessage)
  * @param  {object} control
  */
 ClearCustomErrorMessage.implementedBy(FormationControl).as(function () {
-  if (R.path([NG_MODEL_CTRL, '$error', CUSTOM_ERROR_KEY], this)) {
+  if (path([NG_MODEL_CTRL, '$error', CUSTOM_ERROR_KEY], this)) {
     this[FORM_CONTROLLER].$debug(`Clearing custom error on control "${this.$getName()}".`);
     this[NG_MODEL_CTRL].$setValidity(CUSTOM_ERROR_KEY, true);
     Reflect.deleteProperty(this, CUSTOM_ERROR_MESSAGE_KEY);

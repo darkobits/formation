@@ -1,6 +1,6 @@
 import Interface, {
   Any
-} from '../classes/Interface';
+} from '../classes/interface';
 
 
 /**

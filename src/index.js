@@ -3,11 +3,23 @@ import './components';
 import './filters';
 
 
-// Re-export configurator and registerControl.
+// ----- Public Exports --------------------------------------------------------
+
+export {
+  ConfigurableValidator
+} from './classes/ConfigurableValidator';
+
+export {
+  FormationControl
+} from './classes/FormationControl';
+
 export {
   FormationConfigurator,
   registerControl
 } from './etc/config';
 
+export {
+  onReady
+} from './etc/utils';
 
 export default app.name;

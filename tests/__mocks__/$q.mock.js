@@ -1,8 +1,8 @@
 export default {
   defer () {
-    let deferred = {};
+    const deferred = {};
 
-    let p = new Promise((resolve, reject) => {
+    const p = new Promise((resolve, reject) => {
       deferred.resolve = resolve;
       deferred.reject = reject;
     });

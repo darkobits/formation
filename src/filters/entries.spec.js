@@ -16,14 +16,14 @@ describe('entries Filter', () => {
 
   describe('entries', () => {
     it('convert an object to an array of tuples', () => {
-      let input = {foo: 'bar'};
-      let expected = [['foo', 'bar']];
+      const input = {foo: 'bar'};
+      const expected = [['foo', 'bar']];
 
       expect(T.entries(input)).toEqual(expected);
     });
 
     it('should ignore non-objects', () => {
-      let input = 'foo';
+      const input = 'foo';
 
       expect(T.entries(input)).toBe(input);
     });

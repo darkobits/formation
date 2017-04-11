@@ -1,6 +1,9 @@
-import R from 'ramda';
+import {
+  is
+} from 'ramda';
 
 import {
+  CONFIGURABLE_VALIDATOR,
   FORM_CONTROLLER,
   NG_MODEL_CTRL
 } from '../../etc/constants';
@@ -26,7 +29,7 @@ import {
  */
 export class ConfigurableValidator {
   constructor (validator) {
-    if (!R.is(Function, validator)) {
+    if (!is(Function, validator)) {
       throwError([
         'ConfigurableValidator expected validator to be of type "Function",',
         `but got "${typeof validator}".`
@@ -34,6 +37,11 @@ export class ConfigurableValidator {
     }
 
     this.validator = validator.bind(this);
+
+    // Assign the CONFIGURABLE_VALIDATOR flag so that the instance can be
+    // identified as such by Formation. This must be used because instanceof
+    // does not work across execution contexts,
+    this[CONFIGURABLE_VALIDATOR] = true;
   }
 
   configure (formationControl) {

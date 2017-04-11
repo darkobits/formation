@@ -5,11 +5,11 @@ export default {
     fn();
   },
   $watch (expression, cb) {
-    let getValue = () => R.path(expression.split('.'), this);
+    const getValue = () => R.path(expression.split('.'), this);
     let oldValue;
 
-    let clear = setInterval(() => {
-      let newValue = getValue();
+    const clear = setInterval(() => {
+      const newValue = getValue();
 
       if (oldValue === undefined) {
         cb(newValue, undefined);

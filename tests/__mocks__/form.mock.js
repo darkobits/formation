@@ -12,18 +12,18 @@ import $q from './$q.mock';
 
 export default function createForm ({bindings, injectables = {}, ngForm = {}} = {}) {
   // Injectables.
-  let i = Object.assign({
+  const i = Object.assign({
     $attrs: {},
     $compile: {},
     $element: {},
     $log: {},
     $parse: {},
-    $q: $q,
-    $scope: $scope,
+    $q,
+    $scope,
     $transclude: {}
   }, injectables);
 
-  let form = Object.assign(new FormController(
+  const form = Object.assign(new FormController(
     i.$attrs,
     i.$compile,
     i.$element,

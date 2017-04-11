@@ -100,7 +100,6 @@ export default class Interface {
       args.forEach((arg, index) => {
         if (this.argTypes[index] === Any) {
           // Simple arity-check using Any as a placeholder.
-          return;
         } else if (this.argTypes[index] && !is(this.argTypes[index], arg)) {
           throw new Error([
             `[${this.name}]`,
@@ -156,7 +155,7 @@ export default class Interface {
           enumerable: false,
           configurable: false,
           writable: true,
-          value: function (...args) {
+          value (...args) {
             if (Interface.checkArguments(...args)) {
               return implementation.call(this, ...args);
             }

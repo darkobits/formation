@@ -1,5 +1,3 @@
-import R from 'ramda';
-
 import Formation from '../index';
 
 import {
@@ -7,8 +5,6 @@ import {
   get,
   directive
 } from '../../tests/unity';
-
-import '../../src/index';
 
 import {
   FORM_COMPONENT_NAME,
@@ -47,7 +43,7 @@ function assertIsNgModelController (value) {
 describe('Formation Configuration', () => {
   let T;
 
-  let componentNames = ['foo', 'bar', 'baz'];
+  const componentNames = ['foo', 'bar', 'baz'];
 
   beforeEach(() => {
     componentNames.forEach(componentName => $registerComponent(componentName, {}));
@@ -56,7 +52,7 @@ describe('Formation Configuration', () => {
 
   describe('Decorating ngForm', () => {
     it('should require the Formation form controller', () => {
-      let [ngFormDirective] = get('formDirective');
+      const [ngFormDirective] = get('formDirective');
       expect(ngFormDirective.require).toEqual(expect.arrayContaining([`?^^${FORM_COMPONENT_NAME}`]));
     });
 
@@ -75,7 +71,7 @@ describe('Formation Configuration', () => {
       });
 
       it('should register with the Formation form, if present', () => {
-        let ngFormController = T.fm[NG_FORM_CONTROLLER];
+        const ngFormController = T.fm[NG_FORM_CONTROLLER];
         assertIsNgFormController(ngFormController);
       });
     });
@@ -83,20 +79,20 @@ describe('Formation Configuration', () => {
 
   describe('Decorating ngModel', () => {
     it('should require registered Formation controls', () => {
-      let [ngModelDirective] = get('ngModelDirective');
-      let registeredComponents = R.map(componentName => `?^^${componentName}`, componentNames);
+      const [ngModelDirective] = get('ngModelDirective');
+      const registeredComponents = componentNames.map(componentName => `?^^${componentName}`);
 
       expect(ngModelDirective.require).toEqual(expect.arrayContaining(registeredComponents));
     });
 
     it('should require Formation forms', () => {
-      let [ngModelDirective] = get('ngModelDirective');
+      const [ngModelDirective] = get('ngModelDirective');
       expect(ngModelDirective.require).toEqual(expect.arrayContaining(['?^^fm']));
     });
 
     describe('registering with a Formation form', () => {
-      let controlName = 'foo';
-      let value = 'bar';
+      const controlName = 'foo';
+      const value = 'bar';
 
       beforeEach(() => {
         T = directive('fm', {
@@ -114,7 +110,7 @@ describe('Formation Configuration', () => {
       });
 
       it('should register with the Formation form, if present', () => {
-        let control = T.fm.getControl(controlName);
+        const control = T.fm.getControl(controlName);
 
         assertIsNgModelController(control[NG_MODEL_CTRL]);
         expect(T.fm.getModelValues()).toEqual(expect.objectContaining({
@@ -124,7 +120,7 @@ describe('Formation Configuration', () => {
     });
 
     describe('registering with a Formation control', () => {
-      let controlName = 'foo';
+      const controlName = 'foo';
 
       beforeEach(() => {
         T = directive('fmInput', {
@@ -137,7 +133,7 @@ describe('Formation Configuration', () => {
       });
 
       it('should register with the Formation form, if present', () => {
-        let control = T.fmInput;
+        const control = T.fmInput;
         assertIsNgModelController(control[NG_MODEL_CTRL]);
       });
     });
