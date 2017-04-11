@@ -325,7 +325,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    * @param  {object} control
    */
   RegisterControl.implementedBy(Form).as(function (control) {
-    const controlName = control.name;
+    const controlName = control.name || 'control';
 
     // Ensure there is not a registered child form with the same name as the
     // control being registered.

@@ -1,7 +1,4 @@
-import R from 'ramda';
-
-// Note: Consider using Symbols when they are better supported in IE11.
-
+// ----- Interface -------------------------------------------------------------
 
 /**
  * Placeholder used in interface definitions to denote any value may be passed.
@@ -9,6 +6,20 @@ import R from 'ramda';
  * @type {string}
  */
 export const Any = 'ANY';
+
+
+/**
+ * Determines if 'value' is an instance of 'constructor'.
+ *
+ * @private
+ *
+ * @param  {object} constructor
+ * @param  {*} value
+ * @return {boolean}
+ */
+function is (constructor, value) {
+  return value !== null && (value.constructor === constructor || value instanceof constructor);
+}
 
 
 /**
@@ -32,16 +43,53 @@ export const Any = 'ANY';
  * // The interface can then be used thusly:
  * const myBar = new Bar();
  * myBar[Foo]('baz');
+ *
+ * @example
+ *
+ * // You can also implement interfaces directly on objects, rather than
+ * // prototypes. This is advantageous when using constructor functions that use
+ * // private data/methods that the interface needs access to.
+ *
+ * function Bar () {
+ *   // Private data.
+ *   var foo = '';
+ *
+ *   this.getFoo = () => {
+ *     return foo;
+ *   };
+ *
+ *   Foo.implementedBy(this).as(function (str) {
+ *     // Mutate private data.
+ *     this.foo = str;
+ *   });
+ * }
+ *
+ * const myBar = new Bar();
+ * myBar[Foo]('baz');
  */
-export class Interface {
+export default class Interface {
   constructor (name, argTypes) {
+    if (!is(String, name)) {
+      throw new Error([
+        '[Interface] Constructor expected argument 1 to be of type "String"',
+        `but got "${typeof name}".`
+      ].join(' '));
+    }
+
+    if (argTypes && !is(Array, argTypes)) {
+      throw new Error([
+        '[Interface] Constructor expected argument 2 to be undefined or of type',
+        `"Array" but got "${typeof argTypes}".`
+      ].join(' '));
+    }
+
     this.name = `@@${name}`;
     this.argTypes = argTypes || [];
   }
 
 
   /**
-   * Performs simple runtime check on the arguments passed to an interface's
+   * Performs a simple runtime check on the arguments passed to an interface's
    * implementation.
    *
    * @param  {arglist} args
@@ -53,7 +101,7 @@ export class Interface {
         if (this.argTypes[index] === Any) {
           // Simple arity-check using Any as a placeholder.
           return;
-        } else if (this.argTypes[index] && !R.is(this.argTypes[index], arg)) {
+        } else if (this.argTypes[index] && !is(this.argTypes[index], arg)) {
           throw new Error([
             `[${this.name}]`,
             `Expected argument ${index + 1} to be of type "${this.argTypes[index].name}"`,
@@ -86,18 +134,20 @@ export class Interface {
 
     return {
       as: implementation => {
-        // If we're working with a class/constructor function, decorate its
-        // prototype. Otherwise, decorate the instance itself.
-        const delegate = R.is(Function, obj) ? obj.prototype : obj;
+        // If we're working with a class/constructor function, use its
+        // prototype. Otherwise, use the instance itself.
+        const delegate = is(Function, obj) ? obj.prototype : obj;
 
         if (delegate[Interface.name]) {
           throw new Error(`[Interface] Delegate object already implements ${Interface.name}.`);
         }
 
-        if (!R.is(Function, implementation)) {
+        if (!is(Function, implementation)) {
           throw new Error(`[${Interface.name}] Implementation must be a function.`);
         }
 
+        // Implementations must accept at least as many arguments as the
+        // interface specifies.
         if (implementation.length < Interface.argTypes.length) {
           throw new Error(`[${Interface.name}] Expected implementation to have arity ${Interface.argTypes.length}.`);
         }
@@ -105,7 +155,7 @@ export class Interface {
         Object.defineProperty(delegate, Interface.name, {
           enumerable: false,
           configurable: false,
-          writable: false,
+          writable: true,
           value: function (...args) {
             if (Interface.checkArguments(...args)) {
               return implementation.call(this, ...args);
@@ -128,9 +178,3 @@ export class Interface {
     return this.name;
   }
 }
-
-
-export default {
-  Any,
-  Interface
-};

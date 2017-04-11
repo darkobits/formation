@@ -1,5 +1,6 @@
 {
   "moduleDirectories": [
+    "<rootDir>",
     "<rootDir>/src",
     "<rootDir>/tests",
     "node_modules"

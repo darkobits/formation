@@ -1,6 +1,5 @@
-import {
-  Any,
-  Interface
+import Interface, {
+  Any
 } from '../classes/Interface';
 
 

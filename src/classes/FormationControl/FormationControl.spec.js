@@ -1,152 +1,255 @@
-// import {
-//   REGISTER_NG_MODEL_CALLBACK
-// } from '../../../src/etc/constants';
+import {
+  NG_FORM_CONTROLLER
+} from '../../components/Form/Form';
 
 import {
-  FORM_CONTROLLER,
   NG_MODEL_CTRL
 } from '../../etc/constants';
 
 import {
-  RegisterControl,
-  RegisterNgModel
-} from '../../etc/interfaces';
-
-
-import createForm from '../../../tests/__mocks__/form.mock';
+  module,
+  get,
+  directive
+} from '../../../tests/unity';
 
 import {
-  NG_MESSAGES,
-  FormationControl
+  ClearCustomErrorMessage,
+  Configure,
+  GetModelValue,
+  RegisterControl,
+  RegisterNgModel,
+  SetCustomErrorMessage,
+  SetModelValue
+} from '../../etc/interfaces';
+
+import Formation from '../../index';
+
+import {
+  NG_MESSAGES
 } from './FormationControl';
 
 
+// TODO: Move to unity.
+function compile ({template, scope} = {}) {
+  let $scope;
 
+  if (!scope || !scope.$id) {
+    $scope = get('$rootScope').$new();
+  } else {
+    $scope = scope;
+  }
 
+  if (!template || typeof template !== 'string') {
+    throw new Error('[createElement] No template provided.');
+  }
 
-// TODO: Move to __mocks__.
-function createControl ({bindings, form = {}, ngModelCtrl = {}} = {}) {
-  return Object.assign(new FormationControl(), {
-    [FORM_CONTROLLER]: form,
-    [NG_MODEL_CTRL]: ngModelCtrl
-  }, bindings);
+  return get('$compile')(template)($scope);
 }
 
 
 describe('FormationControl', () => {
-  describe('ngModel registration', () => {
-    it('should define an ngModel registration method', () => {
-      let control = createControl();
-      expect(typeof control[RegisterNgModel]).toBe('function');
+  let T;
+  let Form;
+  let wrapper;
+
+  beforeEach(() => {
+    module(Formation);
+
+    wrapper = compile({
+      template: '<fm></fm>'
     });
 
-    it('should register with the form and assign ngModel to the correct key', () => {
-      let spy = jest.fn();
-      let ngModelCtrl = {};
-      let control = createControl({}, {[RegisterControl]: spy});
-      control[RegisterNgModel](ngModelCtrl);
-      expect(control[NG_MODEL_CTRL]).toBe(ngModelCtrl);
-      expect(spy.mock.calls[0]).toContain(control);
+    Form = wrapper.controller('fm');
+    jest.spyOn(Form, RegisterControl);
+  });
+
+  describe('RegisterNgModel / Form Registration', () => {
+    beforeEach(() => {
+      T = directive('fmInput', {
+        template: '<fm-input></fm-input>',
+        wrap: wrapper
+      });
+    });
+
+    it('should implement the RegisterNgModel interface', () => {
+      expect(typeof T.fmInput[RegisterNgModel]).toEqual('function');
+    });
+
+    it('should register with the form', () => {
+      expect(Form[RegisterControl].mock.calls[0][0]).toEqual(T.fmInput);
+    });
+
+    it('should assign its ngModel controller to the correct key', () => {
+      expect(T.fmInput[NG_MODEL_CTRL]).toBeTruthy();
     });
   });
 
   describe('$getName', () => {
-    it('should report its name when assigned a "name" binding', () => {
+    describe('when assigned a "name" binding', () => {
       let name = 'foo';
-      let control = createControl({name});
-      expect(control.$getName()).toBe(name);
+
+      beforeEach(() => {
+        T = directive('fmInput', {
+          template: `<fm-input name="${name}"></fm-input>`,
+          wrap: wrapper
+        });
+      });
+
+      it('should report its name', () => {
+        expect(T.fmInput.$getName()).toEqual(name);
+      });
     });
 
-    it('should report its name when assigned a "for" binding', () => {
+    describe('when assigned a "for" binding', () => {
       let forStr = 'foo';
-      let control = createControl({for: forStr});
-      expect(control.$getName()).toBe(forStr);
-    });
-  });
 
-  describe('isDisabled', () => {
-    it('should return true when its "$ngDisabled" binding is true', () => {
-      let control = createControl({$ngDisabled: true});
-      expect(control.isDisabled()).toBe(true);
-    });
+      beforeEach(() => {
+        T = directive('fmInput', {
+          template: `<fm-input name="${forStr}"></fm-input>`,
+          wrap: wrapper
+        });
+      });
 
-    it('should return true when its "$disabled" binding is true', () => {
-      let control = createControl({$disabled: true});
-      expect(control.isDisabled()).toBe(true);
-    });
-
-    it('should return true when its form controller is disabled', () => {
-      let control = createControl({}, {isDisabled: () => true});
-      expect(control.isDisabled()).toBe(true);
+      it('should report its name', () => {
+        expect(T.fmInput.$getName()).toEqual(forStr);
+      });
     });
   });
 
   describe('$onDestroy', () => {
-    it('should unregister from its form controller if it has a model', () => {
-      let spy = jest.fn();
-      let control = createControl({}, {$unregisterControl: spy});
-      control.$onDestroy();
-      expect(spy.mock.calls[0]).toContain(control);
+    let unregisterSpy;
+
+    beforeEach(() => {
+      T = directive('fmInput', {
+        template: `<fm-input></fm-input>`,
+        wrap: wrapper
+      });
+
+      unregisterSpy = jest.spyOn(Form, '$unregisterControl');
     });
 
-    it('should not unregister from its form controller if it does not have a model', () => {
-      let spy = jest.fn();
-      let control = createControl({}, {$unregisterControl: spy}, null);
-      control.$onDestroy();
-      expect(spy.mock.calls.length).toBe(0);
+    it('should unregister from its form controller if it has a model', () => {
+      T.fmInput.$onDestroy();
+      expect(unregisterSpy.mock.calls[0][0]).toEqual(T.fmInput);
+    });
+  });
+
+  describe('#isDisabled', () => {
+    describe('when not disabled', () => {
+      beforeEach(() => {
+        T = directive('fmInput', {
+          template: `<fm-input></fm-input>`,
+          wrap: wrapper
+        });
+      });
+
+      it('should return false', () => {
+        expect(T.fmInput.isDisabled()).toBeFalsy();
+      });
+    });
+
+    describe('with a truthy ngDisabled binding', () => {
+      beforeEach(() => {
+        T = directive('fmInput', {
+          template: `<fm-input ng-disabled="true"></fm-input>`,
+          wrap: wrapper
+        });
+      });
+
+      it('should return false', () => {
+        expect(T.fmInput.isDisabled()).toBeTruthy();
+      });
+    });
+
+    describe('when programatically disabled', () => {
+      beforeEach(() => {
+        T = directive('fmInput', {
+          template: `<fm-input></fm-input>`,
+          wrap: wrapper
+        });
+
+        T.fmInput.disable();
+      });
+
+      it('should return false', () => {
+        expect(T.fmInput.isDisabled()).toBeTruthy();
+      });
+    });
+
+    describe('when the form is disabled', () => {
+      beforeEach(() => {
+        T = directive('fmInput', {
+          template: `<fm-input></fm-input>`,
+          wrap: wrapper
+        });
+
+        Form.disable();
+      });
+
+      it('should return false', () => {
+        expect(T.fmInput.isDisabled()).toBeTruthy();
+      });
     });
   });
 
   describe('$getControl', () => {
+    let name = 'foo';
+    let getControlSpy;
+
+    beforeEach(() => {
+      T = directive('fmInput', {
+        template: `<fm-input name="${name}"></fm-input>`,
+        wrap: wrapper
+      });
+
+      getControlSpy = jest.spyOn(Form, 'getControl');
+    });
+
     it('should attempt to get the correct control from the form', () => {
-      let name = 'foo';
-      let spy = jest.fn(getName => getName === name);
-      let control = createControl({name}, {getControl: spy});
-      let result = control.$getControl();
-      expect(result).toBe(true);
-      expect(spy.mock.calls[0]).toContain(name);
+      expect(T.fmInput.$getControl()).toEqual(T.fmInput);
+      expect(getControlSpy.mock.calls[0][0]).toEqual(name);
     });
   });
 
-  describe('$getCanonicalControlId', () => {
-    it('should attempt to get the ID of its canonical control from the form', () => {
-      let formName = 'Form';
-      let controlName = 'foo';
-      let $uid = '42';
-      let spy = jest.fn(getName => getName === controlName ? {$uid} : false);
-      let control = createControl({name: controlName}, {$name: formName, getControl: spy});
-      let result = control.$getCanonicalControlId();
-      expect(result).toBe(`${formName}-${$uid}`);
-      expect(spy.mock.calls[0]).toContain(controlName);
-    });
-  });
+  describe('#getControlId', () => {
+    let formName = 'foo';
+    let controlName = 'bar';
 
-  describe('getControlId', () => {
+    beforeEach(() => {
+      wrapper = compile({
+        template: `<fm name="${formName}"></fm>`
+      });
+
+      Form = wrapper.controller('fm');
+
+      T = directive('fmInput', {
+        template: `<fm-input name="${controlName}"></fm-input>`,
+        wrap: wrapper
+      });
+    });
+
     it('should return its ID', () => {
-      let $uid = '42';
-      let formName = 'Form';
-      let control = createControl({$uid}, {name: formName});
-      expect(control.getControlId()).toBe(`${formName}-${$uid}`);
+      expect(T.fmInput.getControlId()).toEqual(`${formName}-${controlName}-0`);
     });
   });
 
-  describe('enable', () => {
-    it('should set its "$disabled" flag to "false"', () => {
-      let control = createControl({$disabled: true});
-      control.enable();
-      expect(control.$disabled).toBe(false);
+  describe('#enable / #disable', () => {
+    beforeEach(() => {
+      T = directive('fmInput', {
+        template: `<fm-input></fm-input>`,
+        wrap: wrapper
+      });
+    });
+
+    it('should enable / disable the control', () => {
+      T.fmInput.disable();
+      expect(T.fmInput.isDisabled()).toBeTruthy();
+      T.fmInput.enable();
+      expect(T.fmInput.isDisabled()).toBeFalsy();
     });
   });
 
-  describe('disable', () => {
-    it('should set its "$disabled" flag to "true"', () => {
-      let control = createControl({$disabled: false});
-      control.disable();
-      expect(control.$disabled).toBe(true);
-    });
-  });
-
-  describe('getErrors', () => {
+  describe('#getErrors', () => {
     /**
      * Scenario 1
      *
@@ -156,29 +259,26 @@ describe('FormationControl', () => {
      * - [ ] Control has been touched
      * - [ ] Form has been submitted
      */
-    it('Scenario 1', () => {
-      let ctrlName = 'foo';
+    describe('Scenario 1', () => {
+      beforeEach(() => {
+        wrapper = compile({
+          template: '<fm show-errors-on="touched, submitted"></fm>'
+        });
 
-      let form = createForm({
-        bindings: {
-          $showErrorsOn: 'touched, submitted',
-          form: {
-            $submitted: false
-          }
-        }
+        Form = wrapper.controller('fm');
+
+        T = directive('fmInput', {
+          template: `<fm-input></fm-input>`,
+          wrap: wrapper
+        });
+
+        T.fmInput[NG_MODEL_CTRL].$valid = true;
+        T.fmInput[NG_MODEL_CTRL].$touched = false;
       });
 
-      let ctrl = createControl({
-        name: ctrlName,
-        [NG_MODEL_CTRL]: {
-          $valid: true,
-          $touched: false
-        }
+      it('should return false', () => {
+        expect(T.fmInput.getErrors()).toBeFalsy();
       });
-
-      form.$onInit();
-      form.$registerControl(ctrl);
-      expect(form.$getErrorsForControl(ctrlName)).toBe(false);
     });
 
 
@@ -191,28 +291,26 @@ describe('FormationControl', () => {
      * - [ ] Control has been touched
      * - [ ] Form has been submitted
      */
-    // it('Scenario 2', () => {
-    //   let ctrlName = 'foo';
+    describe('Scenario 2', () => {
+      beforeEach(() => {
+        wrapper = compile({
+          template: '<fm show-errors-on="touched, submitted"></fm>'
+        });
 
-    //   let form = createForm({
-    //     $showErrorsOn: 'touched, submitted',
-    //     [NG_FORM_CONTROLLER]: {
-    //       $submitted: false
-    //     }
-    //   });
+        Form = wrapper.controller('fm');
 
-    //   let ctrl = formationCtrl({
-    //     name: ctrlName,
-    //     [NG_MODEL_CTRL]: {
-    //       $valid: false,
-    //       $touched: false
-    //     }
-    //   });
+        T = directive('fmInput', {
+          template: `<fm-input></fm-input>`,
+          wrap: wrapper
+        });
 
-    //   form.$onInit();
-    //   form.$registerControl(ctrl);
-    //   expect(form.$getErrorsForControl(ctrlName)).toBe(false);
-    // });
+        T.fmInput[NG_MODEL_CTRL].$valid = false;
+      });
+
+      it('should return false', () => {
+        expect(T.fmInput.getErrors()).toBeFalsy();
+      });
+    });
 
 
     /**
@@ -224,28 +322,26 @@ describe('FormationControl', () => {
      * - [ ] Control has been touched
      * - [ ] Form has been submitted
      */
-    // it('Scenario 3', () => {
-    //   let ctrlName = 'foo';
+    describe('Scenario 3', () => {
+      beforeEach(() => {
+        wrapper = compile({
+          template: '<fm show-errors-on="touched"></fm>'
+        });
 
-    //   let form = createForm({
-    //     $showErrorsOn: 'touched',
-    //     [NG_FORM_CONTROLLER]: {
-    //       $submitted: false
-    //     }
-    //   });
+        Form = wrapper.controller('fm');
 
-    //   let ctrl = formationCtrl({
-    //     name: ctrlName,
-    //     [NG_MODEL_CTRL]: {
-    //       $valid: false,
-    //       $touched: false
-    //     }
-    //   });
+        T = directive('fmInput', {
+          template: `<fm-input></fm-input>`,
+          wrap: wrapper
+        });
 
-    //   form.$onInit();
-    //   form.$registerControl(ctrl);
-    //   expect(form.$getErrorsForControl(ctrlName)).toBe(false);
-    // });
+        T.fmInput[NG_MODEL_CTRL].$valid = false;
+      });
+
+      it('should return false', () => {
+        expect(T.fmInput.getErrors()).toBeFalsy();
+      });
+    });
 
 
     /**
@@ -257,31 +353,26 @@ describe('FormationControl', () => {
      * - [ ] Control has been touched
      * - [ ] Form has been submitted
      */
-    // it('Scenario 4', () => {
-    //   let ctrlName = 'foo';
-    //   let errors = {
-    //     foo: 'bar'
-    //   };
+    describe('Scenario 4', () => {
+      beforeEach(() => {
+        wrapper = compile({
+          template: '<fm></fm>'
+        });
 
-    //   let form = createForm({
-    //     [NG_FORM_CONTROLLER]: {
-    //       $submitted: false
-    //     }
-    //   });
+        Form = wrapper.controller('fm');
 
-    //   let ctrl = formationCtrl({
-    //     name: ctrlName,
-    //     [NG_MODEL_CTRL]: {
-    //       $valid: false,
-    //       $touched: false,
-    //       $error: errors
-    //     }
-    //   });
+        T = directive('fmInput', {
+          template: `<fm-input></fm-input>`,
+          wrap: wrapper
+        });
 
-    //   form.$onInit();
-    //   form.$registerControl(ctrl);
-    //   expect(form.$getErrorsForControl(ctrlName)).toEqual(expect.objectContaining(errors));
-    // });
+        T.fmInput[NG_MODEL_CTRL].$valid = false;
+      });
+
+      it('should return errors', () => {
+        expect(T.fmInput.getErrors()).toBeTruthy();
+      });
+    });
 
 
     /**
@@ -293,28 +384,27 @@ describe('FormationControl', () => {
      * - [X] Control has been touched
      * - [ ] Form has been submitted
      */
-    // it('Scenario 5', () => {
-    //   let ctrlName = 'foo';
+    describe('Scenario 5', () => {
+      beforeEach(() => {
+        wrapper = compile({
+          template: '<fm show-errors-on="submitted"></fm>'
+        });
 
-    //   let form = createForm({
-    //     $showErrorsOn: 'submitted',
-    //     [NG_FORM_CONTROLLER]: {
-    //       $submitted: false
-    //     }
-    //   });
+        Form = wrapper.controller('fm');
 
-    //   let ctrl = formationCtrl({
-    //     name: ctrlName,
-    //     [NG_MODEL_CTRL]: {
-    //       $valid: false,
-    //       $touched: true
-    //     }
-    //   });
+        T = directive('fmInput', {
+          template: `<fm-input></fm-input>`,
+          wrap: wrapper
+        });
 
-    //   form.$onInit();
-    //   form.$registerControl(ctrl);
-    //   expect(form.$getErrorsForControl(ctrlName)).toBe(false);
-    // });
+        T.fmInput[NG_MODEL_CTRL].$valid = false;
+        T.fmInput[NG_MODEL_CTRL].$touched = true;
+      });
+
+      it('should return false', () => {
+        expect(T.fmInput.getErrors()).toBeFalsy();
+      });
+    });
 
 
     /**
@@ -326,103 +416,102 @@ describe('FormationControl', () => {
      * - [ ] Control has been touched
      * - [X] Form has been submitted
      */
-    // it('Scenario 6', () => {
-    //   let ctrlName = 'foo';
+    describe('Scenario 6', () => {
+      beforeEach(() => {
+        wrapper = compile({
+          template: '<fm show-errors-on="submitted"></fm>'
+        });
 
-    //   let errors = {
-    //     foo: 'bar'
-    //   };
+        Form = wrapper.controller('fm');
 
-    //   let form = createForm({
-    //     $showErrorsOn: 'submitted',
-    //     [NG_FORM_CONTROLLER]: {
-    //       $submitted: true
-    //     }
-    //   });
+        T = directive('fmInput', {
+          template: `<fm-input></fm-input>`,
+          wrap: wrapper
+        });
 
-    //   let ctrl = formationCtrl({
-    //     name: ctrlName,
-    //     [NG_MODEL_CTRL]: {
-    //       $valid: false,
-    //       $touched: true,
-    //       $error: errors
-    //     }
-    //   });
+        T.fmInput[NG_MODEL_CTRL].$valid = false;
+        Form[NG_FORM_CONTROLLER].$submitted = true;
+      });
 
-    //   form.$onInit();
-    //   form.$registerControl(ctrl);
-    //   expect(form.$getErrorsForControl(ctrlName)).toEqual(expect.objectContaining(errors));
-    // });
+      it('should return errors', () => {
+        expect(T.fmInput.getErrors()).toBeTruthy();
+      });
+    });
   });
 
-  // describe('getErrorMessages', () => {
-  //   it('should attempt to get error message from its form controller', () => {
-  //     let expected = true;
-  //     let spy = jest.fn(() => ({[NG_MESSAGES]: expected}));
-  //     let controlName = 'foo';
-  //     let control = createControl({name: controlName}, {getControl: spy});
-  //     let result = control.getErrorMessages();
+  describe('#getErrorMessages', () => {
+    let controlName = 'foo';
+    let errors = [
+      ['foo', 'bar']
+    ];
 
-  //     expect(result).toBe(expected);
-  //     expect(spy.mock.calls[0]).toContain(controlName);
-  //   });
-  // });
+    beforeEach(() => {
+      T = directive('fmInput', {
+        template: `<fm-input name="${controlName}"></fm-input>`,
+        wrap: wrapper
+      });
 
-  // describe('getCustomErrorMessage', () => {
-  //   it('should attempt to get its custom error message from its form controller', () => {
-  //     let message = 'foo';
-  //     let spy = jest.fn(() => message);
-  //     let controlName = 'foo';
-  //     let control = createControl({name: controlName}, {$getCustomErrorMessageForControl: spy});
-  //     let result = control.getCustomErrorMessage();
+      T.fmInput[Configure]({errors});
+    });
 
-  //     expect(result).toBe(message);
-  //     expect(spy.mock.calls[0]).toContain(controlName);
-  //   });
-  // });
+    it('should assign error messages to the correct key', () => {
+      expect(T.fmInput[NG_MESSAGES]).toEqual(errors);
+    });
 
-  // describe('getModelValue / setModelValue / $ngModelGetterSetter', () => {
-  //   let form = {
-  //     modelValues: {},
-  //     $getModelValue (name) {
-  //       return form.modelValues[name];
-  //     },
-  //     $setModelValue (name, value) {
-  //       form.modelValues[name] = value;
-  //     }
-  //   };
+    it('should return its configured error messages', () => {
+      expect(T.fmInput.getErrorMessages()).toEqual(errors);
+    });
+  });
 
-  //   describe('when called with no parameters', () => {
-  //     it('should return the model value from the form', () => {
-  //       let controlName = 'foo';
-  //       let modelValue = 42;
-  //       let control = createControl({name: controlName}, form);
-  //       form.$setModelValue(controlName, modelValue);
-  //       expect(control.$ngModelGetterSetter()).toBe(modelValue);
-  //     });
-  //   });
+  describe('Custom Error Messages', () => {
+    let errorMessage = 'foo';
 
-  //   describe('when called with parameters', () => {
-  //     let controlName = 'bar';
-  //     let control = createControl({name: controlName}, form);
+    beforeEach(() => {
+      T = directive('fmInput', {
+        template: `<fm-input></fm-input>`,
+        wrap: wrapper
+      });
+    });
 
-  //     it('should set the model value with the form', () => {
-  //       let modelValue = 17;
-  //       control.$ngModelGetterSetter(modelValue);
-  //       expect(form.$getModelValue(controlName)).toBe(modelValue);
-  //     });
+    it('should implmenet SetCustomErrorMessage', () => {
+      expect(typeof T.fmInput[SetCustomErrorMessage]).toEqual('function');
+    });
 
-  //     it('should deep clone non-primitive values', () => {
-  //       let deepValue = {foo: 'bar'};
-  //       let modelValue = {deep: deepValue};
-  //       control.$ngModelGetterSetter(modelValue);
+    it('getCustomErrorMessage should return the current custom errror', () => {
+      T.fmInput[SetCustomErrorMessage](errorMessage);
+      expect(T.fmInput.getCustomErrorMessage()).toEqual(errorMessage);
+    });
 
-  //       expect(form.$getModelValue(controlName)).toEqual(modelValue);
-  //       expect(form.$getModelValue(controlName)).not.toBe(modelValue);
+    it('should implmenet ClearCustomErrorMessage', () => {
+      expect(typeof T.fmInput[ClearCustomErrorMessage]).toEqual('function');
+      T.fmInput[SetCustomErrorMessage](errorMessage);
+      expect(T.fmInput.getCustomErrorMessage()).toEqual(errorMessage);
+      T.fmInput[ClearCustomErrorMessage]();
+      expect(T.fmInput.getCustomErrorMessage()).toBeFalsy();
+    });
+  });
 
-  //       expect(form.$getModelValue(controlName).deep).toEqual(deepValue);
-  //       expect(form.$getModelValue(controlName).deep).not.toBe(deepValue);
-  //     });
-  //   });
-  // });
+  describe('#setModelValue / #getModelValue', () => {
+    let modelValue = 'foo';
+
+    beforeEach(() => {
+      T = directive('fmInput', {
+        template: `<fm-input></fm-input>`,
+        wrap: wrapper
+      });
+    });
+
+    it('should implement the SetModelValue interface', () => {
+      expect(typeof T.fmInput[SetModelValue]).toEqual('function');
+    });
+
+    it('should implement the GetModelValue interface', () => {
+      expect(typeof T.fmInput[GetModelValue]).toEqual('function');
+    });
+
+    it('should get/set the controls model value', () => {
+      T.fmInput.setModelValue(modelValue);
+      expect(T.fmInput.getModelValue()).toEqual(modelValue);
+    });
+  });
 });

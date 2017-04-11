@@ -1,14 +1,17 @@
-import NgUnit from '../../tests/helpers';
-import '../../src/index';
+import Formation from '../index';
+
+import {
+  module,
+  filter
+} from '../../tests/unity';
 
 
 describe('entries Filter', () => {
   let T;
 
   beforeEach(() => {
-    T = new NgUnit();
-    T.prepareModule('Formation');
-    T.prepareFilter('entries');
+    module(Formation);
+    T = filter('entries');
   });
 
   describe('entries', () => {
@@ -16,13 +19,13 @@ describe('entries Filter', () => {
       let input = {foo: 'bar'};
       let expected = [['foo', 'bar']];
 
-      expect(T.spec.entries(input)).toEqual(expected);
+      expect(T.entries(input)).toEqual(expected);
     });
 
     it('should ignore non-objects', () => {
       let input = 'foo';
 
-      expect(T.spec.entries(input)).toBe(input);
+      expect(T.entries(input)).toBe(input);
     });
   });
 });

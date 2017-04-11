@@ -178,8 +178,7 @@ export class FormationControl {
    * @return {string}
    */
   $getCanonicalControlId () {
-    const control = this.$getControl() || {};
-    return `${this[FORM_CONTROLLER].$name}-${control.$uid}`;
+    return this.$getControl().getControlId();
   }
 
 
@@ -342,6 +341,7 @@ export class FormationControl {
  */
 Configure.implementedBy(FormationControl).as(function (configuration) {
   if (!this[NG_MODEL_CTRL]) {
+    // If this control doesn't use ngModel (ex: Errors) bail.
     return;
   }
 
@@ -433,10 +433,6 @@ Configure.implementedBy(FormationControl).as(function (configuration) {
   if (R.is(Object, ngModelOptions)) {
     this[NG_MODEL_CTRL].$options = this[NG_MODEL_CTRL].$options.createChild(ngModelOptions);
   }
-
-
-  this.$viewOnly = mergedConfig.viewOnly;
-  console.log('view only', this.$viewOnly);
 
 
   // Validate the control to ensure any new parsers/formatters/validators
