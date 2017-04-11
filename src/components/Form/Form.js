@@ -698,7 +698,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
       }
     } catch (err) {
       // Re-throw errors when testing so we know what caused the submit to fail.
-      if (typeof process !== 'undefined' && process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'development') {
+      if (typeof process !== 'undefined' && (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'development')) {
         Form.$debug('[Logged During Development Only]', err);
       }
     }

@@ -24,7 +24,7 @@ export function get (name) {
     });
 
     return injectable;
-  } catch (error) {
-    throw new Error(`[Unity] Cannot find injectable "${name}": ${error.message}`);
+  } catch (err) {
+    throw new Error(`[Unity] Cannot find injectable "${name}": ${err.message}`);
   }
 }

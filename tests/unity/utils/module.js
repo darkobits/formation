@@ -61,7 +61,7 @@ export function module (...args) {
   }
 
 
-  if (!modules.length) {
+  if (modules.length === 0) {
     throw new Error('[unity] module() expects at least 1 module name.');
   }
 
