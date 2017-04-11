@@ -1,3 +1,4 @@
+export {compile} from './compile';
 export {get} from './get';
 export {matchUrl} from './matchUrl';
 export {module} from './module';

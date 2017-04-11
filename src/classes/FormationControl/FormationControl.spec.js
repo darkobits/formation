@@ -8,7 +8,7 @@ import {
 
 import {
   module,
-  get,
+  compile,
   directive
 } from '../../../tests/unity';
 
@@ -29,22 +29,22 @@ import {
 } from './FormationControl';
 
 
-// TODO: Move to unity.
-function compile ({template, scope} = {}) {
-  let $scope;
+// // TODO: Move to unity.
+// function compile ({template, scope} = {}) {
+//   let $scope;
 
-  if (!scope || !scope.$id) {
-    $scope = get('$rootScope').$new();
-  } else {
-    $scope = scope;
-  }
+//   if (!scope || !scope.$id) {
+//     $scope = get('$rootScope').$new();
+//   } else {
+//     $scope = scope;
+//   }
 
-  if (!template || typeof template !== 'string') {
-    throw new Error('[createElement] No template provided.');
-  }
+//   if (!template || typeof template !== 'string') {
+//     throw new Error('[createElement] No template provided.');
+//   }
 
-  return get('$compile')(template)($scope);
-}
+//   return get('$compile')(template)($scope);
+// }
 
 
 describe('FormationControl', () => {
