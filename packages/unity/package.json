@@ -1,7 +1,7 @@
 {
   "name": "@darkobits/unity",
   "description": "A library to make unit testing Angular 1 applications suck less.",
-  "version": "1.2.0",
+  "version": "1.0.0-beta.3",
   "private": true,
   "contributors": [
     {

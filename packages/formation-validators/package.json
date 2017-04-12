@@ -1,6 +1,6 @@
 {
   "name": "@darkobits/formation-validators",
-  "version": "1.0.0-beta.2",
+  "version": "1.0.0-beta.3",
   "license": "WTFPL",
   "contributors": [
     {
@@ -37,10 +37,10 @@
     "babel-polyfill": "6.x"
   },
   "dependencies": {
-    "@darkobits/formation": "1.0.0-beta.2",
+    "@darkobits/formation": "^1.0.0-beta.3",
     "ramda": "0.23.x"
   },
   "devDependencies": {
-    "@darkobits/unity": "1.x"
+    "@darkobits/unity": "^1.0.0-beta.3"
   }
 }
