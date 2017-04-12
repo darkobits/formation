@@ -4,7 +4,14 @@ node_js: 6
 install:
   - npm install
 
+env:
+  - PACKAGE=formation
+  - PACKAGE=formation-validators
+
 script:
+  - cd packages/$PACKAGE
+  - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> .npmrc
+  - npm install
   - npm run test -- --coverage
 
 after_success:

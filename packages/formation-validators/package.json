@@ -24,7 +24,7 @@
     "test": "jest --config jest.json",
     "test:watch": "npm t -- --watch",
     "test:coverage": "npm t -- --coverage && open ./coverage/lcov-report/index.html",
-    "prebuild": "run-s clean lint test",
+    "prebuild": "run-p clean lint",
     "build:commonjs": "babel src --out-dir dist",
     "build:browser": "webpack --env.dist --progress",
     "build": "run-p build:commonjs build:browser",
@@ -41,6 +41,14 @@
     "ramda": "0.23.x"
   },
   "devDependencies": {
-    "@darkobits/unity": "^1.0.0-beta.3"
+    "@darkobits/unity": "^1.0.0-beta.3",
+    "angular-mocks": ">=1.5.x",
+    "babel-cli": "6.x",
+    "jest": "19.x",
+    "npm-run-all": "4.x",
+    "npm-check": "5.4.x",
+    "rimraf": "2.6.x",
+    "watch": "1.x",
+    "webpack": "2.x"
   }
 }

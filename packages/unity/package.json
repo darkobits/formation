@@ -2,7 +2,6 @@
   "name": "@darkobits/unity",
   "description": "A library to make unit testing Angular 1 applications suck less.",
   "version": "1.0.0-beta.3",
-  "private": true,
   "contributors": [
     {
       "name": "Joshua Martin",
@@ -19,9 +18,11 @@
   },
   "scripts": {
     "clean": "rimraf dist",
-    "build": "run-p clean lint && babel src --out-dir dist",
+    "lint": "xo",
+    "prebuild": "run-p clean lint",
+    "build": "babel src --out-dir dist",
     "build:watch": "watch \"npm run build\" ./src/",
-    "lint": "xo"
+    "depcheck": "npm-check --skip-unused --no-emoji || true"
   },
   "xo": false,
   "peerDependencies": {
@@ -29,6 +30,12 @@
     "angular-mocks": ">=1.3"
   },
   "devDependencies": {
-    "eslint-plugin-import": "2.2.x"
+    "babel-cli": "6.x",
+    "eslint-plugin-import": "2.2.x",
+    "jest": "19.x",
+    "npm-run-all": "4.x",
+    "npm-check": "5.4.x",
+    "rimraf": "2.6.x",
+    "watch": "1.x"
   }
 }
