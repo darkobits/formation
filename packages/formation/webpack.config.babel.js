@@ -5,13 +5,9 @@
 import path from 'path';
 import VisualizerWebpackPlugin from 'webpack-visualizer-plugin';
 import webpack from 'webpack';
-import packageJson from './package.json'; // eslint-disable-line import/extensions
 
 const resolve = path.resolve;
-
 const CONTEXT = resolve(__dirname, 'src');
-const MODULE_NAME = packageJson.name;
-const VERSION = packageJson.version;
 
 
 export default env => {
@@ -26,15 +22,14 @@ export default env => {
 
 
   config.entry = {
-    index: resolve(CONTEXT, 'index.js'),
-    validators: resolve(CONTEXT, 'validators.js')
+    index: resolve(CONTEXT, 'index.js')
   };
 
 
   // Configure output.
   config.output = {
     // Output directory.
-    path: resolve(__dirname, 'dist', 'dist'),
+    path: resolve(__dirname, 'dist'),
     // Output each file using the bundle name and a content-based hash.
     filename: '[name].min.js',
     sourceMapFilename: '[file].map',
@@ -48,8 +43,7 @@ export default env => {
     'angular-messages': {
       commonjs: 'angular-messages',
       commonjs2: 'angular-messages',
-      amd: 'angular-messages',
-      root: 'angular-messages'
+      amd: 'angular-messages'
     },
     ramda: {
       commonjs: 'ramda',
@@ -85,12 +79,12 @@ export default env => {
   // ----- Module Resolving ----------------------------------------------------
 
   // Resolve modules from the build context and node_modules.
-  config.resolve = {
-    modules: [
-      CONTEXT,
-      'node_modules'
-    ]
-  };
+  // config.resolve = {
+  //   modules: [
+  //     CONTEXT,
+  //     'node_modules'
+  //   ]
+  // };
 
 
   // ----- Plugins -------------------------------------------------------------
@@ -102,21 +96,21 @@ export default env => {
   // replace the reference to the variable with its value (hence the double
   // quotes) which will allow UglifyJS to completely remove unused blocks when
   // compiling.
-  config.plugins.push(new webpack.DefinePlugin({
-    // This is here to support Node conventions. Use webpack.ENV in app code.
-    process: {
-      'env.NODE_ENV': env.dist ? '"production"' : '"development"'
-    },
-    webpack: {
-      // Define build environment.
-      ENV: env.dist ? '"dist"' : env.test ? '"test"' : '"local"',
-      // FORMATION_VERSION: `"${formationJson.version}"`,
-      // Expose name from package.json.
-      MODULE_NAME: `"${MODULE_NAME}"`,
-      // Expose version from package.json.
-      VERSION: `"${VERSION}"`
-    }
-  }));
+  // config.plugins.push(new webpack.DefinePlugin({
+  //   // This is here to support Node conventions. Use webpack.ENV in app code.
+  //   process: {
+  //     'env.NODE_ENV': env.dist ? '"production"' : '"development"'
+  //   },
+  //   webpack: {
+  //     // Define build environment.
+  //     ENV: env.dist ? '"dist"' : env.test ? '"test"' : '"local"',
+  //     // FORMATION_VERSION: `"${formationJson.version}"`,
+  //     // Expose name from package.json.
+  //     MODULE_NAME: `"${MODULE_NAME}"`,
+  //     // Expose version from package.json.
+  //     VERSION: `"${VERSION}"`
+  //   }
+  // }));
 
 
   if (env.stats) {

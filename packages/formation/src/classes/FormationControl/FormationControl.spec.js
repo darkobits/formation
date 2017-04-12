@@ -1,16 +1,16 @@
 import {
+  module,
+  compile,
+  directive
+} from '@darkobits/unity';
+
+import {
   NG_FORM_CONTROLLER
 } from '../../components/Form/Form';
 
 import {
   NG_MODEL_CTRL
 } from '../../etc/constants';
-
-import {
-  module,
-  compile,
-  directive
-} from '../../../tests/unity';
 
 import {
   ClearCustomErrorMessage,
@@ -27,24 +27,6 @@ import Formation from '../../index';
 import {
   NG_MESSAGES
 } from './FormationControl';
-
-
-// // TODO: Move to unity.
-// function compile ({template, scope} = {}) {
-//   let $scope;
-
-//   if (!scope || !scope.$id) {
-//     $scope = get('$rootScope').$new();
-//   } else {
-//     $scope = scope;
-//   }
-
-//   if (!template || typeof template !== 'string') {
-//     throw new Error('[createElement] No template provided.');
-//   }
-
-//   return get('$compile')(template)($scope);
-// }
 
 
 describe('FormationControl', () => {

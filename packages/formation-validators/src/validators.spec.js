@@ -1,11 +1,22 @@
-import $scope from '../../tests/__mocks__/$scope.mock';
+import {
+  last
+} from 'ramda';
+
+import Formation, {
+  $constants
+} from '@darkobits/formation';
+
+import {
+  compile,
+  module,
+  directive
+} from '@darkobits/unity';
 
 import * as Validators from './validators';
 
-import {
-  FORM_CONTROLLER,
+const {
   NG_MODEL_CTRL
-} from './constants';
+} = $constants;
 
 
 describe('Validators', () => {
@@ -122,80 +133,98 @@ describe('Validators', () => {
   });
 
   describe('match', () => {
-    const mockControl = (name, form) => ({
-      name,
-      [FORM_CONTROLLER]: form,
-      [NG_MODEL_CTRL]: {
-        $name: name,
-        $validators: {},
-        $setValidity () {
+    let T;
+    let Form;
 
-        }
-      },
-      $getName () {
-        return name;
-      }
+    beforeEach(() => {
+      module(Formation);
     });
 
-    const mockForm = () => ({
-      controls: {},
-      $debug: jest.fn(),
-      $getScope () {
-        return $scope;
-      },
-      addControl (control) {
-        this.controls[control.name] = control;
-      },
-      getControl (name) {
-        return this.controls[name];
-      }
+    describe('trying to match itself', () => {
+      beforeEach(() => {
+        const wrap = compile({
+          template: `
+          <fm controls="controls">
+            <fm-input name="password"></fm-input>
+            <transclude></transclude>
+          </fm>
+        `,
+          scope: {
+            controls: {
+              passwordMatch: {
+                validators: {
+                  match: Validators.match('passwordMatch')
+                }
+              }
+            }
+          }
+        });
+
+        Form = wrap.controller('fm');
+        jest.spyOn(Form, '$debug');
+
+        T = directive('fmInput', {
+          wrap,
+          template: '<fm-input name="passwordMatch"></fm-input>'
+        });
+      });
+
+      it('should return a null validator when trying to match itself', () => {
+        T.fmInput[NG_MODEL_CTRL].$validate();
+        expect(last(Form.$debug.mock.calls)[0]).toMatch(/is trying to match itself/g);
+        expect(T.fmInput[NG_MODEL_CTRL].$validators.match('foo')).toEqual(true);
+      });
     });
 
-    const form = mockForm();
+    describe('matching', () => {
+      beforeEach(() => {
+        const wrap = compile({
+          template: `
+          <fm controls="controls">
+            <fm-input name="password"></fm-input>
+            <transclude></transclude>
+          </fm>
+        `,
+          scope: {
+            controls: {
+              passwordMatch: {
+                validators: {
+                  match: Validators.match('password')
+                }
+              }
+            }
+          }
+        });
 
-    const passwordControl = mockControl('password', form);
+        Form = wrap.controller('fm');
+        jest.spyOn(Form, '$debug');
 
-    const passwordMatchControl = mockControl('passwordMatch', form);
+        T = directive('fmInput', {
+          wrap,
+          template: '<fm-input name="passwordMatch"></fm-input>'
+        });
+      });
 
-    const badControl = {
-      [FORM_CONTROLLER]: form,
-      name: 'badControl',
-      $getName: () => 'badControl'
-    };
+      it('should return true when provided a view value that matches its complement', () => {
+        Form.getControl('password')[NG_MODEL_CTRL].$setViewValue('foo');
 
-    form.addControl(passwordControl);
-    form.addControl(passwordMatchControl);
-    form.addControl(badControl);
+        Form.getControl('passwordMatch')[NG_MODEL_CTRL].$setViewValue('foo');
+        Form.getControl('passwordMatch')[NG_MODEL_CTRL].$validate();
 
-    it('should return a null validator when trying to match itself', () => {
-      const nullValidator = Validators.match('password').configure(passwordControl);
-      expect(nullValidator('foo')).toEqual(true);
-      expect(form.$debug.mock.calls[0][0]).toMatch(/is trying to match itself/g);
-    });
+        expect(Form.getControl('passwordMatch').getErrors()).toEqual(false);
+      });
 
-    it('should return false when the dependent control has no model', () => {
-      const nullValidator = Validators.match('password').configure(badControl);
-      expect(nullValidator('bleh')).toEqual(false);
-      expect(form.$debug.mock.calls[1][0]).toMatch(/Both controls must use ngModel./g);
-    });
 
-    it('should return false when the independent control does not have a model', () => {
-      const nullValidator = Validators.match('badControl').configure(passwordMatchControl);
-      expect(nullValidator('foo')).toBe(false);
-      expect(form.$debug.mock.calls[2][0]).toMatch(/Both controls must use ngModel/g);
-    });
+      it('should return true when provided a view value that matches its complement', () => {
+        Form.getControl('password')[NG_MODEL_CTRL].$setViewValue('foo');
 
-    it('should return true when provided a view value that matches its complement', () => {
-      const matchPassword = Validators.match('password').configure(passwordMatchControl);
-      passwordControl[NG_MODEL_CTRL].$viewValue = 'foo';
-      passwordMatchControl[NG_MODEL_CTRL].$viewValue = 'foo';
-      expect(matchPassword('foo', 'foo')).toBe(true);
-    });
+        Form.getControl('passwordMatch')[NG_MODEL_CTRL].$setViewValue('bar');
+        Form.getControl('passwordMatch')[NG_MODEL_CTRL].$validate();
 
-    it('should return false when provided a view value that does not match its complement', () => {
-      const matchPassword = Validators.match('password').configure(passwordMatchControl);
-      passwordControl[NG_MODEL_CTRL].$viewValue = 'foo';
-      expect(matchPassword('bar', 'bar')).toBe(false);
+        expect(Form.getControl('passwordMatch').getErrors()).toEqual(expect.objectContaining({
+          match: true
+        }));
+      });
     });
   });
 });

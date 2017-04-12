@@ -114,8 +114,15 @@ export function directive (name, opts = {}) {
     // Construct directive's template.
     const directiveEl = angular.element(opts.template);
 
-    // Append template to compiled wrapper.
-    compiledWrapper.append(directiveEl);
+    if (compiledWrapper.find('transclude').length === 1) {
+      // Insert the directive element at the indicated transclusion point.
+      compiledWrapper.find('transclude').replaceWith(directiveEl);
+    } else if (compiledWrapper.find('transclude').length > 1) {
+      throw new Error('[Unity] Only 1 transclusion slot allowed.');
+    } else {
+      // Append template to compiled wrapper.
+      compiledWrapper.append(directiveEl);
+    }
 
     // Compile directive.
     compiledDirective = get('$compile')(directiveEl)(s.$scope);

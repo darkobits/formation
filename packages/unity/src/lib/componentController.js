@@ -62,7 +62,7 @@ import {
 export function componentController (name, opts = {}) {
   const s = {};
 
-  // TODO: Get a reference to the component definition object and attach the
+  // Note: Get a reference to the component definition object and attach the
   // controller to the test $scope under the correct "controllerAs" alias
   // automatically.
 

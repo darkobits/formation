@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------
-// ----- Validators ------------------------------------------------------------
+// ----- Formation Validators --------------------------------------------------
 // -----------------------------------------------------------------------------
 
 /**
@@ -22,12 +22,13 @@ import {
 } from 'ramda';
 
 import {
-  ConfigurableValidator
-} from '../classes/ConfigurableValidator';
+  ConfigurableValidator,
+  $constants
+} from '@darkobits/formation';
 
-import {
+const {
   NG_MODEL_CTRL
-} from './constants';
+} = $constants;
 
 
 /**

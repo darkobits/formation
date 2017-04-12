@@ -1,0 +1,23 @@
+{
+  "moduleDirectories": [
+    "<rootDir>",
+    "<rootDir>/src",
+    "<rootDir>/tests",
+    "node_modules"
+  ],
+  "testPathIgnorePatterns": [
+    "/dist/"
+  ],
+  "coveragePathIgnorePatterns": [
+    "/dist/",
+    "/tests/"
+  ],
+  "coverageThreshold": {
+    "global": {
+      "statements": 75,
+      "branches": 50,
+      "functions": 75,
+      "lines": 75
+    }
+  }
+}

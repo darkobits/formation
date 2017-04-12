@@ -19,13 +19,13 @@ import {
  * @param  {object} [options.scope] - Scope.
  * @return {object} - Compiled DOM element.
  */
-export function compile ({template, scope} = {}) {
+export function compile ({template, scope = {}} = {}) {
   let $scope;
 
-  if (!scope || !scope.$id) {
-    $scope = get('$rootScope').$new();
-  } else {
+  if (typeof scope === 'object' && scope.$id) {
     $scope = scope;
+  } else {
+    $scope = Object.assign(get('$rootScope').$new(), scope);
   }
 
   if (!template || typeof template !== 'string') {

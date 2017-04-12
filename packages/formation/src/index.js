@@ -1,6 +1,7 @@
 import app from './app';
 import './components';
 import './filters';
+import * as $constants from './etc/constants';
 
 
 // ----- Public Exports --------------------------------------------------------
@@ -21,5 +22,9 @@ export {
 export {
   onReady
 } from './etc/utils';
+
+export {
+  $constants
+};
 
 export default app.name;

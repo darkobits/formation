@@ -1,9 +1,9 @@
-import Formation from '../index';
-
 import {
   module,
   filter
-} from '../../tests/unity';
+} from '@darkobits/unity';
+
+import Formation from '../index';
 
 
 describe('entries Filter', () => {

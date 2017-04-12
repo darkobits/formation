@@ -239,6 +239,13 @@ export class FormationControl {
    * @return {object}
    */
   getErrors () {
+    const control = this.$getControl();
+
+    if (!control) {
+      // The form has no control matching our name/for attribute.
+      return false;
+    }
+
     const ngModelCtrl = this.$getControl()[NG_MODEL_CTRL];
     const errorBehavior = this[FORM_CONTROLLER].$getErrorBehavior();
 
