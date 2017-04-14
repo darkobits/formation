@@ -1,0 +1,97 @@
+<fm controls="vm.controls"
+  name="vm.addressForm"
+  on-submit="vm.submit"
+  ng-disabled="vm.disableForm">
+
+  <!-- Name -->
+  <section>
+    <fm-input type="text"
+      name="name">
+      Name
+    </fm-input>
+    <fm-errors for="name"></fm-errors>
+  </section>
+
+  <!-- E-Mail -->
+  <section>
+    <fm-input type="text"
+      name="email">
+      E-Mail Address
+    </fm-input>
+    <fm-errors for="email"></fm-errors>
+  </section>
+
+  <!-- E-Mail (Match) -->
+  <section>
+    <fm-input type="text"
+      name="emailMatch">
+      E-Mail Address (Verify)
+    </fm-input>
+    <fm-errors for="emailMatch"></fm-errors>
+  </section>
+
+  <!-- Gender -->
+  <section>
+    <label class="label" ng-class="{
+      'is-disabled': $fm.getControl('gender').isDisabled()
+    }">
+    Gender
+    </label>
+    <fm-input type="radio"
+      name="gender"
+      ng-value="'M'">
+      Male
+    </fm-input>
+    <fm-input type="radio"
+      name="gender"
+      ng-value="'F'">
+      Female
+    </fm-input>
+    <fm-errors for="gender"></fm-errors>
+  </section>
+
+  <!-- Addresses -->
+  <fm-group name="addresses">
+    <fm ng-repeat="address in [{type: 'home'}, {type: 'work'}]"
+      controls="vm.addressFormControls">
+
+      <label class="label"
+        ng-class="{'is-disabled': $fm.isDisabled()}">
+        {{ address.type }}
+      </label>
+      <br>
+
+      <!-- Street Address -->
+      <section>
+        <fm-input type="text"
+          name="streetAddress">
+          Street Address
+        </fm-input>
+        <fm-errors for="streetAddress"></fm-errors>
+      </section>
+
+      <!-- Locality -->
+      <section>
+        <fm-input type="text"
+          name="locality">
+          Locality
+        </fm-input>
+        <fm-errors for="locality"></fm-errors>
+      </section>
+    </fm>
+  </fm-group>
+
+  <button type="submit">Submit</button>
+
+  <input id="disableForms"
+    type="checkbox"
+    name="disableForms"
+    ng-model="vm.disableForm">
+  <label class="label-inline" for="disableForms">Disable Forms</label>
+</fm>
+
+
+
+<highlight lang="json"
+  code="vm.addressForm.getModelValues() | json">
+</highlight>

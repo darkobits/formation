@@ -1,0 +1,130 @@
+:local(.Highlight) {
+  $foreground: #C0C5CE;
+  $background: #2B303B;
+  $comment-gray: #65737E;
+  $red: #BF616A;
+  $green: #A3BE8C;
+  $orange: #CC846D;
+  $interpolation-blue: #8FA1B3;
+  $purple: #B48EAD;
+  $regex-green: #96B5B4;
+
+  code[class*='language-'],
+  pre[class*='language-'] {
+    background: $background;
+    color: $foreground;
+    direction: ltr;
+    font-family: 'Operator Mono Ssm', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+    font-size: inherit;
+    hyphens: none;
+    line-height: 1.375;
+    tab-size: 2;
+    text-align: left;
+    white-space: pre;
+    word-break: normal;
+    word-spacing: normal;
+  }
+
+  pre[class*='language-'] {
+    margin: 0.5em 0;
+    overflow: auto;
+    padding: 1em;
+  }
+
+  :not(pre) > code[class*='language-'] {
+    padding: 0.1em;
+  }
+
+  .token.punctuation,
+  .token.operator,
+  .token.boolean,
+  .token.property,
+  .token.function {
+    color: $foreground;
+  }
+
+  .token.comment,
+  .token.prolog,
+  .token.doctype,
+  .token.cdata {
+    color: $comment-gray;
+  }
+
+  .token.keyword,
+  .token.control,
+  .token.directive,
+  .token.unit {
+    color: $purple;
+    font-style: italic;
+  }
+
+  .token.important {
+    color: $purple;
+  }
+
+  .token.string,
+  .token.entity,
+  .token.url,
+  .language-css .token.string,
+  .style .token.string,
+  .token.attr-value {
+    color: $green;
+  }
+
+  .token.interpolation-punctuation,
+  .token.placeholder,
+  .token.variable {
+    color: $interpolation-blue;
+  }
+
+  .token.statement,
+  .token.regex,
+  .token.atrule {
+    color: $regex-green;
+  }
+
+  .token.number,
+  .token.selector {
+    color: $orange;
+  }
+
+  .token.tag {
+    color: $red;
+  }
+
+  .token.attr-name {
+    color: $orange;
+    font-style: italic;
+  }
+
+  .token.deleted {
+    text-decoration: line-through;
+  }
+
+  .token.inserted {
+    border-bottom: 1px dotted #EFF1F5;
+    text-decoration: none;
+  }
+
+  .token.italic {
+    font-style: italic;
+  }
+
+  .token.important,
+  .token.bold {
+    font-weight: bold;
+  }
+
+  .token.namespace {
+    opacity: 0.7;
+  }
+
+  .token.entity {
+    cursor: help;
+  }
+
+  pre > code.highlight {
+    outline: 0.4em solid $red;
+    outline-offset: 0.4em;
+  }
+}

@@ -1,0 +1,80 @@
+@import 'grid';
+@import 'mixins';
+@import 'color';
+
+.Main__section {
+  @include span(12 of 12);
+  @include break;
+
+  padding: 0 2em;
+
+  &:last-child {
+    margin-bottom: 2em;
+  }
+}
+
+.Main__logo {
+  color: lighten($jaguar, 10%);
+  font-family: 'Source Sans Pro', sans-serif;
+  font-size: 96px;
+  font-weight: 200;
+  letter-spacing: 10px;
+  line-height: 1em;
+  margin: 46px auto;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.Main__copy {
+  @include vertical-spacing;
+
+  font-size: 18px;
+  font-weight: 300;
+  line-height: 1.6em;
+}
+
+.Main__list {
+  @include vertical-spacing;
+
+  font-size: 18px;
+  font-weight: 300;
+  line-height: 1.8em;
+  list-style: disc outside;
+  margin-left: 1.25em;
+
+  li:not(:last-of-type) {
+    margin-bottom: 0.8em;
+  }
+}
+
+.Main__codeBlock {
+  @include span(12 of 12);
+  @include break;
+
+  background-color: #2B303B;
+  box-shadow: inset 0px 0px 24px rgba(0, 0, 0, 0.18);
+  color: $white;
+  font-size: 14px;
+  margin-top: 2em;
+  padding: 1em 2em;
+}
+
+.Main__figure {
+  @include vertical-spacing;
+}
+
+section {
+  padding-bottom: 16px;
+}
+
+.Main__apiErrors {
+  min-height: 2em;
+
+  [ng-message] {
+    background-color: #270001;
+    border: 1px solid #5A0104;
+    color: #FC7F81;
+    display: block;
+    padding: 8px;
+  }
+}
