@@ -7,11 +7,11 @@ import {
   match,
   email
   // pattern
-} from '@darkobits/formation/dist/validators.min.js';
+} from '@darkobits/formation-validators';
 
 import {
   onReady
-} from '@darkobits/formation/dist/index.min.js';
+} from '@darkobits/formation';
 
 
 import templateUrl from './addressFormDemo.html';

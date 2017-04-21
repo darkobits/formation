@@ -45,6 +45,7 @@
     "@darkobits/unity": "^1.0.0-beta.3",
     "angular-mocks": ">=1.5.x",
     "babel-cli": "6.x",
+    "eslint": "3.19.x",
     "jest": "19.x",
     "npm-check": "5.4.x",
     "npm-run-all": "4.x",

@@ -332,9 +332,9 @@ export function invoke (method, obj, ...args) {
  * @return {object}
  */
 export function greaterScopeId (a, b) {
-  const aId = path(['$id'], invoke('$getScope', a));
-  const bId = path(['$id'], invoke('$getScope', b));
-  return aId > bId ? a : b;
+  const aId = path(['$id'], invoke('$getScope', a)) || 0;
+  const bId = path(['$id'], invoke('$getScope', b)) || 0;
+  return Number(aId) > Number(bId) ? a : b;
 }
 
 

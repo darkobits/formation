@@ -84,7 +84,9 @@ export function componentController (name, opts = {}) {
   s.$element = angular.element('<div></div>');
 
   // Attach component's controller.
-  s[name] = $componentController(name, Object.assign(opts.locals, {
+  s[name] = $componentController(name, Object.assign({
+    $attrs: {}
+  }, opts.locals, {
     $scope: s.$scope,
     $element: s.$element
   }), opts.bindings);

@@ -213,7 +213,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
 
     $scope.$on('$destroy', cancelWatcher);
 
-    return {
+    const mockControl = {
       name: controlName,
       $ngModelCtrl: ngModelCtrl,
       [GetModelValue] () {
@@ -221,6 +221,11 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
       },
       [SetModelValue] () { }
     };
+
+    mockControl.getModelValue = mockControl[GetModelValue];
+    mockControl.setModelValue = mockControl[SetModelValue];
+
+    return mockControl;
   }
 
 
@@ -312,6 +317,12 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    */
   RegisterForm.implementedBy(Form).as(function (childForm) {
     const childFormName = childForm.name;
+
+    // Ensure there is not another registered child form with the same name as
+    // the form being registered.
+    if (Form.getForm(childFormName)) {
+      throwError(`Cannot register child form "${childFormName}"; another child form with this name already exists.`);
+    }
 
     // Ensure there is not a registered control with the same name as the form
     // being registered.
@@ -484,6 +495,8 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
       // scope, mimicing the default Angular behavior.
       $transclude($scope.$parent.$new(), (compiledElement, scope) => {
         // Assign a reference to the form controller in the transclusion scope.
+        // This allows users to reference the Form API from templates:
+        // <div ng-if="$fm.getControl('foo').$valid"></div>
         scope.$fm = Form;
 
         $element.find(elementName).append(compiledElement);
@@ -606,7 +619,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
 
   /**
    * Returns the form's $scope. Used to compare scope IDs for child form
-   * registration, and for configurable validators.
+   * registration, and passed to configurable validators.
    *
    * @return {object}
    */
@@ -722,6 +735,8 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
 
   /**
    * Returns the configured error behavior for the form.
+   *
+   * @private
    *
    * @return {array}
    */
