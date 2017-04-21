@@ -1,7 +1,7 @@
 import app from 'app';
 import Prism from 'prismjs';
 import {Highlight} from './Highlight.scss';
-import 'prismjs/plugins/normalize-whitespace/prism-normalize-whitespace.js';
+import 'prismjs/plugins/normalize-whitespace/prism-normalize-whitespace';
 
 
 app.component('highlight', {

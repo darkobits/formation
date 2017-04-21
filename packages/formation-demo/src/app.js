@@ -6,9 +6,8 @@ import uiRouter from 'angular-ui-router';
 import ngMessages from 'angular-messages';
 
 import Formation, {
-  FormationConfigurator,
-  // registerControl
-} from '@darkobits/formation/dist/index.min.js';
+  FormationConfigurator
+} from '@darkobits/formation/dist/index.min';
 
 
 

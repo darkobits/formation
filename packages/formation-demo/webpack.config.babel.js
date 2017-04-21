@@ -3,17 +3,17 @@
 // -----------------------------------------------------------------------------
 'use strict';
 
+import path from 'path';
 import autoprefixer from 'autoprefixer';
 import bourbon from 'bourbon';
 import bourbonNeat from 'bourbon-neat';
 import ExtractTextWebpackPlugin from 'extract-text-webpack-plugin';
-import formationJson from '@darkobits/formation/package.json';
+import formationJson from '@darkobits/formation/package';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
-import packageJson from './package.json';
-import path from 'path';
 import SassLintPlugin from 'sasslint-webpack-plugin';
 import VisualizerWebpackPlugin from 'webpack-visualizer-plugin';
 import webpack from 'webpack';
+import packageJson from './package';
 
 const resolve = path.resolve;
 

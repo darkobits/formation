@@ -26,7 +26,7 @@ app.config(($locationProvider, $stateProvider, $urlRouterProvider) => {
  */
 app.run(($log, $state) => {
   $state.defaultErrorHandler(error => {
-    if (webpack.ENV === 'local') {
+    if (webpack.ENV === 'local') { // eslint-disable-line no-undef
       $log.error('[ui-router] Error:', error.message);
     }
 

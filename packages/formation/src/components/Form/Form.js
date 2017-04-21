@@ -263,7 +263,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
     Form.$submitting = true;
     Form.disable();
 
-    // TODO: This could be replaced with an interface.
+    // Note: This could be replaced with an interface.
     $scope.$parent.$broadcast(BEGIN_SUBMIT_EVENT);
   }
 

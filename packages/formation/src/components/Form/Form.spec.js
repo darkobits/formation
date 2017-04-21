@@ -1,20 +1,8 @@
-import R from 'ramda';
-
 import {
   module,
-  get,
   compile,
-  directive,
-  digest
+  directive
 } from '@darkobits/unity';
-
-import {
-  // CONFIGURABLE_VALIDATOR,
-  CUSTOM_ERROR_KEY,
-  // FORM_COMPONENT_NAME,
-  // REGISTER_FORM_CALLBACK,
-  // REGISTER_NG_MODEL_CALLBACK
-} from '../../etc/constants';
 
 import {
   RegisterNgForm,
@@ -32,27 +20,12 @@ import {
 import Formation from '../../index';
 
 import {
-  CUSTOM_ERROR_MESSAGE_KEY,
-  NG_FORM_CONTROLLER,
-  FormController
+  NG_FORM_CONTROLLER
 } from './Form';
 
-import {
-  // FORM_CONTROLLER,
-  NG_MESSAGES,
-  NG_MODEL_CTRL
-  // FormationControl
-} from '../../classes/FormationControl';
-
-import {
-  mergeDeep
-} from '../../etc/utils';
-
-// jest.useFakeTimers();
 
 describe('FormController', () => {
   let T;
-  let transcludeSpy;
 
   beforeEach(() => {
     module(Formation);
@@ -76,16 +49,16 @@ describe('FormController', () => {
     });
 
     it('should expose validation properties from ngForm', () => {
-      let props = ['$dirty', '$invalid', '$pending', '$pristine', '$submitted', '$valid'];
+      const props = ['$dirty', '$invalid', '$pending', '$pristine', '$submitted', '$valid'];
 
       props.forEach(prop => {
-        expect(T.fm.hasOwnProperty(prop)).toBe(true);
+        expect(Reflect.has(T.fm, prop)).toBe(true);
       });
     });
 
     describe('trying to register multiple ngForms', () => {
       it('should throw an error', () => {
-        let ngForm = compile({
+        const ngForm = compile({
           template: '<form></form>',
           scope: T.$scope.$new()
         });
@@ -103,8 +76,6 @@ describe('FormController', () => {
     });
 
     describe('when another child form with the same name is present', () => {
-      let childForm;
-
       beforeEach(() => {
         T = directive('fm', {
           template: `
@@ -131,7 +102,7 @@ describe('FormController', () => {
     });
 
     describe('when a control with the same name is present', () => {
-      let name = 'foo';
+      const name = 'foo';
 
       beforeEach(() => {
         T = directive('fm', {
@@ -159,8 +130,8 @@ describe('FormController', () => {
     });
 
     describe('configuring the child form', () => {
-      let configKey = 'config';
-      let childFormName = 'childForm';
+      const configKey = 'config';
+      const childFormName = 'childForm';
 
       beforeEach(() => {
         T = directive('fm', {
@@ -180,7 +151,7 @@ describe('FormController', () => {
       });
 
       it('should pass configuration data to the child form', () => {
-        // TODO: Add tests for this.
+        // Note: Add tests for this.
       });
     });
   });
@@ -192,7 +163,7 @@ describe('FormController', () => {
 
     describe('with a child form of the same name already registered', () => {
       it('should throw an error', () => {
-        let controlName = 'foo';
+        const controlName = 'foo';
 
         expect(() => {
           T = directive('fmInput', {
@@ -210,8 +181,8 @@ describe('FormController', () => {
   });
 
   describe('[Interface] RegisterNgModel', () => {
-    let controlName = 'foo';
-    let modelValue = 'bar';
+    const controlName = 'foo';
+    const modelValue = 'bar';
 
     beforeEach(() => {
       T = directive('fm', {

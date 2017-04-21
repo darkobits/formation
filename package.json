@@ -1,11 +1,16 @@
 {
   "name": "formation",
   "private": true,
+  "engines": {
+    "npm": ">=4.x",
+    "node": ">=6.x"
+  },
   "scripts": {
+    "bootstrap": "lerna bootstrap",
     "lint": "lerna run lint",
     "test": "lerna run test",
     "build": "lerna run build",
-    "preinstall": "lerna bootstrap",
+    "prepare": "run-s bootstrap build test",
     "prepush": "run-p lint test",
     "depcheck": "(npm-check --skip-unused --no-emoji || true) && lerna run depcheck"
   },
@@ -16,11 +21,15 @@
     ],
     "space": true,
     "rules": {
+      "capitalized-comments": "warn",
       "import/no-extraneous-dependencies": "off",
       "import/no-unassigned-import": "off",
+      "import/no-unresolved": "off",
       "import/prefer-default-export": "off",
       "max-params": "off",
+      "new-cap": "off",
       "no-multiple-empty-lines": "off",
+      "no-prototype-builtins": "off",
       "prefer-arrow-callback": "off",
       "space-before-function-paren": [
         "error",
@@ -47,7 +56,6 @@
     "lerna": "^2.0.0-rc.1",
     "npm-check": "5.4.x",
     "npm-run-all": "4.x",
-    "webpack-visualizer-plugin": "0.1.x",
-    "xo": "0.18.x"
+    "webpack-visualizer-plugin": "0.1.x"
   }
 }

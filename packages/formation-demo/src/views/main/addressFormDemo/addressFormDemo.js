@@ -1,12 +1,9 @@
 import app from 'app';
-import R from 'ramda';
 
 import {
   required,
-  minLength,
   match,
   email
-  // pattern
 } from '@darkobits/formation-validators';
 
 import {
@@ -21,7 +18,7 @@ console.log('match', match('email'));
 
 app.component('addressFormDemo', {
   controllerAs: 'vm',
-  controller: function ($log, $q, $scope, $timeout, Api) {
+  controller ($log, $q, $scope, $timeout, Api) {
     const vm = this;
 
     vm.disableForm = false;

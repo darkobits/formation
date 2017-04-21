@@ -13,8 +13,8 @@
   ],
   "main": "dist/index.js",
   "engines": {
-    "npm": ">=3.0.0",
-    "node": ">=6.0.0"
+    "npm": ">=4.x",
+    "node": ">=6.x"
   },
   "scripts": {
     "clean": "rimraf dist",
@@ -36,6 +36,7 @@
     "npm-run-all": "4.x",
     "npm-check": "5.4.x",
     "rimraf": "2.6.x",
-    "watch": "1.x"
+    "watch": "1.x",
+    "xo": "0.18.x"
   }
 }

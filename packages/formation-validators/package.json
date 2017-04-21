@@ -13,7 +13,7 @@
     "url": "https://github.com/darkobits/formation.git"
   },
   "engines": {
-    "npm": ">=3.0.0",
+    "npm": ">=4.x",
     "node": ">=6.x"
   },
   "main": "dist/validators.js",
@@ -49,6 +49,7 @@
     "npm-check": "5.4.x",
     "rimraf": "2.6.x",
     "watch": "1.x",
-    "webpack": "2.x"
+    "webpack": "2.x",
+    "xo": "0.18.x"
   }
 }
