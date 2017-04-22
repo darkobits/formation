@@ -250,300 +250,142 @@ describe('FormController', () => {
     });
   });
 
-
-
-
-
-  // describe('$onInit', () => {
-  //   describe('setting the "$debugging" flag', () => {
-  //     describe('when the "debug" attribute is present', () => {
-  //       it('should set the "$debugging" flag to "true"', () => {
-  //         let form = createForm({}, {
-  //           $attrs: {
-  //             debug: true
-  //           }
-  //         });
-
-  //         form.$onInit();
-  //         expect(form.$debugging).toBe(true);
-  //       });
-  //     });
-
-  //     describe('when the "debug" attribute is absent', () => {
-  //       it('should not set the "$debugging" flag to "true"', () => {
-  //         let form = createForm();
-  //         expect(form.$debugging).toBeFalsy();
-  //       });
-  //     });
-  //   });
-
-  //   describe('assigning "$name" to parent scope', () => {
-  //     describe('when provided a non-empty string', () => {
-  //       let formName = 'vm.myForm';
-
-  //       let assignSpy = jest.fn();
-
-  //       let parseSpy = jest.fn().mockImplementation(() => {
-  //         return {
-  //           assign: assignSpy
-  //         };
-  //       });
-
-  //       let form = createForm({
-  //         $name: formName
-  //       }, {
-  //         $parse: parseSpy
-  //       });
-
-  //       form.$onInit();
-
-  //       it('should assign the form controller to its parent scope', () => {
-  //         expect(parseSpy.mock.calls[0]).toEqual(expect.arrayContaining([formName]));
-  //         expect(assignSpy.mock.calls[0]).toEqual(expect.arrayContaining([form]));
-  //       });
-  //     });
-
-  //     describe('when not provided a falsy value', () => {
-  //       let form = createForm({});
-  //       form.$onInit();
-
-  //       it('should assign an auto-generated name', () => {
-  //         expect(form.$name).toMatch(new RegExp(`Form-\\d*`));
-  //       });
-  //     });
-  //   });
-
-  //   describe('parsing "$showErrorsOn"', () => {
-  //     describe('when provided a valid string', () => {
-  //       let form = createForm({
-  //         $showErrorsOn: 'touched, submitted'
-  //       });
-
-  //       form.$onInit();
-
-  //       it('should parse the string into an array of flags', () => {
-  //         expect(form.showErrorsOn).toEqual(['$touched', '$submitted']);
-  //       });
-  //     });
-
-  //     describe('when provided a falsy value', () => {
-  //       let form = createForm();
-
-  //       form.$onInit();
-
-  //       it('should no-op', () => {
-  //         expect(form.showErrorsOn).toBeFalsy();
-  //       });
-  //     });
-
-  //     describe('when provided an empty string', () => {
-  //       let form = createForm({
-  //         $showErrorsOn: ''
-  //       });
-
-  //       form.$onInit();
-
-  //       it('should no-op', () => {
-  //         expect(form.showErrorsOn).toBeFalsy();
-  //       });
-  //     });
-  //   });
-  // });
-
-  // describe('isDisabled', () => {
-  //   it('should return true when "$disabled" is truthy', () => {
-  //     let form = createForm({$disabled: true});
-  //     expect(form.isDisabled()).toBe(true);
-  //   });
-
-  //   it('should return true when "$ngDisabled" is truthy', () => {
-  //     let form = createForm({$ngDisabled: true});
-  //     expect(form.isDisabled()).toBe(true);
-  //   });
-
-  //   it('should return a falsy value when neither "$disabled" or "$ngDisabled" are true', () => {
-  //     let form = createForm();
-  //     expect(form.isDisabled()).toBeFalsy();
-  //   });
-  // });
-
-  // describe('$getModelValue / $setModelValue', () => {
-  //   it('should get/set the model value for the named control', () => {
-  //     let ctrlName = 'foo';
-  //     let value = 'bar';
-  //     let form = createForm();
-  //     form.$setModelValue(ctrlName, value);
-  //     expect(form.$getModelValue(ctrlName)).toBe(value);
-  //   });
-  // });
-
-  // describe('$registerControl', () => {
-  //   let ctrlName = 'foo';
-
-  //   describe('assigning a uid', () => {
-  //     it('should assign a uid to the control', () => {
-  //       let form = createForm({});
-
-  //       let ctrl = formationCtrl({
-  //         name: ctrlName
-  //       });
-
-  //       form.$onInit();
-
-  //       form.$registerControl(ctrl);
-
-  //       expect(ctrl.$uid).toMatch(new RegExp(`${ctrlName}-\\d*`));
-  //     });
-  //   });
-
-  //   describe('adding controls to the registry', () => {
-  //     it('should add the control to the registry', () => {
-  //       let form = createForm({});
-
-  //       let ctrl = formationCtrl({
-  //         name: ctrlName
-  //       });
-
-  //       form.$onInit();
-
-  //       form.$registerControl(ctrl);
-
-  //       expect(form.getControl(ctrlName)).toBe(ctrl);
-  //     });
-  //   });
-
-  //   describe('applying parsers', () => {
-  //     it('should apply parsers to the control', () => {
-  //       let parsers = [
-  //         () => {}
-  //       ];
-
-  //       let form = createForm({
-  //         $controlConfiguration: {
-  //           [ctrlName]: {
-  //             parsers
-  //           }
-  //         }
-  //       });
-
-  //       let ctrl = formationCtrl({
-  //         name: ctrlName
-  //       });
-
-  //       form.$onInit();
-
-  //       form.$registerControl(ctrl);
-
-  //       expect(ctrl[NG_MODEL_CTRL].$parsers.length).toEqual(1);
-  //     });
-  //   });
-
-  //   describe('applying formatters', () => {
-  //     it('should apply formatters to the control', () => {
-  //       let formatters = [
-  //         () => {}
-  //       ];
-
-  //       let form = createForm({
-  //         $controlConfiguration: {
-  //           [ctrlName]: {
-  //             formatters
-  //           }
-  //         }
-  //       });
-
-  //       let ctrl = formationCtrl({
-  //         name: ctrlName
-  //       });
-
-  //       form.$onInit();
-
-  //       form.$registerControl(ctrl);
-
-  //       expect(ctrl[NG_MODEL_CTRL].$formatters.length).toEqual(1);
-  //     });
-  //   });
-
-  //   describe('applying validators', () => {
-  //     it('should apply validators to the control', () => {
-  //       let validators = {
-  //         foo: () => {}
-  //       };
-
-  //       let form = createForm({
-  //         $controlConfiguration: {
-  //           [ctrlName]: {
-  //             validators
-  //           }
-  //         }
-  //       });
-
-  //       let ctrl = formationCtrl({
-  //         name: ctrlName
-  //       });
-
-  //       form.$onInit();
-
-  //       form.$registerControl(ctrl);
-
-  //       expect(Object.keys(ctrl[NG_MODEL_CTRL].$validators))
-  //         .toEqual(expect.arrayContaining(Object.keys(validators)));
-  //     });
-  //   });
-
-  //   describe('applying async validators', () => {
-  //     it('should apply async validators to the control', () => {
-  //       let asyncValidators = {
-  //         foo: () => {}
-  //       };
-
-  //       let form = createForm({
-  //         $controlConfiguration: {
-  //           [ctrlName]: {
-  //             asyncValidators
-  //           }
-  //         }
-  //       });
-
-  //       let ctrl = formationCtrl({
-  //         name: ctrlName
-  //       });
-
-  //       form.$onInit();
-
-  //       form.$registerControl(ctrl);
-
-  //       expect(Object.keys(ctrl[NG_MODEL_CTRL].$asyncValidators))
-  //         .toEqual(expect.arrayContaining(Object.keys(asyncValidators)));
-  //     });
-  //   });
-
-  //   describe('applying error messages', () => {
-  //     it('should apply ngMessages to the control', () => {
-  //       let errors = [
-  //         ['foo', 'bar']
-  //       ];
-
-  //       let form = createForm({
-  //         $controlConfiguration: {
-  //           [ctrlName]: {
-  //             errors
-  //           }
-  //         }
-  //       });
-
-  //       let ctrl = formationCtrl({
-  //         name: ctrlName
-  //       });
-
-  //       form.$onInit();
-
-  //       form.$registerControl(ctrl);
-
-  //       expect(ctrl[NG_MESSAGES]).toEqual(expect.arrayContaining(errors));
-  //     });
-  //   });
-  // });
+  describe('$onInit', () => {
+    describe('setting the "$debugging" flag', () => {
+      describe('when the "debug" attribute is present', () => {
+        beforeEach(() => {
+          T = directive('fm', {
+            template: `<fm debug></fm>`
+          });
+        });
+
+        it('should set the "$debugging" flag to "true"', () => {
+          expect(T.fm.$debugging).toBe(true);
+        });
+      });
+
+      describe('when the "debug" attribute is absent', () => {
+        beforeEach(() => {
+          T = directive('fm', {
+            template: `<fm></fm>`
+          });
+        });
+
+        it('should not set the "$debugging" flag to "true"', () => {
+          expect(T.fm.$debugging).toBeFalsy();
+        });
+      });
+    });
+
+    describe('assigning "$name" to parent scope', () => {
+      describe('when provided a non-empty string', () => {
+        let name = 'foo';
+
+        beforeEach(() => {
+          T = directive('fm', {
+            template: `<fm name="${name}"></fm>`
+          });
+        });
+
+        it('should assign the form controller to its parent scope', () => {
+          expect(T.$scope[name]).toBe(T.fm);
+        });
+      });
+
+      describe('when provided a falsy value', () => {
+        beforeEach(() => {
+          T = directive('fm', {
+            template: `<fm></fm>`
+          });
+        });
+
+        it('should assign an auto-generated name', () => {
+          expect(T.fm.name).toMatch(new RegExp(`Form-\\d*`));
+        });
+      });
+    });
+
+    describe('parsing "$showErrorsOn"', () => {
+      describe('when provided a valid string', () => {
+        let attrString = 'touched, submitted';
+        let expectedFlags = ['$touched', '$submitted'];
+
+        beforeEach(() => {
+          T = directive('fm', {
+            template: `<fm show-errors-on="${attrString}"></fm>`
+          });
+        });
+
+        it('should parse the string into an array of flags', () => {
+          expect(T.fm.$getErrorBehavior()).toEqual(expectedFlags);
+        });
+      });
+
+      describe('when provided a falsy value', () => {
+        beforeEach(() => {
+          T = directive('fm', {
+            template: `<fm></fm>`
+          });
+        });
+
+        it('should no-op', () => {
+          expect(T.fm.$getErrorBehavior()).toBeFalsy();
+        });
+      });
+
+      describe('when provided an empty string', () => {
+        beforeEach(() => {
+          T = directive('fm', {
+            template: `<fm show-errors-on=""></fm>`
+          });
+        });
+
+        it('should no-op', () => {
+          expect(T.fm.$getErrorBehavior()).toBeFalsy();
+        });
+      });
+    });
+  });
+
+  describe('isDisabled', () => {
+    describe('when "$disabled" is truthy', () => {
+      beforeEach(() => {
+        T = directive('fm', {
+          template: `<fm></fm>`
+        });
+
+        T.fm.disable();
+      });
+
+      it('should return true', () => {
+        expect(T.fm.isDisabled()).toBe(true);
+      });
+    });
+
+    describe('when "$ngDisabled" is truthy', () => {
+      beforeEach(() => {
+        T = directive('fm', {
+          template: `<fm ng-disabled="true"></fm>`
+        });
+      });
+
+      it('should return true', () => {
+        expect(T.fm.isDisabled()).toBe(true);
+      });
+    });
+
+    describe('when neither "$disabled" nor "$ngDisabled" are truthy', () => {
+      beforeEach(() => {
+        T = directive('fm', {
+          template: `<fm></fm>`
+        });
+      });
+
+      it('should return falsy', () => {
+        expect(T.fm.isDisabled()).toBeFalsy();
+      });
+    });
+  });
 
   // describe('$unregisterControl', () => {
   //   let ctrlName = 'foo';
@@ -580,28 +422,6 @@ describe('FormController', () => {
   //     form.$onInit();
   //     form.$debug(message);
   //     expect(spy.mock.calls[0]).toEqual(expect.arrayContaining([message]));
-  //   });
-  // });
-
-  // describe('$getCustomErrorMessageForControl', () => {
-  //   let ctrlName = 'foo';
-  //   let message = 'bar';
-
-  //   let form = createForm();
-
-  //   let ctrl = formationCtrl({
-  //     name: ctrlName,
-  //     [NG_MODEL_CTRL]: {
-  //       $name: ctrlName
-  //     },
-  //     [CUSTOM_ERROR_MESSAGE_KEY]: message
-  //   });
-
-  //   form.$onInit();
-  //   form.$registerControl(ctrl);
-
-  //   it('should retrun the custom error message for the named control', () => {
-  //     expect(form.$getCustomErrorMessageForControl(ctrlName)).toBe(message);
   //   });
   // });
 
@@ -885,30 +705,6 @@ describe('FormController', () => {
   //   });
   // });
 
-  // describe('getModelValues / setModelValues', () => {
-  //   let deepValue = {
-  //     foo: 'bar'
-  //   };
-
-  //   let modelValues = {
-  //     deep: deepValue
-  //   };
-
-  //   let form = createForm();
-  //   form.$onInit();
-  //   form.setModelValues(modelValues);
-
-  //   it('should set and get model values', () => {
-  //     expect(form.getModelValues()).toEqual(modelValues);
-  //   });
-
-  //   it('should deep clone non-primitive values', () => {
-  //     expect(form.getModelValues()).not.toBe(modelValues);
-  //     expect(form.getModelValues().deep).toEqual(deepValue);
-  //     expect(form.getModelValues().deep).not.toBe(deepValue);
-  //   });
-  // });
-
   // describe('disable', () => {
   //   it('should set the $disabled flag to "true"', () => {
   //     let form = createForm({
@@ -930,55 +726,6 @@ describe('FormController', () => {
   //     expect(form.$disabled).toBe(true);
   //     form.enable();
   //     expect(form.$disabled).toBe(false);
-  //   });
-  // });
-
-  // describe('reset', () => {
-  //   it('should validate all controls and set them to pristine and untouched', () => {
-  //     let formPristineSpy = jest.fn();
-  //     let pristineSpy = jest.fn();
-  //     let untouchedSpy = jest.fn();
-  //     let validateSpy = jest.fn();
-
-  //     let ctrl = formationCtrl({
-  //       name: 'foo',
-  //       [NG_MODEL_CTRL]: {
-  //         $setPristine: pristineSpy,
-  //         $setUntouched: untouchedSpy,
-  //         $validate: validateSpy
-  //       }
-  //     });
-
-  //     let form = createForm({
-  //       [NG_FORM_CONTROLLER]: {
-  //         $setPristine: formPristineSpy
-  //       }
-  //     });
-
-  //     form.$onInit();
-  //     form.$registerControl(ctrl);
-  //     form.reset();
-
-  //     expect(formPristineSpy.mock.calls.length).toBe(1);
-  //     expect(pristineSpy.mock.calls.length).toBe(1);
-  //     expect(untouchedSpy.mock.calls.length).toBe(1);
-  //     expect(validateSpy.mock.calls.length).toBeGreaterThan(1);
-  //   });
-
-  //   it('should apply model values, if provided', () => {
-  //     let modelValues = {
-  //       foo: 'bar'
-  //     };
-
-  //     let form = createForm({
-  //       [NG_FORM_CONTROLLER]: {
-  //         $setPristine: () => {}
-  //       }
-  //     });
-  //     form.$onInit();
-  //     form.reset(modelValues);
-
-  //     expect(form.getModelValues()).toEqual(modelValues);
   //   });
   // });
 });
