@@ -1,6 +1,6 @@
 {
   "name": "@darkobits/formation-demo",
-  "version": "0.1.0",
+  "version": "1.0.0-beta.3",
   "private": true,
   "license": "WTFPL",
   "contributors": [
@@ -30,8 +30,8 @@
   },
   "xo": false,
   "dependencies": {
-    "@darkobits/formation": "canary",
-    "@darkobits/formation-validators": "canary",
+    "@darkobits/formation": "1.0.0-beta.3",
+    "@darkobits/formation-validators": "1.0.0-beta.3",
     "angular": "1.6.x",
     "angular-animate": "1.6.x",
     "angular-messages": "1.6.x",

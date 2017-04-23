@@ -10,11 +10,8 @@ import {
   onReady
 } from '@darkobits/formation';
 
-
 import templateUrl from './addressFormDemo.html';
 
-
-console.log('match', match('email'));
 
 app.component('addressFormDemo', {
   controllerAs: 'vm',
@@ -90,8 +87,6 @@ app.component('addressFormDemo', {
 
     vm.$onInit = () => {
       onReady(vm, 'addressForm').then(form => {
-        console.log('FORM IS READY!');
-
         form.setModelValues({
           name: 'Frodo Baggins',
           gender: 'M',

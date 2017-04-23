@@ -7,7 +7,7 @@ import ngMessages from 'angular-messages';
 
 import Formation, {
   FormationConfigurator
-} from '@darkobits/formation/dist/index.min';
+} from '@darkobits/formation';
 
 
 

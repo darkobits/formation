@@ -215,8 +215,50 @@ describe('FormController', () => {
   });
 
   describe('[Interface] Configure', () => {
+    const formName = 'form';
+    const configKey = 'config';
+    const controlNameA = 'foo';
+    const controlNameB = 'bar';
+    const errors = [
+      ['required', 'This field is required.']
+    ];
+
+    beforeEach(() => {
+      T = directive('fm', {
+        template: `
+          <fm name="${formName}" controls="${configKey}">
+            <fm-input name="${controlNameA}"></fm-input>
+            <transclude></transclude>
+          </fm>
+        `,
+        scope: {
+          [configKey]: {
+            [controlNameA]: {
+              errors
+            },
+            [controlNameB]: {
+              errors
+            }
+          }
+        }
+      });
+    });
+
     it('should implement the Configure interface', () => {
       expect(typeof T.fm[Configure]).toEqual('function');
+    });
+
+    it('should configure known entities', () => {
+      expect(T.fm.getControl(controlNameA).getErrorMessages()).toEqual(errors);
+    });
+
+    it('should cache configuration data and pass it to newly-registered controls', () => {
+      const controlB = compile({
+        template: `<fm-input name="${controlNameB}""></fm-input>`,
+        insertAt: T.$element.find('transclude')
+      }).controller('fmInput');
+
+      expect(controlB.getErrorMessages()).toEqual(errors);
     });
   });
 
@@ -279,7 +321,7 @@ describe('FormController', () => {
 
     describe('assigning "$name" to parent scope', () => {
       describe('when provided a non-empty string', () => {
-        let name = 'foo';
+        const name = 'foo';
 
         beforeEach(() => {
           T = directive('fm', {
@@ -307,8 +349,8 @@ describe('FormController', () => {
 
     describe('parsing "$showErrorsOn"', () => {
       describe('when provided a valid string', () => {
-        let attrString = 'touched, submitted';
-        let expectedFlags = ['$touched', '$submitted'];
+        const attrString = 'touched, submitted';
+        const expectedFlags = ['$touched', '$submitted'];
 
         beforeEach(() => {
           T = directive('fm', {

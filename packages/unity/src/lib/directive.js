@@ -85,7 +85,7 @@ export function directive (name, opts = {}) {
   const s = {};
   let compiledDirective;
 
-  // Ensure the injector has the directive. This will throw if it isn't.
+  // Ensure the injector has the directive. This will throw if it doesn't.
   get(name + 'Directive');
 
   // Ensure the user provided a template.

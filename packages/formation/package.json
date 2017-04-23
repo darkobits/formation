@@ -37,6 +37,7 @@
     "babel-polyfill": "6.x"
   },
   "dependencies": {
+    "@darkobits/interface": "1.x",
     "angular": ">=1.5.x",
     "angular-messages": ">=1.5.x",
     "ramda": "0.23.x"

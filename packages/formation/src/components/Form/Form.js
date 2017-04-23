@@ -339,7 +339,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
 
 
   /**
-   * Adds the provided control to the registry and applies configuration.
+   * Adds the provided control to the registry and configures it.
    *
    * @private
    *
@@ -381,7 +381,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
 
 
   /**
-   * Updates the form's configuration data and configures each registered
+   * Updates the form's configuration data and (re)configures each registered
    * control, child form, or child form group.
    */
   Configure.implementedBy(Form).as(function (config) {

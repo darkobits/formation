@@ -1,6 +1,7 @@
-import Interface, {
-  Any
-} from '../classes/interface';
+import {
+  Any,
+  Interface
+} from '@darkobits/interface';
 
 
 /**
