@@ -51,6 +51,7 @@ app.run(Formation => {
       name: '@',
       placeholder: '@',
       type: '@',
+      maxlength: '@',
       ngValue: '<'
     },
     transclude: true,
@@ -69,6 +70,7 @@ app.run(Formation => {
         type="{{::Input.type }}"
         name="{{::Input.name }}"
         placeholder="{{::Input.placeholder }}"
+        maxlength="{{::Input.maxlength }}"
         ng-model="Input.$ngModelGetterSetter"
         ng-value="Input.ngValue"
         ng-class="{
