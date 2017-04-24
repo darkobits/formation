@@ -392,7 +392,7 @@ export function greaterScopeId (a, b) {
  *   collection to pass matched data fragments to.
  * @param {object|array} data - Data to disperse to members of 'collection'.
  */
-export const applyToCollection = curry((collection, entryFn, memberFn, data) => {
+export function applyToCollection (collection, entryFn, memberFn, data) {
   // Convert collection to entries using the provided entry generation function.
   const collectionEntries = toPairsWith(entryFn, collection);
 
@@ -409,7 +409,7 @@ export const applyToCollection = curry((collection, entryFn, memberFn, data) => 
   return map(([name, member, data]) => {
     return [name, invoke(memberFn, member, data)];
   }, mergedEntries);
-});
+}
 
 
 export default {

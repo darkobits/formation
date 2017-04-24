@@ -6,6 +6,7 @@ import {
   find,
   is,
   map,
+  partial,
   propEq,
   without
 } from 'ramda';
@@ -103,7 +104,7 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
    * @param {string} methodName - Method name to invoke on each member.
    * @param {object|array} [data] - Optional data to disperse to members.
    */
-  const applyToRegistry = applyToCollection(registry)((m, i) => i);
+  const applyToRegistry = partial(applyToCollection, [registry, (member, index) => index]);
 
 
   // ----- Interfaces ----------------------------------------------------------
@@ -155,7 +156,7 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
   GetModelValue.implementedBy(FormGroup).as(function () {
     // Map the [index, modelValuesObject] entries we get from applyToRegistry
     // into a list of modelValues objects.
-    return map(([, modelValues]) => modelValues, applyToRegistry(GetModelValue, null));
+    return map(([, modelValues]) => modelValues, applyToRegistry(GetModelValue));
   });
 
 
