@@ -176,13 +176,19 @@ Feel free to explore the [source](/src) -- most of the core components are docum
 - Classes:
   - [FormationControl](/src/components/FormationControl)
 
-[travis-img]: https://img.shields.io/travis/darkobits/formation/master.svg?style=flat-square
+## &nbsp;
+<p align="center">
+  <br>
+  <img width="22" height="22" src="https://cloud.githubusercontent.com/assets/441546/25318539/db2f4cf2-2845-11e7-8e10-ef97d91cd538.png">
+</p>
+
+[travis-img]: https://img.shields.io/travis/darkobits/formation.svg?style=flat-square
 [travis-url]: https://travis-ci.org/darkobits/formation
 [david-img]: https://img.shields.io/david/darkobits/formation.svg?style=flat-square
 [david-url]: https://david-dm.org/darkobits/formation
 [codacy-img]: https://img.shields.io/codacy/coverage/e3fb8e46d6a241f5a952cf3fe6a49d06.svg?style=flat-square
 [codacy-url]: https://www.codacy.com/app/darkobits/formation
-[xo-img]: https://img.shields.io/badge/code_style-XO-e271a5.svg?style=flat-square
+[xo-img]: https://img.shields.io/badge/code_style-XO-f74c4c.svg?style=flat-square
 [xo-url]: https://github.com/sindresorhus/xo
 [npm-img]: https://img.shields.io/npm/v/@darkobits/formation.svg?style=flat-square
 [npm-url]: https://www.npmjs.com/package/@darkobits/formation
