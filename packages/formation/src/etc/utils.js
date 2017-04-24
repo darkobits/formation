@@ -28,20 +28,13 @@ import {
 } from './constants';
 
 
-/**
- * Throws a new error with the provided message, prefixed with the module
- * name.
- *
- * @param  {string} message
- */
-export function throwError (message) {
-  throw new Error(`[${MODULE_NAME}] ${message}`);
-}
-
+// ----- Private Methods -------------------------------------------------------
 
 /**
  * Throws an error if the provided value is not an array. Otherwise, returns
  * true.
+ *
+ * @private
  *
  * @param  {*} value
  * @param  {string} [desc] - Optional descriptor.
@@ -60,6 +53,8 @@ function assertIsArray (value, desc) {
  * Throws an error if the provided value is not a [key, value] entry. Otherwise,
  * returns true.
  *
+ * @private
+ *
  * @param  {*} value
  * @param  {string} [desc] - Optional descriptor.
  * @return {boolean}
@@ -70,6 +65,31 @@ function assertIsEntry (value, desc) {
   }
 
   return true;
+}
+
+
+// ----- Public Methods --------------------------------------------------------
+
+/**
+ * Because Jest's mocked functions fail a Function type check, we need to
+ * additionally check their "typeof" property.
+ *
+ * @param  {any} value
+ * @return {boolean}
+ */
+export function isFunction (value) {
+  return is(Function, value) || typeof value === 'function';
+}
+
+
+/**
+ * Throws a new error with the provided message, prefixed with the module
+ * name.
+ *
+ * @param  {string} message
+ */
+export function throwError (message) {
+  throw new Error(`[${MODULE_NAME}] ${message}`);
 }
 
 
@@ -138,7 +158,7 @@ export function mergeWithDeep (f, ...objs) {
 const DEFAULT_MERGER = (d, s) => {
   if (Array.isArray(d) && Array.isArray(s)) {
     return concat(d, s);
-  } else if (is(Object, d) && is(Object, s) && !is(Function, s)) {
+  } else if (is(Object, d) && is(Object, s) && !isFunction(s)) {
     return mergeWithDeep(DEFAULT_MERGER, d, s);
   }
 
@@ -155,9 +175,6 @@ const DEFAULT_MERGER = (d, s) => {
 export const mergeDeep = (...objs) => {
   return mergeWithDeep(DEFAULT_MERGER, ...objs);
 };
-
-
-
 
 
 /**
@@ -269,11 +286,11 @@ export function toPairsWith (...args) {
       break;
   }
 
-  if (!is(Function, keyFn)) {
+  if (!isFunction(keyFn)) {
     throwError(`Expected key generation function to be of type "Function", but got "${typeof keyFn}".`);
   }
 
-  if (!is(Function, valueFn)) {
+  if (!isFunction(valueFn)) {
     throwError(`Expected key value generation function to be of type "Function", but got "${typeof valueFn}".`);
   }
 
@@ -318,7 +335,7 @@ export function mergeEntries (dest = [], src = []) {
  * @return {*}
  */
 export function invoke (method, obj, ...args) {
-  return obj && is(Function, obj[method]) && obj[method](...args);
+  return obj && isFunction(obj[method]) && obj[method](...args);
 }
 
 
@@ -376,19 +393,22 @@ export function greaterScopeId (a, b) {
  * @param {object|array} data - Data to disperse to members of 'collection'.
  */
 export const applyToCollection = curry((collection, entryFn, memberFn, data) => {
-  // Convert registry array to registry entries in the format [name, member].
+  // Convert collection to entries using the provided entry generation function.
   const collectionEntries = toPairsWith(entryFn, collection);
 
-  // Convert data object to entries in the format [key, data].
+  // Convert data object to entries in the format [key, value].
   const dataEntries = Object.entries(data || {});
 
   // Correlate data to registry members by common name/key, generating
   // triplets in the format [name, member, data].
   const mergedEntries = mergeEntries(collectionEntries, dataEntries);
 
-  // For each triplet, invoke the provided method name on the member, passing
-  // it its matching data.
-  return map(([name, member, data]) => [name, invoke(memberFn, member, data)], mergedEntries);
+  // For each triplet, invoke the provided method name on the collection member,
+  // passing it its matching data. Return an entry in the format
+  // [name, returnValue].
+  return map(([name, member, data]) => {
+    return [name, invoke(memberFn, member, data)];
+  }, mergedEntries);
 });
 
 
@@ -398,6 +418,7 @@ export default {
   capitalizeFirst,
   greaterScopeId,
   invoke,
+  isFunction,
   lowercaseFirst,
   mergeDeep,
   mergeEntries,

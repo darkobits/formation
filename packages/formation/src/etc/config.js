@@ -26,6 +26,7 @@ import {
 
 import {
   capitalizeFirst,
+  isFunction,
   lowercaseFirst,
   mergeDeep
 } from './utils';
@@ -195,7 +196,7 @@ app.config($provide => {
         // module and Form.js.
         const fmFormController = find(controller => path(['constructor', FORM_CONTROLLER], controller), controllers);
 
-        if (fmFormController && is(Function, fmFormController[RegisterNgForm])) {
+        if (fmFormController && isFunction(fmFormController[RegisterNgForm])) {
           fmFormController[RegisterNgForm](ngFormController);
         }
       }
@@ -217,11 +218,11 @@ app.config($provide => {
         // module and Form.js.
         const fmFormController = find(controller => path(['constructor', FORM_CONTROLLER], controller), controllers);
 
-        if (fmComponentController && is(Function, fmComponentController[RegisterNgModel])) {
+        if (fmComponentController && isFunction(fmComponentController[RegisterNgModel])) {
           // If we are the child of a Formation control, register with the
           // control.
           fmComponentController[RegisterNgModel](ngModelController);
-        } else if (fmFormController && is(Function, fmFormController[RegisterNgModel])) {
+        } else if (fmFormController && isFunction(fmFormController[RegisterNgModel])) {
           // Otherwise, if we are the child of a Formation form, register with
           // the form.
           fmFormController[RegisterNgModel](ngModelController);
@@ -247,13 +248,13 @@ app.config($provide => {
           // Return new link object.
           return {
             pre () {
-              if (is(Function, link.pre)) {
+              if (isFunction(link.pre)) {
                 // Invoke original pre-link.
                 Reflect.apply(link.pre, this, arguments);
               }
             },
             post () {
-              if (is(Function, link.post)) {
+              if (isFunction(link.post)) {
                 // Invoke original post-link.
                 Reflect.apply(link.post, this, arguments);
               }

@@ -9,6 +9,7 @@ import {
 } from '../../etc/constants';
 
 import {
+  isFunction,
   throwError
 } from '../../etc/utils';
 
@@ -29,7 +30,7 @@ import {
  */
 export class ConfigurableValidator {
   constructor (validator) {
-    if (!is(Function, validator)) {
+    if (!isFunction(validator)) {
       throwError([
         'ConfigurableValidator expected validator to be of type "Function",',
         `but got "${typeof validator}".`

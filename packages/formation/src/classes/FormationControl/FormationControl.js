@@ -26,6 +26,7 @@ import {
 } from '../../etc/constants';
 
 import {
+  isFunction,
   mergeDeep,
   throwError
 } from '../../etc/utils';
@@ -164,8 +165,10 @@ export class FormationControl {
 
   /**
    * Returns a reference to the "canonical" control that this component instance
-   * represents or interacts with. Ex: An error or other tertiary component
-   * may use this to access the primary control of the same name.
+   * represents or interacts with. Ex: An error or other tertiary component that
+   * doesn't use ngModel may use this to access the primary control of the same
+   * name. This works by virtue of the fact that components that do not use
+   * ngModel do not register as controls with the form.
    *
    * @private
    *
@@ -193,7 +196,8 @@ export class FormationControl {
 
 
   /**
-   * Used by ngModel (via ngModelOptions) to set and retreive model values.
+   * Used by ngModel (via ngModelOptions) to set and retreive model values using
+   * the GetModelValue and SetModelValue interfaces.
    *
    * See: https://docs.angularjs.org/api/ng/directive/ngModelOptions
    *
@@ -391,7 +395,7 @@ Configure.implementedBy(FormationControl).as(function (configuration) {
   // Set up parsers.
   if (Array.isArray(parsers)) {
     parsers.forEach(parser => {
-      if (is(Function, parser)) {
+      if (isFunction(parser)) {
         this[NG_MODEL_CTRL].$parsers.push(parser.bind(this[NG_MODEL_CTRL]));
       } else {
         throwError(`Expected parser to be a function, got "${typeof parser}".`);
@@ -403,7 +407,7 @@ Configure.implementedBy(FormationControl).as(function (configuration) {
   // Set up formatters.
   if (Array.isArray(formatters)) {
     formatters.forEach(formatter => {
-      if (is(Function, formatter)) {
+      if (isFunction(formatter)) {
         this[NG_MODEL_CTRL].$formatters.push(formatter.bind(this[NG_MODEL_CTRL]));
       } else {
         throwError(`Expected formatter to be a function, got "${typeof formatter}".`);
@@ -422,7 +426,7 @@ Configure.implementedBy(FormationControl).as(function (configuration) {
         // using is() because instanceof does not work across execution
         // contexts.
         this[NG_MODEL_CTRL].$validators[name] = validator.configure(this);
-      } else if (is(Function, validator)) {
+      } else if (isFunction(validator)) {
         this[NG_MODEL_CTRL].$validators[name] = validator.bind(this[NG_MODEL_CTRL]);
       } else {
         throwError(`Expected validator to be of type "Function", but got "${typeof validator}".`);
@@ -438,7 +442,7 @@ Configure.implementedBy(FormationControl).as(function (configuration) {
         // Validator with same key already exists on this control, pass.
       } else if (is(ConfigurableValidator, asyncValidator)) {
         this[NG_MODEL_CTRL].$asyncValidators[name] = asyncValidator.configure(this);
-      } else if (is(Function, asyncValidator)) {
+      } else if (isFunction(asyncValidator)) {
         this[NG_MODEL_CTRL].$asyncValidators[name] = asyncValidator.bind(this[NG_MODEL_CTRL]);
       } else {
         throwError(`Expected async validator to be of type "Function", but got "${typeof asyncValidator}".`);
