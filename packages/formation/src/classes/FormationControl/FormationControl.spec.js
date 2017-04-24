@@ -498,5 +498,17 @@ describe('FormationControl', () => {
 
       expect(T.fmInput.getModelValue()).toEqual(modelValue);
     });
+
+    it('should no-op when passed "undefined"', () => {
+      T.fmInput.setModelValue(modelValue);
+      digest();
+
+      expect(T.fmInput.getModelValue()).toEqual(modelValue);
+
+      T.fmInput.setModelValue();
+      digest();
+
+      expect(T.fmInput.getModelValue()).toEqual(modelValue);
+    });
   });
 });

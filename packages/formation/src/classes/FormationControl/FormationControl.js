@@ -507,8 +507,10 @@ GetModelValue.implementedBy(FormationControl).as(function () {
  *
  * @param  {*} newValue - Value to set.
  */
-SetModelValue.implementedBy(FormationControl).as(function (newValue) {
-  this[FORM_CONTROLLER].$setModelValue(this.$getName(), clone(newValue));
+SetModelValue.implementedBy(FormationControl).as(function (modelValue) {
+  if (modelValue !== undefined) {
+    this[FORM_CONTROLLER].$setModelValue(this.$getName(), clone(modelValue));
+  }
 });
 
 
