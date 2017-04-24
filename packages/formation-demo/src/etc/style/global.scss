@@ -250,7 +250,11 @@ fm-input[type='radio'] {
 
     // Inner circle (checked).
     &:checked ~ label {
-      &::after {
+      &.is-disabled::after {
+        background-color: rgba($dove-gray, 0.6);
+      }
+
+      &:not(.is-disabled)::after {
         background-color: $dove-gray;
       }
     }
