@@ -209,7 +209,11 @@ export class FormationControl {
   $ngModelGetterSetter (...args) {
     if (args.length > 0) {
       const [newValue] = args;
-      this[SetModelValue](newValue);
+
+      // This does not defer to the SetModelValue implementation because
+      // validators will need to be able to clear a model value when validation
+      // fails by setting it to undefined.
+      this[FORM_CONTROLLER].$setModelValue(this.$getName(), clone(newValue));
     } else {
       return this[GetModelValue]();
     }
@@ -499,7 +503,7 @@ GetModelValue.implementedBy(FormationControl).as(function () {
 
 
 /**
- * Sets the control's model value.
+ * If the provided value is undefined, sets the control's model value.
  *
  * @example
  *
@@ -515,8 +519,6 @@ SetModelValue.implementedBy(FormationControl).as(function (modelValue) {
 
 
 /**
- * Formerly: $setCustomError
- *
  * Sets a custom error on the control and sets the "custom" validity state to
  * false.
  *
@@ -540,8 +542,6 @@ SetCustomErrorMessage.implementedBy(FormationControl).as(function (errorMessage)
 /**
  * Sets the "custom" validity state of the provided control to true, and
  * clears the custom error message.
- *
- * TODO: Move this to the FormationControl class.
  *
  * @private
  *
