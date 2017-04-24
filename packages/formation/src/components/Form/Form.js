@@ -23,6 +23,18 @@ import {
 } from '../../etc/config';
 
 import {
+  FormGroupController
+} from '../FormGroup/FormGroup';
+
+import {
+  FormationControl
+} from '../../classes/FormationControl';
+
+import {
+  MockControl
+} from '../../classes/MockControl';
+
+import {
   applyToCollection,
   assignToScope,
   greaterScopeId,
@@ -186,51 +198,6 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
 
 
   /**
-   * Wraps an ngModel controller instance in a mock control instance, allowing
-   * users to use ngModel outside of Formation controls.
-   *
-   * @example
-   *
-   * <fm name="vm.myForm">
-   *   <input type="text"
-   *     name="email"
-   *     ng-model="vm.email">
-   * </fm>
-   *
-   * @private
-   *
-   * @param  {object} ngModelCtrl
-   * @return {object}
-   */
-  function createMockInputControl (ngModelCtrl) {
-    const controlName = ngModelCtrl.$name;
-
-    // We don't know what this control's ngModel expression is bound to, so in
-    // order to keep it in sync we need to watch it and update our internal
-    // model value when it changes.
-    const cancelWatcher = $scope.$watch(() => ngModelCtrl.$modelValue, newValue => {
-      Form.$setModelValue(controlName, newValue);
-    });
-
-    $scope.$on('$destroy', cancelWatcher);
-
-    const mockControl = {
-      name: controlName,
-      $ngModelCtrl: ngModelCtrl,
-      [GetModelValue] () {
-        return Form.$getModelValue(controlName);
-      },
-      [SetModelValue] () { }
-    };
-
-    mockControl.getModelValue = mockControl[GetModelValue];
-    mockControl.setModelValue = mockControl[SetModelValue];
-
-    return mockControl;
-  }
-
-
-  /**
    * Returns a promise that resolves when the Angular form controller's
    * "$pending" flag becomes false.
    *
@@ -377,7 +344,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    * @param  {object} ngModelCtrl
    */
   RegisterNgModel.implementedBy(Form).as(function (ngModelCtrl) {
-    Form[RegisterControl](createMockInputControl(ngModelCtrl));
+    Form[RegisterControl](new MockControl(ngModelCtrl, Form, $scope));
   });
 
 
@@ -756,7 +723,10 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    */
   Form.getControl = controlName => {
     const control = find(propEq('name', controlName), registry);
-    return !is(FormController, control) && control;
+
+    if (is(FormationControl, control) || is(MockControl, control)) {
+      return control;
+    }
   };
 
 
@@ -768,7 +738,10 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    */
   Form.getForm = formName => {
     const form = find(propEq('name', formName), registry);
-    return is(FormController, form) && form;
+
+    if (is(FormController, form) || is(FormGroupController, form)) {
+      return form;
+    }
   };
 
 
