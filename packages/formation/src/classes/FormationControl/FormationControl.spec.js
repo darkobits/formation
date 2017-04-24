@@ -1,7 +1,8 @@
 import {
   module,
   compile,
-  directive
+  directive,
+  digest
 } from '@darkobits/unity';
 
 import {
@@ -493,6 +494,8 @@ describe('FormationControl', () => {
 
     it('should get/set the controls model value', () => {
       T.fmInput.setModelValue(modelValue);
+      digest();
+
       expect(T.fmInput.getModelValue()).toEqual(modelValue);
     });
   });

@@ -97,7 +97,7 @@ describe('Formation Configuration', () => {
       beforeEach(() => {
         T = directive('fm', {
           template: `
-            <fm debug>
+            <fm>
               <input name="${controlName}"
                 type="text"
                 ng-model="${controlName}"
@@ -111,8 +111,8 @@ describe('Formation Configuration', () => {
 
       it('should register with the Formation form, if present', () => {
         const control = T.fm.getControl(controlName);
-
         assertIsNgModelController(control[NG_MODEL_CTRL]);
+
         expect(T.fm.getModelValues()).toEqual(expect.objectContaining({
           [controlName]: value
         }));

@@ -1,8 +1,4 @@
 import {
-  is
-} from 'ramda';
-
-import {
   CONFIGURABLE_VALIDATOR,
   FORM_CONTROLLER,
   NG_MODEL_CTRL

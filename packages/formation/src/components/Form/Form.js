@@ -618,7 +618,12 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    * @param  {*} newValue
    */
   Form.$setModelValue = (controlName, newValue) => {
-    modelValues.set(controlName, clone(newValue));
+    // Any time we programatically update the model values map, we need to
+    // trigger a digest cycle so that controls' ngModel getter/setters will pull
+    // the new values.
+    $scope.$applyAsync(() => {
+      modelValues.set(controlName, clone(newValue));
+    });
   };
 
 
@@ -690,14 +695,16 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
     } catch (err) {
       // Re-throw errors when testing so we know what caused the submit to fail.
       if (typeof process !== 'undefined' && (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'development')) {
-        Form.$debug('[Logged During Development Only]', err);
+        Form.$debug('[Logged During Development Only]', err.message);
+        throw err;
       }
+    } finally {
+      // [6] Restore forms to editable state. $apply is needed here because we're
+      // in an async function.
+      $scope.$apply(() => {
+        terminateSubmit();
+      });
     }
-
-    // [6] Restore forms to editable state.
-    $scope.$apply(() => {
-      terminateSubmit();
-    });
   };
 
 
@@ -781,6 +788,8 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
 }
 
 
+// NOTE: This might be obsolete now that it seems to be possible to use
+// circular dependencies.
 FormController[FORM_CONTROLLER] = true;
 
 FormController.$inject = ['$attrs', '$compile', '$element', '$log', '$parse', '$scope', '$transclude'];

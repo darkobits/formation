@@ -1,7 +1,8 @@
 import {
   module,
   compile,
-  directive
+  directive,
+  digest
 } from '@darkobits/unity';
 
 import {
@@ -17,24 +18,38 @@ import {
   Reset
 } from '../../etc/interfaces';
 
+import {
+  CUSTOM_ERROR_KEY,
+  NG_MODEL_CTRL
+} from '../../etc/constants';
+
 import Formation from '../../index';
+
+import {
+  CUSTOM_ERROR_MESSAGE_KEY
+} from '../../classes/FormationControl';
 
 import {
   NG_FORM_CONTROLLER
 } from './Form';
 
-
 describe('FormController', () => {
   let T;
+  const logSpy = jest.fn();
 
   beforeEach(() => {
-    module(Formation);
+    module(Formation, {
+      mock: {
+        $log: {
+          log: logSpy
+        }
+      }
+    });
 
     T = directive('fm', {
       template: '<fm></fm>'
     });
   });
-
 
 
   // ----- Interfaces ----------------------------------------------------------
@@ -199,6 +214,8 @@ describe('FormController', () => {
       });
 
       jest.spyOn(T.fm, RegisterNgModel);
+
+      digest();
     });
 
     it('should implement the RegisterNgModel interface', () => {
@@ -262,15 +279,138 @@ describe('FormController', () => {
     });
   });
 
-  describe('[Interface] GetModelValue', () => {
+  describe('[Interface] GetModelValue / SetModelValue', () => {
+    const spies = {};
+
+    const modelValues = {
+      foo: 'bar',
+      childForm: {
+        childFoo: 'bar'
+      },
+      group: [
+        {
+          groupedFoo1: 'bar'
+        },
+        {
+          groupedFoo2: 'bar'
+        }
+      ]
+    };
+
+    beforeEach(() => {
+      T = directive('fm', {
+        template: `
+          <fm>
+            <fm-input name="foo"></fm-input>
+            <fm name="childForm">
+              <fm-input name="childFoo"></fm-input>
+            </fm>
+            <fm-group name="group">
+              <fm name="grouped1">
+                <fm-input name="groupedFoo1"></fm-input>
+              </fm>
+              <fm name="grouped2">
+                <fm-input name="groupedFoo2"></fm-input>
+              </fm>
+            </fm-group>
+          </fm>
+        `
+      });
+
+      digest();
+
+      Object.assign(spies, {
+        foo: {
+          getModelValue: jest.spyOn(T.fm.getControl('foo'), GetModelValue),
+          setModelValue: jest.spyOn(T.fm.getControl('foo'), SetModelValue)
+        },
+        childForm: {
+          getModelValue: jest.spyOn(T.fm.getForm('childForm'), GetModelValue),
+          setModelValue: jest.spyOn(T.fm.getForm('childForm'), SetModelValue),
+          childFoo: {
+            getModelValue: jest.spyOn(T.fm.getForm('childForm').getControl('childFoo'), GetModelValue),
+            setModelValue: jest.spyOn(T.fm.getForm('childForm').getControl('childFoo'), SetModelValue)
+          }
+        },
+        group: {
+          getModelValue: jest.spyOn(T.fm.getForm('group'), GetModelValue),
+          setModelValue: jest.spyOn(T.fm.getForm('group'), SetModelValue),
+          grouped1: {
+            getModelValue: jest.spyOn(T.fm.getForm('group').getForm('grouped1'), GetModelValue),
+            setModelValue: jest.spyOn(T.fm.getForm('group').getForm('grouped1'), SetModelValue),
+            groupedFoo1: {
+              getModelValue: jest.spyOn(T.fm.getForm('group').getForm('grouped1').getControl('groupedFoo1'), GetModelValue),
+              setModelValue: jest.spyOn(T.fm.getForm('group').getForm('grouped1').getControl('groupedFoo1'), SetModelValue)
+            }
+          },
+          grouped2: {
+            getModelValue: jest.spyOn(T.fm.getForm('group').getForm('grouped2'), GetModelValue),
+            setModelValue: jest.spyOn(T.fm.getForm('group').getForm('grouped2'), SetModelValue),
+            groupedFoo2: {
+              getModelValue: jest.spyOn(T.fm.getForm('group').getForm('grouped2').getControl('groupedFoo2'), GetModelValue),
+              setModelValue: jest.spyOn(T.fm.getForm('group').getForm('grouped2').getControl('groupedFoo2'), SetModelValue)
+            }
+          }
+        }
+      });
+    });
+
+    it('should implement the SetModelValue interface', () => {
+      expect(typeof T.fm[SetModelValue]).toEqual('function');
+    });
+
+    it('should delegate to the SetModelValue interface of registry members', () => {
+      T.fm.setModelValues(modelValues);
+      digest();
+
+      expect(spies.foo.setModelValue.mock.calls.length).toEqual(1);
+      expect(spies.foo.setModelValue.mock.calls[0]).toEqual([modelValues.foo]);
+
+      expect(spies.childForm.setModelValue.mock.calls.length).toEqual(1);
+      expect(spies.childForm.setModelValue.mock.calls[0]).toEqual([modelValues.childForm]);
+
+      expect(spies.childForm.childFoo.setModelValue.mock.calls.length).toEqual(1);
+      expect(spies.childForm.childFoo.setModelValue.mock.calls[0]).toEqual([modelValues.childForm.childFoo]);
+
+      expect(spies.group.setModelValue.mock.calls.length).toEqual(1);
+      expect(spies.group.setModelValue.mock.calls[0]).toEqual([modelValues.group]);
+
+      expect(spies.group.grouped1.setModelValue.mock.calls.length).toEqual(1);
+      expect(spies.group.grouped1.setModelValue.mock.calls[0]).toEqual([modelValues.group[0]]);
+
+      expect(spies.group.grouped1.groupedFoo1.setModelValue.mock.calls.length).toEqual(1);
+      expect(spies.group.grouped1.groupedFoo1.setModelValue.mock.calls[0]).toEqual([modelValues.group[0].groupedFoo1]);
+
+      expect(spies.group.grouped2.setModelValue.mock.calls.length).toEqual(1);
+      expect(spies.group.grouped2.setModelValue.mock.calls[0]).toEqual([modelValues.group[1]]);
+
+      expect(spies.group.grouped2.groupedFoo2.setModelValue.mock.calls.length).toEqual(1);
+      expect(spies.group.grouped2.groupedFoo2.setModelValue.mock.calls[0]).toEqual([modelValues.group[1].groupedFoo2]);
+    });
+
     it('should implement the GetModelValue interface', () => {
       expect(typeof T.fm[GetModelValue]).toEqual('function');
     });
-  });
 
-  describe('[Interface] SetModelValue', () => {
-    it('should implement the SetModelValue interface', () => {
-      expect(typeof T.fm[SetModelValue]).toEqual('function');
+    it('should delegate to the GetModelValue interface of registry members', () => {
+      T.fm.setModelValues(modelValues);
+      digest();
+
+      const result = T.fm.getModelValues();
+
+      expect(result).toEqual(modelValues);
+
+      // Forms and form groups should have had GetModelValues invoked once.
+      expect(spies.childForm.getModelValue.mock.calls.length).toEqual(1);
+      expect(spies.group.getModelValue.mock.calls.length).toEqual(1);
+      expect(spies.group.grouped1.getModelValue.mock.calls.length).toEqual(1);
+      expect(spies.group.grouped2.getModelValue.mock.calls.length).toEqual(1);
+
+      // Child controls will have had GetModelValue invoked 3 times.
+      expect(spies.foo.getModelValue.mock.calls.length).toEqual(3);
+      expect(spies.childForm.childFoo.getModelValue.mock.calls.length).toEqual(3);
+      expect(spies.group.grouped1.groupedFoo1.getModelValue.mock.calls.length).toEqual(3);
+      expect(spies.group.grouped2.groupedFoo2.getModelValue.mock.calls.length).toEqual(3);
     });
   });
 
@@ -289,6 +429,24 @@ describe('FormController', () => {
   describe('[Interface] Reset', () => {
     it('should implement the Reset interface', () => {
       expect(typeof T.fm[Reset]).toEqual('function');
+    });
+  });
+
+
+  // ----- Semi-Private Methods ------------------------------------------------
+
+  describe('$debug', () => {
+    const message = 'foo';
+
+    beforeEach(() => {
+      T = directive('fm', {
+        template: '<fm debug></fm>'
+      });
+    });
+
+    it('should log debug messages when "$debugging" is true', () => {
+      T.fm.$debug(message);
+      expect(logSpy.mock.calls[0]).toEqual(expect.arrayContaining([message]));
     });
   });
 
@@ -389,6 +547,284 @@ describe('FormController', () => {
     });
   });
 
+  describe('$unregisterControl', () => {
+    const controlName = 'foo';
+
+    beforeEach(() => {
+      T = directive('fm', {
+        template: `
+          <fm>
+            <fm-input name="${controlName}"></fm-input>
+          </fm>
+        `
+      });
+    });
+
+    it('should unregister the named control', () => {
+      const control = T.fm.getControl(controlName);
+      expect(T.fm.getControl(controlName)).toBeTruthy();
+
+      T.fm.$unregisterControl(control);
+      expect(T.fm.getControl(controlName)).toBeFalsy();
+    });
+  });
+
+  describe('$submit', () => {
+    jest.useFakeTimers();
+
+    const controlName = 'foo';
+
+    let onSubmitSpy;
+    let disableSpy;
+    let enableSpy;
+    let setValid;
+    let setPending;
+    let setSubmitting;
+
+    beforeEach(() => {
+      onSubmitSpy = jest.fn();
+
+      T = directive('fm', {
+        template: `
+          <fm controls="controls" on-submit="onSubmit">
+            <fm-input name="${controlName}"></fm-input>
+          </fm>
+        `,
+        scope: {
+          onSubmit: onSubmitSpy
+        }
+      });
+
+      digest();
+
+      // Spy on the form's enable / disable functions.
+      disableSpy = jest.spyOn(T.fm, 'disable');
+      enableSpy = jest.spyOn(T.fm, 'enable');
+
+      // Set up helpers to manipulate the ngForm controller's $valid and
+      // $pending states.
+      setValid = value => {
+        T.fm[NG_FORM_CONTROLLER].$valid = Boolean(value);
+        T.fm[NG_FORM_CONTROLLER].$invalid = !value;
+      };
+
+      setPending = value => {
+        T.fm[NG_FORM_CONTROLLER].$pending = Boolean(value);
+      };
+
+      // Set up a helper to manipulate the form's $submitting state.
+      setSubmitting = value => {
+        T.fm.$submitting = Boolean(value);
+      };
+    });
+
+
+    /**
+     * Scenario 1
+     *
+     * - [X] Form is already submitting
+     * - [ ] Form has pending async validators
+     * - [ ] Form is valid
+     * - [ ] Control has a custom error set
+     * - [ ] onSubmit returned field errors
+     */
+    describe('Scenario 1', () => {
+      it('should return immediately', () => {
+        expect.assertions(1);
+
+        setSubmitting(true);
+
+        return T.fm.$submit().catch(err => {
+          expect(err.message).toEqual('SUBMIT_IN_PROGRESS');
+        });
+      });
+    });
+
+
+    /**
+     * Scenario 2
+     *
+     * - [ ] Form is already submitting
+     * - [X] Form has pending async validators
+     * - [ ] Form is valid
+     * - [ ] Control has a custom error set
+     * - [ ] onSubmit returned field errors
+     */
+    describe('Scenario 2', () => {
+      it('should wait until $pending is "false"', () => {
+        expect.assertions(4);
+
+        setPending(true);
+        setValid(false);
+
+
+        // Queue up a micro-task that will execute as soon as we call
+        // runAllTimers().
+        setImmediate(() => setPending(false));
+
+        const promise = T.fm.$submit().catch(err => {
+          expect(err.message).toEqual('NG_FORM_INVALID');
+          expect(disableSpy.mock.calls.length).toBe(1);
+          expect(onSubmitSpy.mock.calls.length).toBe(0);
+          expect(enableSpy.mock.calls.length).toBe(1);
+        });
+
+        jest.runAllTimers();
+        digest();
+
+        return promise;
+      });
+    });
+
+
+    /**
+     * Scenario 3
+     *
+     * - [ ] Form is already submitting
+     * - [X] Form has pending async validators
+     * - [X] Form is valid
+     * - [ ] Control has a custom error set
+     * - [ ] onSubmit returned field errors
+     */
+    describe('Scenario 3', () => {
+      it('should wait until $pending is false, then call onSubmit', () => {
+        expect.assertions(3);
+
+        setPending(true);
+        setValid(true);
+
+        // Queue up a micro-task that will execute as soon as we call
+        // runAllTimers().
+        setImmediate(() => setPending(false));
+
+        const promise = T.fm.$submit().then(() => {
+          expect(disableSpy.mock.calls.length).toBe(1);
+          expect(onSubmitSpy.mock.calls.length).toBe(1);
+          expect(enableSpy.mock.calls.length).toBe(1);
+        });
+
+        jest.runAllTimers();
+        digest();
+
+        return promise;
+      });
+    });
+
+
+    /**
+     * Scenario 4
+     *
+     * - [ ] Form is already submitting
+     * - [ ] Form has pending async validators
+     * - [X] Form is valid
+     * - [ ] Control has a custom error set
+     * - [X] onSubmit returned a promise
+     */
+    describe('Scenario 4', () => {
+      it('should call onSubmit and apply field errors', () => {
+        expect.assertions(4);
+
+        const fieldError = 'bar';
+
+        const fieldErrors = {
+          [controlName]: fieldError
+        };
+
+        setPending(false);
+        setValid(true);
+
+        T.$scope.onSubmit = jest.fn(() => fieldErrors);
+
+        const promise = T.fm.$submit().then(() => {
+          expect(disableSpy.mock.calls.length).toBe(1);
+          expect(T.$scope.onSubmit.mock.calls.length).toBe(1);
+          expect(enableSpy.mock.calls.length).toBe(1);
+          expect(T.fm.getControl(controlName)[CUSTOM_ERROR_MESSAGE_KEY]).toBe(fieldError);
+        });
+
+        jest.runAllTimers();
+        digest();
+
+        return promise;
+      });
+    });
+
+
+    /**
+     * Scenario 5
+     *
+     * - [ ] Form is already submitting
+     * - [ ] Form has pending async validators
+     * - [X] Form is valid
+     * - [ ] Control has a custom error set
+     * - [ ] onSubmit returned field errors
+     */
+    describe('Scenario 5', () => {
+      it('should indicate that onSubmit did not catch', () => {
+        expect.assertions(4);
+
+        const error = 'foo';
+
+        setPending(false);
+        setValid(true);
+
+        T.$scope.onSubmit = jest.fn(() => Promise.reject(new Error(error)));
+
+        const promise = T.fm.$submit().catch(err => {
+          expect(err.message).toBe(error);
+          expect(disableSpy.mock.calls.length).toBe(1);
+          expect(T.$scope.onSubmit.mock.calls.length).toBe(1);
+          expect(enableSpy.mock.calls.length).toBe(1);
+        });
+
+        jest.runAllTimers();
+        digest();
+
+        return promise;
+      });
+    });
+
+
+    /**
+     * Scenario 6
+     *
+     * - [ ] Form is already submitting
+     * - [ ] Form has pending async validators
+     * - [ ] Form is valid
+     * - [X] Control has a custom error set
+     * - [ ] onSubmit returned field errors
+     */
+    describe('Scenario 6', () => {
+      it('should clear custom errors on controls', () => {
+        expect.assertions(6);
+
+        const customErrorMessage = 'foo';
+
+        T.fm.getControl(controlName)[SetCustomErrorMessage](customErrorMessage);
+        expect(T.fm.getControl(controlName)[CUSTOM_ERROR_MESSAGE_KEY]).toBe(customErrorMessage);
+
+        setPending(false);
+        setValid(true);
+
+        const promise = T.fm.$submit().then(() => {
+          expect(T.fm.getControl(controlName)[CUSTOM_ERROR_MESSAGE_KEY]).toBeFalsy();
+          expect(T.fm.getControl(controlName)[NG_MODEL_CTRL].$error[CUSTOM_ERROR_KEY]).toBeFalsy();
+          expect(disableSpy.mock.calls.length).toBe(1);
+          expect(onSubmitSpy.mock.calls.length).toBe(1);
+          expect(enableSpy.mock.calls.length).toBe(1);
+        });
+
+        jest.runAllTimers();
+        digest();
+
+        return promise;
+      });
+    });
+  });
+
+
+  // ----- Public Methods ------------------------------------------------------
+
   describe('isDisabled', () => {
     describe('when "$disabled" is truthy', () => {
       beforeEach(() => {
@@ -429,345 +865,23 @@ describe('FormController', () => {
     });
   });
 
-  // describe('$unregisterControl', () => {
-  //   let ctrlName = 'foo';
-  //   let form = createForm();
-  //   let ctrl = {
-  //     name: ctrlName,
-  //     [NG_MODEL_CTRL]: ngModelCtrl({
-  //       $name: ctrlName
-  //     })
-  //   };
+  describe('getControl', () => {
+    const ctrlName = 'foo';
+    const badName = 'bar';
 
-  //   form.$registerControl(ctrl);
+    beforeEach(() => {
+      T = directive('fm', {
+        template: `
+          <fm>
+            <fm-input name="${ctrlName}"></fm-input>
+          </fm>
+        `
+      });
+    });
 
-  //   it('should unregister the named control', () => {
-  //     expect(form.getControl(ctrlName)).toBe(ctrl);
-  //     form.$unregisterControl(ctrl);
-  //     expect(form.getControl(ctrlName)).toBeFalsy();
-  //   });
-  // });
-
-  // describe('$debug', () => {
-  //   it('should log debug messages when "$debugging" is true', () => {
-  //     let spy = jest.fn();
-  //     let message = 'foo';
-  //     let form = createForm({}, {
-  //       $attrs: {
-  //         debug: true
-  //       },
-  //       $log: {
-  //         log: spy
-  //       }
-  //     });
-
-  //     form.$onInit();
-  //     form.$debug(message);
-  //     expect(spy.mock.calls[0]).toEqual(expect.arrayContaining([message]));
-  //   });
-  // });
-
-  // describe('$submit', () => {
-  //   function onSubmitForm () {
-  //     let onSubmitReturn;
-
-  //     let onSubmitSpy = jest.fn(() => {
-  //       return onSubmitReturn;
-  //     });
-
-  //     let form = createForm({
-  //       $onSubmit: onSubmitSpy,
-  //       $submitting: false,
-  //       [NG_FORM_CONTROLLER]: {
-  //         $valid: true,
-  //         $pending: false
-  //       }
-  //     });
-
-  //     // Spy on the disable() method.
-  //     let origDisable = form.disable;
-  //     let disableSpy = jest.fn(() => {
-  //       origDisable();
-  //     });
-  //     form.disable = disableSpy;
-
-  //     // Spy on the enable() method.
-  //     let origEnable = form.enable;
-  //     let enableSpy = jest.fn(() => {
-  //       origEnable();
-  //     });
-  //     form.enable = enableSpy;
-
-  //     form.$onInit();
-
-  //     return {
-  //       form,
-  //       spies: {
-  //         onSubmit: onSubmitSpy,
-  //         enable: enableSpy,
-  //         disable: disableSpy
-  //       },
-  //       valid (value) {
-  //         form[NG_FORM_CONTROLLER].$valid = value;
-  //       },
-  //       pending (value) {
-  //         form[NG_FORM_CONTROLLER].$pending = value;
-  //       },
-  //       submitting (value) {
-  //         form.$submitting = value;
-  //       },
-  //       onSubmitReturn (value) {
-  //         onSubmitReturn = value;
-  //       }
-  //     };
-  //   }
-
-
-  //   /**
-  //    * Scenario 1
-  //    *
-  //    * - [X] Form is already submitting
-  //    * - [ ] Form has pending async validators
-  //    * - [ ] Form is valid
-  //    * - [ ] Control has a custom error set
-  //    * - [ ] onSubmit returned field errors
-  //    */
-  //   describe('Scenario 1', () => {
-  //     it('should return immediately', () => {
-  //       expect.assertions(1);
-
-  //       let test = onSubmitForm();
-  //       test.submitting(true);
-
-  //       return test.form.$submit().catch(err => {
-  //         expect(err.message).toBe('SUBMIT_IN_PROGRESS');
-  //       });
-  //     });
-  //   });
-
-
-  //   /**
-  //    * Scenario 2
-  //    *
-  //    * - [ ] Form is already submitting
-  //    * - [X] Form has pending async validators
-  //    * - [ ] Form is valid
-  //    * - [ ] Control has a custom error set
-  //    * - [ ] onSubmit returned field errors
-  //    */
-  //   describe('Scenario 2', () => {
-  //     it('should wait until $pending is "false"', () => {
-  //       expect.assertions(4);
-
-  //       let test = onSubmitForm();
-  //       test.pending(true);
-  //       test.valid(false);
-  //       setImmediate(() => test.pending(false));
-
-  //       let promise = test.form.$submit().catch(err => {
-  //         expect(err.message).toBe('NG_FORM_INVALID');
-  //         expect(test.spies.disable.mock.calls.length).toBe(1);
-  //         expect(test.spies.onSubmit.mock.calls.length).toBe(0);
-  //         expect(test.spies.enable.mock.calls.length).toBe(1);
-  //       });
-
-  //       jest.runAllTimers();
-  //       return promise;
-  //     });
-  //   });
-
-
-  //   /**
-  //    * Scenario 3
-  //    *
-  //    * - [ ] Form is already submitting
-  //    * - [X] Form has pending async validators
-  //    * - [X] Form is valid
-  //    * - [ ] Control has a custom error set
-  //    * - [ ] onSubmit returned field errors
-  //    */
-  //   describe('Scenario 3', () => {
-  //     it('should wait until $pending is false, then call onSubmit', () => {
-  //       expect.assertions(4);
-
-  //       let test = onSubmitForm();
-  //       test.pending(true);
-  //       test.valid(true);
-  //       setImmediate(() => test.pending(false));
-
-  //       let promise = test.form.$submit().then(result => {
-  //         expect(result).toBe('SUBMIT_COMPLETE');
-  //         expect(test.spies.disable.mock.calls.length).toBe(1);
-  //         expect(test.spies.onSubmit.mock.calls.length).toBe(1);
-  //         expect(test.spies.enable.mock.calls.length).toBe(1);
-  //       });
-
-  //       jest.runAllTimers();
-  //       return promise;
-  //     });
-  //   });
-
-
-  //   /**
-  //    * Scenario 4
-  //    *
-  //    * - [ ] Form is already submitting
-  //    * - [ ] Form has pending async validators
-  //    * - [X] Form is valid
-  //    * - [ ] Control has a custom error set
-  //    * - [X] onSubmit returned a promise
-  //    */
-  //   describe('Scenario 4', () => {
-  //     it('should call onSubmit and apply field errors', () => {
-  //       expect.assertions(5);
-
-  //       let ctrlName = 'foo';
-  //       let fieldError = 'bar';
-
-  //       let ctrl = formationCtrl({
-  //         name: ctrlName
-  //       });
-
-  //       let fieldErrors = {
-  //         [ctrlName]: fieldError
-  //       };
-
-  //       let test = onSubmitForm();
-  //       test.pending(false);
-  //       test.valid(true);
-  //       test.onSubmitReturn(fieldErrors);
-  //       test.form.$registerControl(ctrl);
-
-  //       let promise = test.form.$submit().then(result => {
-  //         expect(result).toBe('SUBMIT_COMPLETE');
-  //         expect(test.spies.disable.mock.calls.length).toBe(1);
-  //         expect(test.spies.onSubmit.mock.calls.length).toBe(1);
-  //         expect(test.spies.enable.mock.calls.length).toBe(1);
-  //         expect(ctrl[CUSTOM_ERROR_MESSAGE_KEY]).toBe(fieldError);
-  //       });
-
-  //       jest.runAllTimers();
-  //       return promise;
-  //     });
-  //   });
-
-
-  //   /**
-  //    * Scenario 5
-  //    *
-  //    * - [ ] Form is already submitting
-  //    * - [ ] Form has pending async validators
-  //    * - [X] Form is valid
-  //    * - [ ] Control has a custom error set
-  //    * - [ ] onSubmit returned field errors
-  //    */
-  //   describe('Scenario 5', () => {
-  //     it('should indicate that onSubmit did not catch', () => {
-  //       expect.assertions(4);
-
-  //       let test = onSubmitForm();
-  //       test.pending(false);
-  //       test.valid(true);
-  //       test.onSubmitReturn(Promise.reject({}));
-
-  //       let promise = test.form.$submit().catch(err => {
-  //         expect(err.message).toBe('CONSUMER_REJECTED');
-  //         expect(test.spies.disable.mock.calls.length).toBe(1);
-  //         expect(test.spies.onSubmit.mock.calls.length).toBe(1);
-  //         expect(test.spies.enable.mock.calls.length).toBe(1);
-  //       });
-
-  //       jest.runAllTimers();
-  //       return promise;
-  //     });
-  //   });
-
-
-  //   /**
-  //    * Scenario 6
-  //    *
-  //    * - [ ] Form is already submitting
-  //    * - [ ] Form has pending async validators
-  //    * - [ ] Form is valid
-  //    * - [X] Control has a custom error set
-  //    * - [ ] onSubmit returned field errors
-  //    */
-  //   describe('Scenario 6', () => {
-  //     it('should clear custom errors on controls', () => {
-  //       expect.assertions(6);
-
-  //       let ctrlName = 'foo';
-  //       let customMessage = 'bar';
-  //       let test = onSubmitForm();
-
-  //       let ctrl = formationCtrl({
-  //         name: ctrlName,
-  //         [CUSTOM_ERROR_MESSAGE_KEY]: customMessage,
-  //         [NG_MODEL_CTRL]: {
-  //           $error: {
-  //             [CUSTOM_ERROR_KEY]: true
-  //           }
-  //         }
-  //       });
-
-  //       test.pending(false);
-  //       test.valid(true);
-  //       test.form.$registerControl(ctrl);
-
-  //       let promise = test.form.$submit().then(response => {
-  //         expect(response).toBe('SUBMIT_COMPLETE');
-  //         expect(ctrl[CUSTOM_ERROR_MESSAGE_KEY]).toBeFalsy();
-  //         expect(ctrl[NG_MODEL_CTRL].$error[CUSTOM_ERROR_KEY]).toBe(false);
-  //         expect(test.spies.disable.mock.calls.length).toBe(1);
-  //         expect(test.spies.onSubmit.mock.calls.length).toBe(1);
-  //         expect(test.spies.enable.mock.calls.length).toBe(1);
-  //       });
-
-  //       jest.runAllTimers();
-  //       return promise;
-  //     });
-  //   });
-  // });
-
-  // describe('getControl', () => {
-  //   it('should return the named control, if it exists', () => {
-  //     let ctrlName = 'foo';
-  //     let badName = 'bar';
-  //     let form = createForm();
-
-  //     let ctrl = formationCtrl({
-  //       name: ctrlName
-  //     });
-
-  //     form.$onInit();
-  //     form.$registerControl(ctrl);
-
-  //     expect(form.getControl(badName)).toBeFalsy();
-  //     expect(form.getControl(ctrlName)).toBe(ctrl);
-  //   });
-  // });
-
-  // describe('disable', () => {
-  //   it('should set the $disabled flag to "true"', () => {
-  //     let form = createForm({
-  //       $disabled: false
-  //     });
-
-  //     expect(form.$disabled).toBe(false);
-  //     form.disable();
-  //     expect(form.$disabled).toBe(true);
-  //   });
-  // });
-
-  // describe('enable', () => {
-  //   it('should set the $disabled flag to "false"', () => {
-  //     let form = createForm({
-  //       $disabled: true
-  //     });
-
-  //     expect(form.$disabled).toBe(true);
-  //     form.enable();
-  //     expect(form.$disabled).toBe(false);
-  //   });
-  // });
+    it('should return the named control, if it exists', () => {
+      expect(T.fm.getControl(badName)).toBeFalsy();
+      expect(T.fm.getControl(ctrlName)).toBeTruthy();
+    });
+  });
 });
