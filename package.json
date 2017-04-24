@@ -26,6 +26,7 @@
       "import/no-unassigned-import": "off",
       "import/no-unresolved": "off",
       "import/prefer-default-export": "off",
+      "max-nested-callbacks": "off",
       "max-params": "off",
       "new-cap": "off",
       "no-multiple-empty-lines": "off",
@@ -41,9 +42,9 @@
     }
   },
   "devDependencies": {
-    "angular": ">=1.5.x",
-    "angular-messages": ">=1.5.x",
-    "angular-mocks": ">=1.5.x",
+    "angular": "^1.5.0",
+    "angular-messages": "^1.5.0",
+    "angular-mocks": "^1.5.0",
     "babel-core": "6.x",
     "babel-jest": "19.x",
     "babel-loader": "6.4.x",

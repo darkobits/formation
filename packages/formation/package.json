@@ -38,15 +38,15 @@
   },
   "dependencies": {
     "@darkobits/interface": "1.x",
-    "angular": ">=1.5.x",
-    "angular-messages": ">=1.5.x",
+    "angular": "^1.5.0",
+    "angular-messages": "^1.5.0",
     "ramda": "0.23.x"
   },
   "devDependencies": {
     "@darkobits/unity": "^1.0.0-beta.3",
-    "angular-mocks": ">=1.5.x",
+    "angular-mocks": "^1.5.0",
     "babel-cli": "6.x",
-    "eslint": "3.19.x",
+    "eslint": "3.x",
     "jest": "19.x",
     "npm-check": "5.4.x",
     "npm-run-all": "4.x",
