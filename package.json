@@ -6,11 +6,11 @@
     "node": ">=6.x"
   },
   "scripts": {
-    "bootstrap": "lerna bootstrap",
+    "bootstrap": "lerna bootstrap --hoist",
     "lint": "lerna run lint",
     "test": "lerna run test",
     "build": "lerna run build",
-    "prepare": "run-s bootstrap build test",
+    "prepare": "run-s bootstrap build",
     "prepush": "run-p lint test",
     "depcheck": "(npm-check --skip-unused --no-emoji || true) && lerna run depcheck"
   },
