@@ -277,6 +277,12 @@ describe('FormController', () => {
 
       expect(controlB.getErrorMessages()).toEqual(errors);
     });
+
+    it('should throw an error if not passed an object', () => {
+      expect(() => {
+        T.fm[Configure]('foo');
+      }).toThrow('expected configuration to be of type "Object"');
+    });
   });
 
   describe('[Interface] GetModelValue / SetModelValue', () => {
@@ -412,23 +418,124 @@ describe('FormController', () => {
       expect(spies.group.grouped1.groupedFoo1.getModelValue.mock.calls.length).toEqual(3);
       expect(spies.group.grouped2.groupedFoo2.getModelValue.mock.calls.length).toEqual(3);
     });
+
+    it('SetModelValue should throw an error if not passed an object', () => {
+      expect(() => {
+        T.fm[SetModelValue]('foo');
+      }).toThrow('expected model values to be of type "Object"');
+    });
   });
 
   describe('[Interface] SetCustomErrorMessage', () => {
+    const controlName = 'foo';
+    const errorMessage = 'bar';
+    const errorData = {
+      [controlName]: errorMessage
+    };
+
+    beforeEach(() => {
+      T = directive('fm', {
+        template: `
+          <fm>
+            <fm-input name="${controlName}"></fm-input>
+          </fm>
+        `
+      });
+    });
+
     it('should implement the SetCustomErrorMessage interface', () => {
       expect(typeof T.fm[SetCustomErrorMessage]).toEqual('function');
+    });
+
+    it('should assign error messages to known controls', () => {
+      expect(T.fm.getControl(controlName)[CUSTOM_ERROR_MESSAGE_KEY]).toBeFalsy();
+      T.fm[SetCustomErrorMessage](errorData);
+      expect(T.fm.getControl(controlName)[CUSTOM_ERROR_MESSAGE_KEY]).toEqual(errorMessage);
+    });
+
+    it('should throw an error if not passed an object', () => {
+      expect(() => {
+        T.fm[SetCustomErrorMessage]('foo');
+      }).toThrow('expected error message data to be of type "Object"');
     });
   });
 
   describe('[Interface] ClearCustomErrorMessage', () => {
+    const controlName = 'foo';
+    const errorMessage = 'bar';
+
+    beforeEach(() => {
+      T = directive('fm', {
+        template: `
+          <fm>
+            <fm-input name="${controlName}"></fm-input>
+          </fm>
+        `
+      });
+
+      T.fm.getControl(controlName)[SetCustomErrorMessage](errorMessage);
+    });
+
     it('should implement the ClearCustomErrorMessage interface', () => {
       expect(typeof T.fm[ClearCustomErrorMessage]).toEqual('function');
+    });
+
+    it('should clear custom error messages from known controls', () => {
+      T.fm[ClearCustomErrorMessage]();
+      expect(T.fm.getControl(controlName)[CUSTOM_ERROR_MESSAGE_KEY]).toBeFalsy();
     });
   });
 
   describe('[Interface] Reset', () => {
+    const controlName = 'foo';
+    let resetSpy;
+
+    beforeEach(() => {
+      T = directive('fm', {
+        template: `
+          <fm>
+            <fm-input name="${controlName}"></fm-input>
+          </fm>
+        `
+      });
+
+      resetSpy = jest.spyOn(T.fm.getControl(controlName), Reset);
+    });
+
     it('should implement the Reset interface', () => {
       expect(typeof T.fm[Reset]).toEqual('function');
+    });
+
+    it('should set the $pristine flag to true', () => {
+      T.fm[NG_FORM_CONTROLLER].$setDirty();
+      expect(T.fm[NG_FORM_CONTROLLER].$pristine).toBeFalsy();
+      T.fm[Reset]();
+      expect(T.fm[NG_FORM_CONTROLLER].$pristine).toBeTruthy();
+    });
+
+    it('should delegate model values to known controls', () => {
+      const value = 'bar';
+
+      const modelValues = {
+        [controlName]: value
+      };
+
+      T.fm[Reset](modelValues);
+
+      digest();
+
+      expect(T.fm.getControl(controlName)[GetModelValue]()).toEqual(value);
+      expect(resetSpy.mock.calls[0]).toEqual([value]);
+    });
+
+    it('should throw an error if passed a truthy value that is not an object', () => {
+      expect(() => {
+        T.fm[Reset]();
+      }).not.toThrow();
+
+      expect(() => {
+        T.fm[Reset]('foo');
+      }).toThrow('expected model data to be of type "Object"');
     });
   });
 

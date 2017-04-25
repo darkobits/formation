@@ -175,6 +175,7 @@ fm-group {
 fm-input[type='text'] {
   display: inline-block;
   margin-bottom: $error-element-min-height;
+  width: 100%;
 
   label {
     @include label;

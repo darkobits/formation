@@ -14,10 +14,6 @@ import {
 } from 'ramda';
 
 import {
-  ConfigurableValidator
-} from '../../classes/ConfigurableValidator';
-
-import {
   COMPONENT_CONFIGURATION,
   CONFIGURABLE_VALIDATOR,
   CUSTOM_ERROR_KEY,
@@ -402,7 +398,7 @@ Configure.implementedBy(FormationControl).as(function (configuration) {
       if (isFunction(parser)) {
         this[NG_MODEL_CTRL].$parsers.push(parser.bind(this[NG_MODEL_CTRL]));
       } else {
-        throwError(`Expected parser to be a function, got "${typeof parser}".`);
+        throwError(`Expected parser to be of type "Function", but got "${typeof parser}".`);
       }
     });
   }
@@ -414,7 +410,7 @@ Configure.implementedBy(FormationControl).as(function (configuration) {
       if (isFunction(formatter)) {
         this[NG_MODEL_CTRL].$formatters.push(formatter.bind(this[NG_MODEL_CTRL]));
       } else {
-        throwError(`Expected formatter to be a function, got "${typeof formatter}".`);
+        throwError(`Expected formatter to be of type "Function", but got "${typeof formatter}".`);
       }
     });
   }
@@ -424,8 +420,8 @@ Configure.implementedBy(FormationControl).as(function (configuration) {
   if (is(Object, validators)) {
     mapObjIndexed((validator, name) => {
       if (has(name, this[NG_MODEL_CTRL].$validators)) {
-        // Validator with same key already exists on this control, pass.
-      } else if (validator[CONFIGURABLE_VALIDATOR]) {
+        // Validator with same key already exists on this control, bail.
+      } else if (validator && validator[CONFIGURABLE_VALIDATOR]) {
         // Check against the CONFIGURABLE_VALIDATOR constant here rather than
         // using is() because instanceof does not work across execution
         // contexts.
@@ -443,8 +439,11 @@ Configure.implementedBy(FormationControl).as(function (configuration) {
   if (is(Object, asyncValidators)) {
     mapObjIndexed((asyncValidator, name) => {
       if (has(name, this[NG_MODEL_CTRL].$asyncValidators)) {
-        // Validator with same key already exists on this control, pass.
-      } else if (is(ConfigurableValidator, asyncValidator)) {
+        // Validator with same key already exists on this control, bail.
+      } else if (asyncValidator && asyncValidator[CONFIGURABLE_VALIDATOR]) {
+        // Check against the CONFIGURABLE_VALIDATOR constant here rather than
+        // using is() because instanceof does not work across execution
+        // contexts.
         this[NG_MODEL_CTRL].$asyncValidators[name] = asyncValidator.configure(this);
       } else if (isFunction(asyncValidator)) {
         this[NG_MODEL_CTRL].$asyncValidators[name] = asyncValidator.bind(this[NG_MODEL_CTRL]);

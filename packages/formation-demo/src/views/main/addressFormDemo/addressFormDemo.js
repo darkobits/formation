@@ -42,7 +42,6 @@ app.component('addressFormDemo', {
         ]
       },
       emailMatch: {
-        viewOnly: true,
         validators: {
           required,
           email,

@@ -138,7 +138,8 @@ export function $getPrefixedName (name) {
 // ----- Public Functions ------------------------------------------------------
 
 /**
- * Registers a Formation control.
+ * Registers a Formation control an an Angular component using the provided
+ * name and component definition object.
  *
  * @param  {string} name - Control name. Will be prefixed using the configured
  *   or default prefix.

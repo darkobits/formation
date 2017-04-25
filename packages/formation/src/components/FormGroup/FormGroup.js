@@ -120,6 +120,12 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
   RegisterForm.implementedBy(FormGroup).as(function (childForm) {
     const childFormName = childForm.name;
 
+    // Ensure there is not another registered child form with the same name as
+    // the form being registered.
+    if (FormGroup.getForm(childFormName)) {
+      throwError(`Cannot register child form "${childFormName}"; another child form with this name already exists.`);
+    }
+
     FormGroup.$debug(`Registering child form "${childFormName}".`);
     registry.push(childForm);
 
@@ -166,7 +172,7 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
    * @param  {array} newValues - Values to set.
    */
   SetModelValue.implementedBy(FormGroup).as(function (newValues) {
-    if (newValues && !is(Array, newValues)) {
+    if (newValues && !Array.isArray(newValues)) {
       throwError(`Form group expected model values to be of type "Array" but got "${typeof newValues}".`);
     }
 
@@ -322,7 +328,10 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
    */
   FormGroup.getForm = formName => {
     const form = find(propEq('name', formName), registry);
-    return is(FormController, form) && form;
+
+    if (is(FormController, form)) {
+      return form;
+    }
   };
 
 

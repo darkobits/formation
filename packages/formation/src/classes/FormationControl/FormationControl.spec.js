@@ -1,4 +1,8 @@
 import {
+  last
+} from 'ramda';
+
+import {
   module,
   compile,
   directive,
@@ -19,6 +23,7 @@ import {
   GetModelValue,
   RegisterControl,
   RegisterNgModel,
+  Reset,
   SetCustomErrorMessage,
   SetModelValue
 } from '../../etc/interfaces';
@@ -46,26 +51,7 @@ describe('FormationControl', () => {
     jest.spyOn(Form, RegisterControl);
   });
 
-  describe('RegisterNgModel / Form Registration', () => {
-    beforeEach(() => {
-      T = directive('fmInput', {
-        template: '<fm-input></fm-input>',
-        wrap: wrapper
-      });
-    });
 
-    it('should implement the RegisterNgModel interface', () => {
-      expect(typeof T.fmInput[RegisterNgModel]).toEqual('function');
-    });
-
-    it('should register with the form', () => {
-      expect(Form[RegisterControl].mock.calls[0][0]).toEqual(T.fmInput);
-    });
-
-    it('should assign its ngModel controller to the correct key', () => {
-      expect(T.fmInput[NG_MODEL_CTRL]).toBeTruthy();
-    });
-  });
 
   describe('$getName', () => {
     describe('when assigned a "name" binding', () => {
@@ -446,9 +432,10 @@ describe('FormationControl', () => {
     });
   });
 
-  describe('Custom Error Messages', () => {
-    const errorMessage = 'foo';
 
+  // ----- Interfaces ----------------------------------------------------------
+
+  describe('[Interface] Configure', () => {
     beforeEach(() => {
       T = directive('fmInput', {
         template: `<fm-input></fm-input>`,
@@ -456,25 +443,181 @@ describe('FormationControl', () => {
       });
     });
 
-    it('should implmenet SetCustomErrorMessage', () => {
-      expect(typeof T.fmInput[SetCustomErrorMessage]).toEqual('function');
+    describe('applying error messages', () => {
+      it('should ensure each error is a tuple', () => {
+        expect(() => {
+          T.fmInput[Configure]({
+            errors: [
+              null,
+              null,
+              'foo'
+            ]
+          });
+        }).toThrow('Expected error message tuple to be an array of length 2');
+      });
+
+      it('should not overwrite matching error tuples', () => {
+        const error1 = ['foo', 'bar'];
+        const error2 = ['foo', 'bar'];
+
+        T.fmInput[Configure]({
+          errors: [
+            error1
+          ]
+        });
+
+        T.fmInput[Configure]({
+          errors: [
+            error2
+          ]
+        });
+
+        expect(T.fmInput.getErrorMessages().length).toBe(1);
+      });
     });
 
-    it('getCustomErrorMessage should return the current custom errror', () => {
-      T.fmInput[SetCustomErrorMessage](errorMessage);
-      expect(T.fmInput.getCustomErrorMessage()).toEqual(errorMessage);
+    describe('applying parsers', () => {
+      it('should ensure each parser is a function', () => {
+        expect(() => {
+          T.fmInput[Configure]({
+            parsers: [
+              null,
+              null,
+              'foo'
+            ]
+          });
+        }).toThrow('Expected parser to be of type "Function"');
+      });
+
+      it('should push parsers onto $parsers', () => {
+        const parser = () => {};
+
+        T.fmInput[Configure]({
+          parsers: [parser]
+        });
+
+        // The actual function pushed onto $parsers will be a bound version of
+        // the original.
+        expect(last(T.fmInput[NG_MODEL_CTRL].$parsers).name).toMatch('bound parser');
+      });
     });
 
-    it('should implmenet ClearCustomErrorMessage', () => {
-      expect(typeof T.fmInput[ClearCustomErrorMessage]).toEqual('function');
-      T.fmInput[SetCustomErrorMessage](errorMessage);
-      expect(T.fmInput.getCustomErrorMessage()).toEqual(errorMessage);
-      T.fmInput[ClearCustomErrorMessage]();
-      expect(T.fmInput.getCustomErrorMessage()).toBeFalsy();
+    describe('applying formatters', () => {
+      it('should ensure each formatter is a function', () => {
+        expect(() => {
+          T.fmInput[Configure]({
+            formatters: [
+              null,
+              null,
+              'foo'
+            ]
+          });
+        }).toThrow('Expected formatter to be of type "Function"');
+      });
+
+      it('should push formatters onto $formatters', () => {
+        function formatter () { }
+
+        T.fmInput[Configure]({
+          formatters: [formatter]
+        });
+
+        // The actual function pushed onto $formatters will be a bound version of
+        // the original.
+        expect(last(T.fmInput[NG_MODEL_CTRL].$formatters).name).toMatch('bound formatter');
+      });
+    });
+
+    describe('applying validators', () => {
+      it('should ensure each validator is a function', () => {
+        expect(() => {
+          T.fmInput[Configure]({
+            validators: {
+              foo: null,
+              bar: null
+            }
+          });
+        }).toThrow('Expected validator to be of type "Function"');
+      });
+
+      it('should add validators to $validators', () => {
+        function validator () { }
+
+        T.fmInput[Configure]({
+          validators: {validator}
+        });
+
+        // The actual function added to $validators will be a bound version of
+        // the original.
+        expect(T.fmInput[NG_MODEL_CTRL].$validators.validator.name).toMatch('bound validator');
+      });
+    });
+
+    describe('applying async validators', () => {
+      it('should ensure each async validator is a function', () => {
+        expect(() => {
+          T.fmInput[Configure]({
+            asyncValidators: {
+              foo: null,
+              bar: null
+            }
+          });
+        }).toThrow('Expected async validator to be of type "Function"');
+      });
+
+      it('should add async validators to $asyncValidators', () => {
+        function asyncValidator () {
+          return Promise.resolve();
+        }
+
+        T.fmInput[Configure]({
+          asyncValidators: {asyncValidator}
+        });
+
+        // The actual function added to $asyncValidator will be a bound version of
+        // the original.
+        expect(T.fmInput[NG_MODEL_CTRL].$asyncValidators.asyncValidator.name).toMatch('bound asyncValidator');
+      });
+    });
+
+    describe('applying ngModelOptions', () => {
+      it('should configure ngModelOptions', () => {
+        const options = {
+          updateOn: 'blur',
+          allowInvalid: true
+        };
+
+        T.fmInput[Configure]({
+          ngModelOptions: options
+        });
+
+        expect(T.fmInput[NG_MODEL_CTRL].$options.$$options).toEqual(expect.objectContaining(options));
+      });
     });
   });
 
-  describe('#setModelValue / #getModelValue', () => {
+  describe('[Interface] RegisterNgModel / Form Registration', () => {
+    beforeEach(() => {
+      T = directive('fmInput', {
+        template: '<fm-input></fm-input>',
+        wrap: wrapper
+      });
+    });
+
+    it('should implement the RegisterNgModel interface', () => {
+      expect(typeof T.fmInput[RegisterNgModel]).toEqual('function');
+    });
+
+    it('should register with the form', () => {
+      expect(Form[RegisterControl].mock.calls[0][0]).toEqual(T.fmInput);
+    });
+
+    it('should assign its ngModel controller to the correct key', () => {
+      expect(T.fmInput[NG_MODEL_CTRL]).toBeTruthy();
+    });
+  });
+
+  describe('[Interface] SetModelValue / GetModelValue', () => {
     const modelValue = 'foo';
 
     beforeEach(() => {
@@ -509,6 +652,77 @@ describe('FormationControl', () => {
       digest();
 
       expect(T.fmInput.getModelValue()).toEqual(modelValue);
+    });
+  });
+
+  describe('[Interface] SetCustomErrorMessage / ClearCustomErrorMessage', () => {
+    const errorMessage = 'foo';
+
+    beforeEach(() => {
+      T = directive('fmInput', {
+        template: `<fm-input></fm-input>`,
+        wrap: wrapper
+      });
+    });
+
+    it('should implmenet SetCustomErrorMessage', () => {
+      expect(typeof T.fmInput[SetCustomErrorMessage]).toEqual('function');
+    });
+
+    it('getCustomErrorMessage should return the current custom errror', () => {
+      T.fmInput[SetCustomErrorMessage](errorMessage);
+      expect(T.fmInput.getCustomErrorMessage()).toEqual(errorMessage);
+    });
+
+    it('should implmenet ClearCustomErrorMessage', () => {
+      expect(typeof T.fmInput[ClearCustomErrorMessage]).toEqual('function');
+      T.fmInput[SetCustomErrorMessage](errorMessage);
+      expect(T.fmInput.getCustomErrorMessage()).toEqual(errorMessage);
+      T.fmInput[ClearCustomErrorMessage]();
+      expect(T.fmInput.getCustomErrorMessage()).toBeFalsy();
+    });
+
+    it('SetCustomErrorMessage should throw an error if not passed a string', () => {
+      expect(() => {
+        T.fmInput[SetCustomErrorMessage]({});
+      }).toThrow('Expected error message to be of type "String"');
+    });
+  });
+
+  describe('[Interface] Reset', () => {
+    beforeEach(() => {
+      T = directive('fmInput', {
+        template: '<fm-input name="foo"></fm-input>',
+        wrap: wrapper
+      });
+    });
+
+    it('should implement the Reset interface', () => {
+      expect(typeof T.fmInput[Reset]).toEqual('function');
+    });
+
+    it('should set the control to an untouched, pristine state', () => {
+      T.fmInput[NG_MODEL_CTRL].$setDirty();
+      T.fmInput[NG_MODEL_CTRL].$setTouched();
+
+      T.fmInput[Reset]();
+
+      expect(T.fmInput[NG_MODEL_CTRL].$dirty).toBeFalsy();
+      expect(T.fmInput[NG_MODEL_CTRL].$touched).toBeFalsy();
+    });
+
+    it('should validate the control', () => {
+      const validateSpy = jest.spyOn(T.fmInput[NG_MODEL_CTRL], '$validate');
+      T.fmInput[Reset]();
+      expect(validateSpy.mock.calls.length).toBe(1);
+    });
+
+    it('if provided a non-undefined value, it should set the its model value', () => {
+      const value = 'foo';
+      expect(T.fmInput[GetModelValue]()).toBeFalsy();
+      T.fmInput[Reset](value);
+      digest();
+      expect(T.fmInput[GetModelValue]()).toBe(value);
     });
   });
 });

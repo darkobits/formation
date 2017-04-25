@@ -116,6 +116,7 @@
   letter-spacing: 0.6px;
   min-width: 20em;
   padding: 6px 8px;
+  width: 100%;
 
   &:focus {
     @include focus;

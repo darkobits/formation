@@ -78,6 +78,19 @@
         </fm-input>
         <fm-errors for="locality"></fm-errors>
       </section>
+
+      <!-- Administrative Area -->
+      <section>
+        <fm-select
+          name="administrativeArea"
+          options="i.value as i.label for i in [
+            {label: 'Rivendell', value: 'RD'},
+            {label: 'Mordor', value: 'MD'}
+          ]">
+          Administrative Area
+        </fm-select>
+        <fm-errors for="locality"></fm-errors>
+      </section>
     </fm>
   </fm-group>
 

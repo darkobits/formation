@@ -3,6 +3,7 @@
 // -----------------------------------------------------------------------------
 
 import {
+  $getPrefixedName,
   $registerComponent
 } from '../../etc/config';
 
@@ -35,24 +36,22 @@ import {
  * 2. ngOptions needs to be set on the select element during compilation,
  *    requiring a compile function.
  *
- * @module Select
- *
  * @example
  *
- * <my-form name="myForm">
- *   <my-select name="myControl"
+ * <fm name="myForm">
+ *   <fm-select name="myControl"
  *     config="vm.mySelectConfig"
- *     options="i.label as i.value for vm.myOptions">
+ *     options="i.value as i.label for i in vm.myOptions">
  *     Select an item:
- *   </my-select>
- *  </my-form>
+ *   </fm-select>
+ *  </fm>
  */
 class SelectControl extends FormationControl {
 
 }
 
 
-$registerComponent('Select', () => {
+$registerComponent($getPrefixedName('Select'), () => {
   return {
     restrict: 'E',
     scope: true,

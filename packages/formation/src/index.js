@@ -1,6 +1,5 @@
 import app from './app';
 import './components';
-import './filters';
 import * as $constants from './etc/constants';
 
 
