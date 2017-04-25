@@ -25,7 +25,7 @@
     "build": "webpack --env.dist --progress",
     "deploy": "git push origin `git subtree split --prefix dist`:gh-pages --force",
     "precommit": "run-s lint build && git add dist/",
-    "start": "webpack-dev-server --env.local",
+    "start": "webpack-dev-server --env.dev",
     "depcheck": "npm-check --skip-unused --no-emoji || true"
   },
   "xo": false,

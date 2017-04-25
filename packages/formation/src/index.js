@@ -3,7 +3,7 @@ import './components';
 import * as $constants from './etc/constants';
 
 
-// ----- Public Exports --------------------------------------------------------
+// ----- Formation Public API --------------------------------------------------
 
 export {
   ConfigurableValidator
@@ -22,8 +22,10 @@ export {
   onReady
 } from './etc/utils';
 
+// Semi-public, used by formation-validators.
 export {
   $constants
 };
+
 
 export default app.name;
