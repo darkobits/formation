@@ -10,7 +10,6 @@ import Formation, {
 } from '@darkobits/formation';
 
 
-
 const app = angular.module('App', [
   'ngMockE2E',
   'ui.router.state.events',
@@ -23,6 +22,7 @@ const app = angular.module('App', [
 
 // Set API delay.
 app.constant('API_DELAY', 1000);
+
 
 // Set-up Formation error behavior.
 FormationConfigurator({

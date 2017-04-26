@@ -16,11 +16,11 @@ This component creates a `<label>` and a `<select>` control. The control and lab
 |`placeholder`|`@`|Input placeholder (will be rendered as a null option).|
 |`multiple`|`@`|Whether to render a single select or a multi-select.|
 |`options`|`@`|Comprehension expression to pass to `ngOptions`.|
-|`config`|`<`|Control configuration object. (See: [Control Configuration](/src/components/FormationControl#control-configuration))|
+|`config`|`<`|Control configuration object. (See: [Control Configuration](/packages/formation/src/classes/FormationControl#control-configuration))|
 
 ## API
 
-This control extends the [`FormationControl`](/src/components/FormationControl) class, and does not implement any additional methods.
+This control extends the [`FormationControl`](/packages/formation/src/classes/FormationControl) class, and does not implement any additional methods.
 
 ## Additional Behavior
 
@@ -32,7 +32,7 @@ This control extends the [`FormationControl`](/src/components/FormationControl) 
     - Using `ngDisabled` on the Formation form element (`<fm>`).
     - Using `ngDisabled` on the component's element.
     - Using the [`disable`](https://github.com/darkobits/formation/tree/canary/src/components/Form#disable)/[`enable`](https://github.com/darkobits/formation/tree/canary/src/components/Form#enable) methods of the Formation form API.
-    - Using the [`disable`](/src/components/FormationControl#disable)/[`enable`](/src/components/FormationControl#enable) methods of the component API.
+    - Using the [`disable`](/packages/formation/src/classes/FormationControl#disable)/[`enable`](/packages/formation/src/classes/FormationControl#enable) methods of the component API.
 
 ## Example
 

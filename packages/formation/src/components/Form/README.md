@@ -34,7 +34,7 @@ Returns the first control whose name matches the provided value.
 
 **Returns:**
 
-[`FormationControl`](/src/components/FormationControl) - Control instance, if found.
+[`FormationControl`](/packages/formation/src/classes/FormationControl) - Control instance, if found.
 
 **Example:**
 
@@ -143,9 +143,9 @@ vm.myForm.reset({firstName: null, lastName: null});
 
 ## Working With Model Values
 
-Formation takes a "managed" approach to model values in forms; rather than requiring developers to manually bind each control to an expression using `ngModel`, Formation creates an object keyed by the name of each control in the form. Model values can be accessed and modified using the [`getModelValues`](/src/components/Form#getmodelvalues--object) and [`setModelValues`](/src/components/Form#setmodelvaluesmodelvalues) instance methods, and are also passed to the form's [`onSubmit`](/src/components/Form#bindings) handler. This approach allows templates to remain terse, prevents controllers from becoming cluttered with extraneous model value bindings, and encourages developers to reason about model values as inputs to and outputs from a component rather than two-way-bound data.
+Formation takes a "managed" approach to model values in forms; rather than requiring developers to manually bind each control to an expression using `ngModel`, Formation creates an object keyed by the name of each control in the form. Model values can be accessed and modified using the [`getModelValues`](/packages/formation/src/components/Form#getmodelvalues--object) and [`setModelValues`](/packages/formation/src/components/Form#setmodelvaluesmodelvalues) instance methods, and are also passed to the form's [`onSubmit`](/packages/formation/src/components/Form#bindings) handler. This approach allows templates to remain terse, prevents controllers from becoming cluttered with extraneous model value bindings, and encourages developers to reason about model values as inputs to and outputs from a component rather than two-way-bound data.
 
-It is also possible to manipulate the model value of a specific control programatically using the [`getModelValue`](/src/components/FormationControl#getmodelvalue--) and [`setModelValue`](/src/components/FormationControl#setmodelvalue) methods of the control API.
+It is also possible to manipulate the model value of a specific control programatically using the [`getModelValue`](/packages/formation/src/classes/FormationControl#getmodelvalue--) and [`setModelValue`](/packages/formation/src/classes/FormationControl#setmodelvalue) methods of the control API.
 
 #### Scenario: Setting and Resetting to an Initial State
 
@@ -214,7 +214,7 @@ When a Formation form is submitted, the following steps are taken:
 4. Check if the form is `$valid`. If not, bail.
 5. Invoke the `onSubmit` handler for the form, passing it the model values from the form. If this function returns a promise, the following actions are performed:
   - If the promise rejects, bail.
-  - If the promise resolves, assume the resolved value is an object of control names and error messages (typically from an API). Each custom error message will be applied to controls using the `$custom` validation key. (When using the [Errors](/src/components/Errors) component, everything Just Works.)
+  - If the promise resolves, assume the resolved value is an object of control names and error messages (typically from an API). Each custom error message will be applied to controls using the `$custom` validation key. (When using the [Errors](/packages/formation/src/components/Errors) component, everything Just Works.)
 
 Based on this, a submit handler might look something like the following:
 

@@ -2,7 +2,7 @@ import app from 'app';
 import R from 'ramda';
 
 
-app.service('Api', (API_DELAY, $http, $timeout) => {
+app.factory('Api', (API_DELAY, $http, $timeout) => {
   function req (options) {
     return $timeout(() => {}, API_DELAY || 0).then(() => $http(options));
   }

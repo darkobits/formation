@@ -4,7 +4,7 @@
 
 ## Description
 
-This is the base class shared by all Formation control components ([`Input`](/src/components/Input), [`Select`](/src/components/Select), [`Textarea`](/src/components/Textarea), [`Errors`](/src/components/Errors)). It can be extended to create custom components that work with Formation forms. You can use the [`getControl`](/src/components/Form#getcontrolcontrolname--object) method of the Formation [form controller](/src/components/FormationControl) to access individual control instnaces in a form.
+This is the base class shared by all Formation control components ([`Input`](/packages/formation/src/components/Input), [`Select`](/packages/formation/src/components/Select), [`Textarea`](/packages/formation/src/components/Textarea), [`Errors`](/packages/formation/src/components/Errors)). It can be extended to create custom components that work with Formation forms. You can use the [`getControl`](/packages/formation/src/components/Form#getcontrolcontrolname--object) method of the Formation [form controller](/packages/formation/src/components/FormationControl) to access individual control instnaces in a form.
 
 ## API
 
@@ -68,7 +68,7 @@ Sets the control's internal `$disabled` flag to true. A control will be disabled
 
 1. It's `$disabled` flag is `true`.
 2. It has a truthy `ngDisabled` expression on it.
-3. The form's `$disabled` flag is `true`, set using [`Form#disable`](/src/components/Form#disable)
+3. The form's `$disabled` flag is `true`, set using [`Form#disable`](/packages/formation/src/components/Form#disable)
 4. The form has a truthy `ngDisabled` expresssion on it.
 
 **Example:**

@@ -22,7 +22,7 @@
 
 ## API
 
-This control extends the [`FormationControl`](/src/components/FormationControl) class, and does not implement any additional methods.
+This control extends the [`FormationControl`](/packages/formation/src/components/FormationControl) class, and does not implement any additional methods.
 
 ## Additional Behavior
 
