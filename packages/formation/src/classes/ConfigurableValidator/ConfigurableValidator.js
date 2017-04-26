@@ -5,8 +5,7 @@ import {
 } from '../../etc/constants';
 
 import {
-  isFunction,
-  throwError
+  assertType
 } from '../../etc/utils';
 
 
@@ -26,12 +25,7 @@ import {
  */
 export class ConfigurableValidator {
   constructor (validator) {
-    if (!isFunction(validator)) {
-      throwError([
-        'ConfigurableValidator expected validator to be of type "Function",',
-        `but got "${typeof validator}".`
-      ].join(' '));
-    }
+    assertType('ConfigurableValidator', [Function, undefined], 'validator', validator);
 
     this.validator = validator.bind(this);
 

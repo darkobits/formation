@@ -453,7 +453,7 @@ describe('FormationControl', () => {
               'foo'
             ]
           });
-        }).toThrow('Expected error message tuple to be an array of length 2');
+        }).toThrow('Expected error message to be a [key, value] entry');
       });
 
       it('should not overwrite matching error tuples', () => {
@@ -486,7 +486,7 @@ describe('FormationControl', () => {
               'foo'
             ]
           });
-        }).toThrow('Expected parser to be of type "Function"');
+        }).toThrow('expected parser to be of type Function');
       });
 
       it('should push parsers onto $parsers', () => {
@@ -512,7 +512,7 @@ describe('FormationControl', () => {
               'foo'
             ]
           });
-        }).toThrow('Expected formatter to be of type "Function"');
+        }).toThrow('expected formatter to be of type Function');
       });
 
       it('should push formatters onto $formatters', () => {
@@ -537,7 +537,7 @@ describe('FormationControl', () => {
               bar: null
             }
           });
-        }).toThrow('Expected validator to be of type "Function"');
+        }).toThrow('expected validator to be of type Function');
       });
 
       it('should add validators to $validators', () => {
@@ -562,7 +562,7 @@ describe('FormationControl', () => {
               bar: null
             }
           });
-        }).toThrow('Expected async validator to be of type "Function"');
+        }).toThrow('expected async validator to be of type Function');
       });
 
       it('should add async validators to $asyncValidators', () => {
@@ -648,7 +648,7 @@ describe('FormationControl', () => {
 
       expect(T.fmInput.getModelValue()).toEqual(modelValue);
 
-      T.fmInput.setModelValue();
+      T.fmInput.setModelValue(undefined);
       digest();
 
       expect(T.fmInput.getModelValue()).toEqual(modelValue);
@@ -685,7 +685,7 @@ describe('FormationControl', () => {
     it('SetCustomErrorMessage should throw an error if not passed a string', () => {
       expect(() => {
         T.fmInput[SetCustomErrorMessage]({});
-      }).toThrow('Expected error message to be of type "String"');
+      }).toThrow('expected error message to be of type String');
     });
   });
 

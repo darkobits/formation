@@ -19,7 +19,7 @@ describe('ConfigurableValidator', () => {
   describe('creating configurable validators', () => {
     it('should throw an error if not provided a function', () => {
       expect(() => new ConfigurableValidator(null))
-        .toThrow('expected validator to be of type "Function"');
+        .toThrow('expected validator to be of type Function');
     });
 
     it('should assign a bound copy of the provided function to itself', () => {

@@ -281,7 +281,7 @@ describe('FormController', () => {
     it('should throw an error if not passed an object', () => {
       expect(() => {
         T.fm[Configure]('foo');
-      }).toThrow('expected configuration to be of type "Object"');
+      }).toThrow('expected configuration to be of type Object or Undefined');
     });
   });
 
@@ -422,7 +422,7 @@ describe('FormController', () => {
     it('SetModelValue should throw an error if not passed an object', () => {
       expect(() => {
         T.fm[SetModelValue]('foo');
-      }).toThrow('expected model values to be of type "Object"');
+      }).toThrow('expected model values to be of type Object or Undefined');
     });
   });
 
@@ -456,7 +456,7 @@ describe('FormController', () => {
     it('should throw an error if not passed an object', () => {
       expect(() => {
         T.fm[SetCustomErrorMessage]('foo');
-      }).toThrow('expected error message data to be of type "Object"');
+      }).toThrow('expected error messages to be of type Object or Undefined');
     });
   });
 
@@ -535,7 +535,7 @@ describe('FormController', () => {
 
       expect(() => {
         T.fm[Reset]('foo');
-      }).toThrow('expected model data to be of type "Object"');
+      }).toThrow('expected model values to be of type Object or Undefined');
     });
   });
 

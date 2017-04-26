@@ -22,9 +22,9 @@ import {
 } from '../../etc/constants';
 
 import {
-  isFunction,
-  mergeDeep,
-  throwError
+  assertIsEntry,
+  assertType,
+  mergeDeep
 } from '../../etc/utils';
 
 import {
@@ -60,6 +60,19 @@ export const NG_MESSAGES = '$ngMessages';
  * @type {string}
  */
 export const CUSTOM_ERROR_MESSAGE_KEY = '$customError';
+
+
+/**
+ * Curried assertType.
+ *
+ * Remaining parameters:
+ *
+ * @param {string} label
+ * @param {any} value
+ *
+ * @return {boolean}
+ */
+const assertIsFunction = assertType('FormationControl', Function);
 
 
 /**
@@ -383,9 +396,9 @@ Configure.implementedBy(FormationControl).as(function (configuration) {
   // Set up error messages.
   if (Array.isArray(errors)) {
     errors.forEach(error => {
-      if (!Array.isArray(error) || error.length !== 2) {
-        throwError(`Expected error message tuple to be an array of length 2, got "${typeof error}".`);
-      } else if (!contains(error, this[NG_MESSAGES])) {
+      assertIsEntry(error, 'error message');
+
+      if (!contains(error, this[NG_MESSAGES])) {
         this[NG_MESSAGES].push(error);
       }
     });
@@ -395,11 +408,8 @@ Configure.implementedBy(FormationControl).as(function (configuration) {
   // Set up parsers.
   if (Array.isArray(parsers)) {
     parsers.forEach(parser => {
-      if (isFunction(parser)) {
-        this[NG_MODEL_CTRL].$parsers.push(parser.bind(this[NG_MODEL_CTRL]));
-      } else {
-        throwError(`Expected parser to be of type "Function", but got "${typeof parser}".`);
-      }
+      assertIsFunction('parser', parser);
+      this[NG_MODEL_CTRL].$parsers.push(parser.bind(this[NG_MODEL_CTRL]));
     });
   }
 
@@ -407,11 +417,8 @@ Configure.implementedBy(FormationControl).as(function (configuration) {
   // Set up formatters.
   if (Array.isArray(formatters)) {
     formatters.forEach(formatter => {
-      if (isFunction(formatter)) {
-        this[NG_MODEL_CTRL].$formatters.push(formatter.bind(this[NG_MODEL_CTRL]));
-      } else {
-        throwError(`Expected formatter to be of type "Function", but got "${typeof formatter}".`);
-      }
+      assertIsFunction('formatter', formatter);
+      this[NG_MODEL_CTRL].$formatters.push(formatter.bind(this[NG_MODEL_CTRL]));
     });
   }
 
@@ -426,10 +433,9 @@ Configure.implementedBy(FormationControl).as(function (configuration) {
         // using is() because instanceof does not work across execution
         // contexts.
         this[NG_MODEL_CTRL].$validators[name] = validator.configure(this);
-      } else if (isFunction(validator)) {
-        this[NG_MODEL_CTRL].$validators[name] = validator.bind(this[NG_MODEL_CTRL]);
       } else {
-        throwError(`Expected validator to be of type "Function", but got "${typeof validator}".`);
+        assertIsFunction('validator', validator);
+        this[NG_MODEL_CTRL].$validators[name] = validator.bind(this[NG_MODEL_CTRL]);
       }
     }, validators);
   }
@@ -445,10 +451,9 @@ Configure.implementedBy(FormationControl).as(function (configuration) {
         // using is() because instanceof does not work across execution
         // contexts.
         this[NG_MODEL_CTRL].$asyncValidators[name] = asyncValidator.configure(this);
-      } else if (isFunction(asyncValidator)) {
-        this[NG_MODEL_CTRL].$asyncValidators[name] = asyncValidator.bind(this[NG_MODEL_CTRL]);
       } else {
-        throwError(`Expected async validator to be of type "Function", but got "${typeof asyncValidator}".`);
+        assertIsFunction('async validator', asyncValidator);
+        this[NG_MODEL_CTRL].$asyncValidators[name] = asyncValidator.bind(this[NG_MODEL_CTRL]);
       }
     }, asyncValidators);
   }
@@ -527,9 +532,7 @@ SetModelValue.implementedBy(FormationControl).as(function (modelValue) {
  */
 SetCustomErrorMessage.implementedBy(FormationControl).as(function (errorMessage) {
   if (errorMessage) {
-    if (!is(String, errorMessage)) {
-      throwError(`Expected error message to be of type "String" but got "${typeof errorMessage}".`);
-    }
+    assertType('FormationControl', String, 'error message', errorMessage);
 
     this[FORM_CONTROLLER].$debug(`Setting custom error "${errorMessage}" on control "${this.$getName()}".`);
     this[CUSTOM_ERROR_MESSAGE_KEY] = errorMessage;

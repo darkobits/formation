@@ -21,6 +21,7 @@ import {
 } from '../../etc/config';
 
 import {
+  assertType,
   applyToCollection,
   invoke,
   throwError
@@ -67,6 +68,19 @@ export const BEGIN_SUBMIT_EVENT = '$fmInitiateSubmit';
  * @type {string}
  */
 export const END_SUBMIT_EVENT = '$fmTerminateSubmit';
+
+
+/**
+ * Curried assertType.
+ *
+ * Remaining arguments:
+ *
+ * @param {string} label
+ * @param {any} value
+ *
+ * @return {boolean}
+ */
+const assertIsArrayOrNil = assertType('Form Group', [Array, undefined]);
 
 
 export function FormGroupController ($attrs, $compile, $element, $log, $parse, $scope, $transclude) {
@@ -139,9 +153,7 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
    * child form.
    */
   Configure.implementedBy(FormGroup).as(function (config) {
-    if (config && !is(Array, config)) {
-      throwError(`Expected configuration to be of type "Array" but got "${typeof config}".`);
-    }
+    assertIsArrayOrNil('configuration', config);
 
     // Update our local configuration object.
     if (Array.isArray(config)) {
@@ -172,9 +184,7 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
    * @param  {array} newValues - Values to set.
    */
   SetModelValue.implementedBy(FormGroup).as(function (newValues) {
-    if (newValues && !Array.isArray(newValues)) {
-      throwError(`Form group expected model values to be of type "Array" but got "${typeof newValues}".`);
-    }
+    assertIsArrayOrNil('model values', newValues);
 
     // Delegate to each child form's SetModelValue method.
     applyToRegistry(SetModelValue, newValues);
@@ -187,15 +197,13 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
    *
    * @private
    *
-   * @param  {array} errorData
+   * @param  {array} errorMessages
    */
-  SetCustomErrorMessage.implementedBy(FormGroup).as(function (errorData) {
-    if (errorData && !is(Array, errorData)) {
-      throwError(`Form group expected error message data to be of type "Array" but got "${typeof errorData}".`);
-    }
+  SetCustomErrorMessage.implementedBy(FormGroup).as(function (errorMessages) {
+    assertIsArrayOrNil('error messages', errorMessages);
 
     // Delegate to each child form's SetCustomErrorMessage method.
-    applyToRegistry(SetCustomErrorMessage, errorData);
+    applyToRegistry(SetCustomErrorMessage, errorMessages);
   });
 
 
@@ -216,9 +224,7 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
    * @param  {object} [modelValues]
    */
   Reset.implementedBy(FormGroup).as(function (modelValues) {
-    if (modelValues && !is(Array, modelValues)) {
-      throwError(`Form group expected model data to be of type "Array", but got "${typeof modelValues}".`);
-    }
+    assertIsArrayOrNil('model values', modelValues);
 
     // Delegate to each child form's Reset method.
     applyToRegistry(Reset, modelValues);

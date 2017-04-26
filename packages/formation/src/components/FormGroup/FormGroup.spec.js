@@ -150,7 +150,7 @@ describe('FormGroupController', () => {
     it('should throw an error when not passed an array', () => {
       expect(() => {
         T.fmGroup[Configure]('foo');
-      }).toThrow('Expected configuration to be of type "Array"');
+      }).toThrow('expected configuration to be of type Array or Undefined');
     });
 
     it('should configure known entities', () => {
@@ -275,7 +275,7 @@ describe('FormGroupController', () => {
     it('SetModelValue should throw an error if not passed an array', () => {
       expect(() => {
         T.fmGroup[SetModelValue]('foo');
-      }).toThrow('expected model values to be of type "Array"');
+      }).toThrow('expected model values to be of type Array or Undefined');
     });
   });
 
@@ -315,7 +315,7 @@ describe('FormGroupController', () => {
     it('should throw an error if not passed an array', () => {
       expect(() => {
         T.fmGroup[SetCustomErrorMessage]('foo');
-      }).toThrow('expected error message data to be of type "Array"');
+      }).toThrow('expected error messages to be of type Array or Undefined');
     });
   });
 
@@ -397,7 +397,7 @@ describe('FormGroupController', () => {
 
       expect(() => {
         T.fmGroup[Reset]('foo');
-      }).toThrow('expected model data to be of type "Array"');
+      }).toThrow('expected model values to be of type Array or Undefined');
     });
   });
 

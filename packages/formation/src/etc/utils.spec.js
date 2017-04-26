@@ -1,13 +1,168 @@
-import R from 'ramda';
-import * as Utils from '../../src/etc/utils';
+import {
+  __,
+  prop
+} from 'ramda';
+
+import {
+  applyToCollection,
+  assertIsEntry,
+  assertType,
+  assignToScope,
+  capitalizeFirst,
+  greaterScopeId,
+  invoke,
+  isDefined,
+  isFunction,
+  lowercaseFirst,
+  mergeDeep,
+  mergeEntries,
+  onReady,
+  parseFlags,
+  throwError,
+  toPairsWith
+} from './utils';
 
 
 describe('Utils', () => {
+  describe('assertIsEntry', () => {
+    it('should require its argument to be a [key, value] pair', () => {
+      expect(() => {
+        assertIsEntry(null);
+      }).toThrow('Expected [key, value] entry, but got Null');
+
+      expect(() => {
+        assertIsEntry([]);
+      }).toThrow('Expected [key, value] entry, but got Array');
+
+      expect(() => {
+        assertIsEntry(['foo', 'bar']);
+      }).not.toThrow();
+    });
+  });
+
+  describe('isDefined', () => {
+    it('should assert that its argument is not "undefined"', () => {
+      expect(isDefined('foo')).toBe(true);
+      expect(isDefined(null)).toBe(true);
+      expect(isDefined(NaN)).toBe(true);
+      expect(isDefined(false)).toBe(true);
+      expect(isDefined(undefined)).toBe(false);
+    });
+  });
+
+  describe('isFunction', () => {
+    it('should assert that its argument is a function', () => {
+      expect(isFunction(() => {})).toBe(true);
+      expect(isFunction(Array.isArray)).toBe(true);
+
+      // Including jest.fn(), which does not pass using R.is.
+      expect(isFunction(jest.fn())).toBe(true);
+
+      expect(isFunction({})).toBe(false);
+      expect(isFunction(null)).toBe(false);
+    });
+  });
+
+  describe('throwError', () => {
+    it('should throw an error with the provided message', () => {
+      const message = 'foo';
+      expect(() => throwError(message)).toThrow(message);
+    });
+  });
+
+  describe('assertType', () => {
+    const testAssertType = assertType('Test', __, 'value');
+
+    it('should check for type Function', () => {
+      expect(testAssertType(Function, function () {})).toBe(true);
+      expect(testAssertType([Function, String], function () {})).toBe(true);
+
+      expect(() => {
+        testAssertType(Function, null);
+      }).toThrow('Test expected value to be of type Function, but got Null.');
+
+      expect(() => {
+        testAssertType([Function, String], null);
+      }).toThrow('Test expected value to be of type Function or String, but got Null.');
+    });
+
+    it('should check for type Array', () => {
+      expect(testAssertType(Array, [])).toBe(true);
+      expect(testAssertType([Array, String], [])).toBe(true);
+
+      expect(() => {
+        testAssertType(Array, null);
+      }).toThrow('Test expected value to be of type Array, but got Null.');
+
+      expect(() => {
+        testAssertType([Array, String], null);
+      }).toThrow('Test expected value to be of type Array or String, but got Null.');
+    });
+
+    it('should check for type Undefined', () => {
+      expect(testAssertType(undefined, undefined)).toBe(true);
+      expect(testAssertType([undefined, String], undefined)).toBe(true);
+
+      expect(() => {
+        testAssertType(undefined, 'foo');
+      }).toThrow('Test expected value to be of type Undefined, but got String.');
+
+      expect(() => {
+        testAssertType([undefined, Array], 'foo');
+      }).toThrow('Test expected value to be of type Undefined or Array, but got String.');
+    });
+
+    it('should check for type Null', () => {
+      expect(testAssertType(null, null)).toBe(true);
+      expect(testAssertType([null, String], null)).toBe(true);
+
+      expect(() => {
+        testAssertType(null, 'foo');
+      }).toThrow('Test expected value to be of type Null, but got String.');
+
+      expect(() => {
+        testAssertType([null, Array], 'foo');
+      }).toThrow('Test expected value to be of type Null or Array, but got String.');
+    });
+
+    it('should check for the provided constructor', () => {
+      function Foo () { }
+
+      const myFoo = new Foo();
+
+      class Bar { }
+
+      const myBar = new Bar();
+
+      expect(testAssertType(Foo, myFoo)).toBe(true);
+      expect(testAssertType([Foo, String], myFoo)).toBe(true);
+
+      expect(testAssertType(Bar, myBar)).toBe(true);
+      expect(testAssertType([Bar, String], myBar)).toBe(true);
+
+      expect(() => {
+        testAssertType(Foo, 'foo');
+      }).toThrow('Test expected value to be of type Foo, but got String.');
+
+      expect(() => {
+        testAssertType([Foo, Array], 'foo');
+      }).toThrow('Test expected value to be of type Foo or Array, but got String.');
+
+      expect(() => {
+        testAssertType(Bar, 'foo');
+      }).toThrow('Test expected value to be of type Bar, but got String.');
+
+      expect(() => {
+        testAssertType([Bar, Array], 'foo');
+      }).toThrow('Test expected value to be of type Bar or Array, but got String.');
+    });
+  });
+
   describe('capitalizeFirst', () => {
     it('should capitalize a string', () => {
       const input = 'foo';
 
-      expect(Utils.capitalizeFirst(input)).toBe('Foo');
+      expect(capitalizeFirst(input)).toBe('Foo');
     });
   });
 
@@ -15,14 +170,7 @@ describe('Utils', () => {
     it('should convert the first character of a string to lowercase', () => {
       const input = 'Foo';
 
-      expect(Utils.lowercaseFirst(input)).toBe('foo');
-    });
-  });
-
-  describe('throwError', () => {
-    it('should throw an error with the provided message', () => {
-      const message = 'foo';
-      expect(() => Utils.throwError(message)).toThrow(message);
+      expect(lowercaseFirst(input)).toBe('foo');
     });
   });
 
@@ -30,19 +178,19 @@ describe('Utils', () => {
     it('should convert a comma-delimited string into an array', () => {
       const input = 'foo,bar,baz';
       const expected = ['$foo', '$bar', '$baz'];
-      expect(Utils.parseFlags(input)).toEqual(expected);
+      expect(parseFlags(input)).toEqual(expected);
     });
 
     it('should convert a space-delimited string into an array', () => {
       const input = 'foo bar baz';
       const expected = ['$foo', '$bar', '$baz'];
-      expect(Utils.parseFlags(input)).toEqual(expected);
+      expect(parseFlags(input)).toEqual(expected);
     });
 
     it('should convert a comma and space-delimited string into an array', () => {
       const input = 'foo, bar, baz';
       const expected = ['$foo', '$bar', '$baz'];
-      expect(Utils.parseFlags(input)).toEqual(expected);
+      expect(parseFlags(input)).toEqual(expected);
     });
   });
 
@@ -56,7 +204,7 @@ describe('Utils', () => {
         foo: false
       };
 
-      Utils.onReady(obj, 'foo').then(() => {
+      onReady(obj, 'foo').then(() => {
         expect(true).toBe(true);
         done();
       });
@@ -78,7 +226,7 @@ describe('Utils', () => {
     }));
 
     it('should assign the provided value to the scope', () => {
-      Utils.assignToScope($parse, {}, value, expression);
+      assignToScope($parse, {}, value, expression);
 
       expect(assignSpy.mock.calls[0]).toEqual([$scope, value]);
       expect($parse.mock.calls[0][0]).toEqual(expression);
@@ -102,7 +250,7 @@ describe('Utils', () => {
           [collection[2].name, collection[2]]
         ];
 
-        expect(Utils.toPairsWith(keyFn, collection)).toEqual(expected);
+        expect(toPairsWith(keyFn, collection)).toEqual(expected);
       });
     });
 
@@ -123,25 +271,25 @@ describe('Utils', () => {
           [collection[2].name, collection[2].age]
         ];
 
-        expect(Utils.toPairsWith(keyFn, valueFn, collection)).toEqual(expected);
+        expect(toPairsWith(keyFn, valueFn, collection)).toEqual(expected);
       });
     });
 
     describe('when passed a bad key generation function', () => {
       it('should throw an error', () => {
-        expect(() => Utils.toPairsWith(false, [])).toThrow('to be of type "Function"');
+        expect(() => toPairsWith(false, [])).toThrow('to be of type "Function"');
       });
     });
 
     describe('when passed a bad value generation function', () => {
       it('should throw an error', () => {
-        expect(() => Utils.toPairsWith(i => i, false, [])).toThrow('to be of type "Function"');
+        expect(() => toPairsWith(i => i, false, [])).toThrow('to be of type "Function"');
       });
     });
 
     describe('when passed a bad collection', () => {
       it('should throw an error', () => {
-        expect(() => Utils.toPairsWith(i => i, i => i, 'foo')).toThrow('to be of type "Array"');
+        expect(() => toPairsWith(i => i, i => i, 'foo')).toThrow('to be of type "Array"');
       });
     });
   });
@@ -164,7 +312,7 @@ describe('Utils', () => {
         [3, 'baz', undefined]
       ];
 
-      expect(Utils.mergeEntries(dest, src)).toEqual(expected);
+      expect(mergeEntries(dest, src)).toEqual(expected);
     });
 
     it('should duplicate source entries to matching destination entries', () => {
@@ -184,21 +332,21 @@ describe('Utils', () => {
         [2, 'baz', undefined]
       ];
 
-      expect(Utils.mergeEntries(dest, src)).toEqual(expected);
+      expect(mergeEntries(dest, src)).toEqual(expected);
     });
 
     describe('error-handling', () => {
       it('should throw an error when passed non-arrays', () => {
-        expect(() => Utils.mergeEntries('foo', [])).toThrow('first argument');
+        expect(() => mergeEntries('foo', [])).toThrow('first argument');
       });
 
       it('should throw an error when passed non-arrays', () => {
-        expect(() => Utils.mergeEntries([], 'foo')).toThrow('second argument');
+        expect(() => mergeEntries([], 'foo')).toThrow('second argument');
       });
 
       it('should throw an error when arrays contain non-entries', () => {
-        expect(() => Utils.mergeEntries([1], [[1, 'foo']])).toThrow('Expected [key, value] entry');
-        expect(() => Utils.mergeEntries([[1, 'foo']], [1])).toThrow('Expected [key, value] entry');
+        expect(() => mergeEntries([1], [[1, 'foo']])).toThrow('Expected [key, value] entry');
+        expect(() => mergeEntries([[1, 'foo']], [1])).toThrow('Expected [key, value] entry');
       });
     });
   });
@@ -218,7 +366,7 @@ describe('Utils', () => {
       };
 
       const args = ['foo'];
-      Utils.invoke('getName', obj, ...args);
+      invoke('getName', obj, ...args);
       expect(wasInvoked).toEqual(true);
       expect(invokedWith).toEqual(args);
     });
@@ -234,7 +382,7 @@ describe('Utils', () => {
         getScope: () => 2
       };
 
-      expect(Utils.greaterScopeId(objA, objB)).toEqual(objB);
+      expect(greaterScopeId(objA, objB)).toEqual(objB);
     });
   });
 
@@ -243,7 +391,7 @@ describe('Utils', () => {
       const objA = {foo: 'bar'};
       const objB = {foo: 'baz'};
 
-      expect(Utils.mergeDeep(objA, objB)).toEqual({
+      expect(mergeDeep(objA, objB)).toEqual({
         foo: 'baz'
       });
     });
@@ -257,7 +405,7 @@ describe('Utils', () => {
         foo: [4, 5, 6]
       };
 
-      expect(Utils.mergeDeep(objA, objB)).toEqual({
+      expect(mergeDeep(objA, objB)).toEqual({
         foo: [1, 2, 3, 4, 5, 6]
       });
     });
@@ -279,7 +427,7 @@ describe('Utils', () => {
         }
       };
 
-      expect(Utils.mergeDeep(objA, objB)).toEqual({
+      expect(mergeDeep(objA, objB)).toEqual({
         foo: {
           bar: {
             baz: 1,
@@ -308,7 +456,7 @@ describe('Utils', () => {
       2: 'bar'
     };
 
-    Utils.applyToCollection(collection, R.prop('id'), 'setName', data);
+    applyToCollection(collection, prop('id'), 'setName', data);
     expect(collection[0].name).toEqual('foo');
     expect(collection[1].name).toEqual('bar');
   });

@@ -35,6 +35,7 @@ import {
 } from '../../classes/MockControl';
 
 import {
+  assertType,
   applyToCollection,
   assignToScope,
   greaterScopeId,
@@ -89,6 +90,19 @@ export const BEGIN_SUBMIT_EVENT = '$fmInitiateSubmit';
  * @type {string}
  */
 export const END_SUBMIT_EVENT = '$fmTerminateSubmit';
+
+
+/**
+ * Curried assertType.
+ *
+ * Remaining arguments:
+ *
+ * @param {string} label
+ * @param {any} value
+ *
+ * @return {boolean}
+ */
+const assertIsObjectOrNil = assertType('Form', [Object, undefined]);
 
 
 /**
@@ -353,9 +367,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    * control, child form, or child form group.
    */
   Configure.implementedBy(Form).as(function (config) {
-    if (config && !is(Object, config)) {
-      throwError(`Form expected configuration to be of type "Object" but got "${typeof config}".`);
-    }
+    assertIsObjectOrNil('configuration', config);
 
     // Update our local configuration object so that controls can pull from it
     // as they come online.
@@ -384,9 +396,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    * @param  {object} newValues - Values to set.
    */
   SetModelValue.implementedBy(Form).as(function (newValues) {
-    if (newValues && !is(Object, newValues)) {
-      throwError(`Form expected model values to be of type "Object" but got "${typeof newValues}".`);
-    }
+    assertIsObjectOrNil('model values', newValues);
 
     // Delegate to each member's SetModelValue method.
     applyToRegistry(SetModelValue, newValues);
@@ -399,15 +409,13 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    *
    * @private
    *
-   * @param  {object} errorData
+   * @param  {object} errorMessages
    */
-  SetCustomErrorMessage.implementedBy(Form).as(function (errorData) {
-    if (errorData && !is(Object, errorData)) {
-      throwError(`Form expected error message data to be of type "Object" but got "${typeof errorData}".`);
-    }
+  SetCustomErrorMessage.implementedBy(Form).as(function (errorMessages) {
+    assertIsObjectOrNil('error messages', errorMessages);
 
     // Delegate to each member's SetCustomErrorMessage method.
-    applyToRegistry(SetCustomErrorMessage, errorData);
+    applyToRegistry(SetCustomErrorMessage, errorMessages);
   });
 
 
@@ -430,9 +438,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    * @param  {object} [modelValues]
    */
   Reset.implementedBy(Form).as(function (modelValues) {
-    if (modelValues && !is(Object, modelValues)) {
-      throwError(`Form expected model data to be of type "Object", but got "${typeof modelValues}".`);
-    }
+    assertIsObjectOrNil('model values', modelValues);
 
     Form[NG_FORM_CONTROLLER].$setPristine();
 

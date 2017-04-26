@@ -3,8 +3,7 @@
 // -----------------------------------------------------------------------------
 
 /**
- * TODO: Consider replacing mergeDeep with webpack-merge, especially if it can
- * be used with tree-shaking.
+ * TODO: Consider replacing mergeDeep with webpack-merge et. al.
  */
 
 import {
@@ -12,6 +11,7 @@ import {
   clone,
   concat,
   curry,
+  equals,
   filter,
   head,
   identity,
@@ -20,7 +20,8 @@ import {
   mergeWith,
   nth,
   path,
-  slice
+  slice,
+  type
 } from 'ramda';
 
 import {
@@ -28,47 +29,36 @@ import {
 } from './constants';
 
 
-// ----- Private Methods -------------------------------------------------------
-
-/**
- * Throws an error if the provided value is not an array. Otherwise, returns
- * true.
- *
- * @private
- *
- * @param  {*} value
- * @param  {string} [desc] - Optional descriptor.
- * @return {boolean}
- */
-function assertIsArray (value, desc) {
-  if (!Array.isArray(value)) {
-    throwError(`Expected ${desc ? desc + ' to be of type ' : ''}"Array", but got "${typeof value}".`);
-  }
-
-  return true;
-}
-
-
 /**
  * Throws an error if the provided value is not a [key, value] entry. Otherwise,
  * returns true.
  *
- * @private
- *
- * @param  {*} value
- * @param  {string} [desc] - Optional descriptor.
+ * @param  {any} value
+ * @param  {string} [label] - Optional label.
  * @return {boolean}
  */
-function assertIsEntry (value, desc) {
+export function assertIsEntry (value, label) {
   if (!Array.isArray(value) || value.length !== 2) {
-    throwError(`Expected ${desc ? desc + ' to be of type ' : ''}[key, value] entry, but got "${JSON.stringify(value)}".`);
+    throwError([
+      `Expected ${label ? label + ' to be a ' : ''}[key, value] entry,`,
+      `but got ${type(value)}.`
+    ].join(' '));
   }
 
   return true;
 }
 
 
-// ----- Public Methods --------------------------------------------------------
+/**
+ * Returns true if the provided value is not undefined.
+ *
+ * @param  {any} value
+ * @return {boolean}
+ */
+export function isDefined (value) {
+  return value !== undefined;
+}
+
 
 /**
  * Because Jest's mocked functions fail a Function type check, we need to
@@ -91,6 +81,65 @@ export function isFunction (value) {
 export function throwError (message) {
   throw new Error(`[${MODULE_NAME}] ${message}`);
 }
+
+
+/**
+ * Checks the type of a value and throws an error if it does not match one of
+ * the provided types.
+ *
+ * @param  {string} callee - Label of the method/process to use in errors.
+ * @param  {function|array} types - Constructor/class or list of constructors
+ *   and classes to check against.
+ * @param  {string} label  - Label for the value being checked, used in errors.
+ * @param  {any} value  - Value to check.
+ *
+ * @return {boolean} - True if types match, throws otherwise.
+ */
+export const assertType = curry((callee, types, label, value) => {
+  types = [].concat(types);
+
+  const match = types.reduce((accumulator, type) => {
+    let predicateFn;
+
+    switch (type) {
+      case Function:
+        predicateFn = isFunction;
+        break;
+      case Array:
+        predicateFn = Array.isArray;
+        break;
+      case undefined:
+        predicateFn = equals(undefined);
+        break;
+      case null:
+        predicateFn = equals(null);
+        break;
+      default:
+        predicateFn = is(type);
+        break;
+    }
+
+    return accumulator || predicateFn(value);
+  }, false);
+
+  if (!match) {
+    const typeNames = types.map(ctor => {
+      try {
+        return ctor.prototype.constructor.name;
+      } catch (err) {
+        return type(ctor);
+      }
+    }).join(' or ');
+
+    throwError([
+      `${callee} expected ${label} to be of type`,
+      `${typeNames},`,
+      `but got ${type(value)}.`
+    ].join(' '));
+  }
+
+  return true;
+});
 
 
 /**
@@ -314,8 +363,10 @@ export function toPairsWith (...args) {
  * @return {array}
  */
 export function mergeEntries (dest = [], src = []) {
-  assertIsArray(dest, 'first argument');
-  assertIsArray(src, 'second argument');
+  const check = assertType('mergeEntries');
+
+  check(Array, 'first argument', dest);
+  check(Array, 'second argument', src);
 
   return dest.map(destEntry => {
     assertIsEntry(destEntry);
@@ -414,10 +465,13 @@ export function applyToCollection (collection, entryFn, memberFn, data) {
 
 export default {
   applyToCollection,
+  assertIsEntry,
+  assertType,
   assignToScope,
   capitalizeFirst,
   greaterScopeId,
   invoke,
+  isDefined,
   isFunction,
   lowercaseFirst,
   mergeDeep,
