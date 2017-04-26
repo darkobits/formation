@@ -6,33 +6,44 @@ import {
   path
 } from 'ramda';
 
-import app from '../app';
+import app from '../../app';
 
 import {
   FormationControl
-} from '../classes/FormationControl';
+} from '../../classes/FormationControl';
 
 import {
   COMPONENT_CONFIGURATION,
   DEFAULT_PREFIX,
   FORM_COMPONENT_NAME,
   FORM_CONTROLLER
-} from './constants';
+} from '../constants';
 
 import {
   RegisterNgForm,
   RegisterNgModel
-} from './interfaces';
+} from '../interfaces';
 
 import {
+  assertType,
   capitalizeFirst,
   isFunction,
   lowercaseFirst,
-  mergeDeep
-} from './utils';
+  mergeDeep,
+  throwError
+} from '../utils';
 
 
 // ----- Private Data ----------------------------------------------------------
+
+/**
+ * Set to true during Angular's configuration phase to prevent Formation
+ * configuration.
+ *
+ * @type {boolean}
+ */
+let allowConfiguration = true;
+
 
 /**
  * @private
@@ -135,10 +146,24 @@ export function $getPrefixedName (name) {
 }
 
 
+/**
+ * Curried assertType.
+ *
+ * Remaining arguments:
+ *
+ * @param {function|array} types
+ * @param {string} label
+ * @param {any} value
+ *
+ * @return {boolean}
+ */
+const check = assertType('FormationConfigurator');
+
+
 // ----- Public Functions ------------------------------------------------------
 
 /**
- * Registers a Formation control an an Angular component using the provided
+ * Registers a Formation control as an Angular component using the provided
  * name and component definition object.
  *
  * @param  {string} name - Control name. Will be prefixed using the configured
@@ -170,19 +195,28 @@ export function registerControl (name, definition) {
  *   all formation controls.
  */
 export function FormationConfigurator (opts) {
-  if (opts.showErrorsOn) {
+  if (!allowConfiguration) {
+    throwError('Formation cannot be configured once Angular has bootstrapped.');
+  }
+
+  check(Object, 'options', opts);
+
+  if (check([String, undefined], 'showErrorsOn', opts.showErrorsOn)) {
     showErrorsOnStr = opts.showErrorsOn;
   }
 
-  if (opts.prefix) {
-    prefix = String(opts.prefix);
+  if (check([String, undefined], 'prefix', opts.prefix)) {
+    prefix = opts.prefix;
   }
 }
 
 
-// ----- Form & ngModel Decorators ---------------------------------------------
+// ----- Decorators ------------------------------------------------------------
 
 app.config($provide => {
+  // Disallow configuration once the application has started bootstrapping.
+  allowConfiguration = false;
+
   const decorate = [
     // Decoration spec for form/ngForm.
     {

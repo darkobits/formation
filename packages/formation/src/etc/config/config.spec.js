@@ -4,20 +4,21 @@ import {
   directive
 } from '@darkobits/unity';
 
-import Formation from '../index';
+import Formation from '../../index';
 
 import {
   FORM_COMPONENT_NAME,
   NG_MODEL_CTRL
-} from '../../src/etc/constants';
+} from '../../../src/etc/constants';
 
 import {
   NG_FORM_CONTROLLER
-} from '../../src/components/Form/Form';
+} from '../../../src/components/Form/Form';
 
 import {
-  $registerComponent
-} from '../../src/etc/config';
+  $registerComponent,
+  FormationConfigurator
+} from '../../../src/etc/config';
 
 
 /**
@@ -40,7 +41,62 @@ function assertIsNgModelController (value) {
 }
 
 
-describe('Formation Configuration', () => {
+describe('Configurator', () => {
+  describe('prior to Angular bootstrapping', () => {
+    it('should require an object as its argument', () => {
+      expect(() => {
+        FormationConfigurator({});
+      }).not.toThrow();
+
+      expect(() => {
+        FormationConfigurator('foo');
+      }).toThrow('FormationConfigurator expected options to be of type Object');
+    });
+
+    it('should require showErrorsOn to be a string or nil', () => {
+      expect(() => {
+        FormationConfigurator({
+          showErrorsOn: 'foo'
+        });
+      }).not.toThrow();
+
+      expect(() => {
+        FormationConfigurator({
+          showErrorsOn: []
+        });
+      }).toThrow('FormationConfigurator expected showErrorsOn to be of type String or Undefined');
+    });
+
+    it('should require prefix to be a string or nil', () => {
+      expect(() => {
+        FormationConfigurator({
+          prefix: 'foo'
+        });
+      }).not.toThrow();
+
+      expect(() => {
+        FormationConfigurator({
+          prefix: []
+        });
+      }).toThrow('FormationConfigurator expected prefix to be of type String or Undefined');
+    });
+  });
+
+  describe('after Angular bootstrapping', () => {
+    beforeEach(() => {
+      module(Formation);
+    });
+
+    it('should throw an error', () => {
+      expect(() => {
+        FormationConfigurator();
+      }).toThrow('Formation cannot be configured once Angular has bootstrapped');
+    });
+  });
+});
+
+
+describe('Decorators', () => {
   let T;
 
   const componentNames = ['foo', 'bar', 'baz'];
