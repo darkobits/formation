@@ -129,10 +129,14 @@ export class FormationControl {
 
   constructor () {
     this[NG_MESSAGES] = [];
+
+    // Expose interfaces as public methods.
+    this.getModelValue = this[GetModelValue];
+    this.setModelValue = this[SetModelValue];
   }
 
 
-  // ----- Semi-Private Methods ------------------------------------------------
+  // ----- Semi-Public Methods -------------------------------------------------
 
   /**
    * Returns the name of the control, or the name of the control that this
@@ -346,22 +350,6 @@ export class FormationControl {
   disable () {
     this.$disabled = true;
   }
-
-
-  /**
-   * Expose our GetModelValue implementation.
-   */
-  getModelValue () {
-    return this[GetModelValue]();
-  }
-
-
-  /**
-   * Expose our SetModelValue implementation.
-   */
-  setModelValue (newValue) {
-    this[SetModelValue](newValue);
-  }
 }
 
 
@@ -408,6 +396,12 @@ Configure.implementedBy(FormationControl).as(function (configuration) {
   // Set up parsers.
   if (Array.isArray(parsers)) {
     parsers.forEach(parser => {
+      if (has(parser, this[NG_MODEL_CTRL].$parsers)) {
+        // Parser already exists on this control, bail.
+        this[FORM_CONTROLLER].$debug(`Control "${this.$getName()}" already has parser:`, parser);
+        return;
+      }
+
       assertIsFunction('parser', parser);
       this[NG_MODEL_CTRL].$parsers.push(parser.bind(this[NG_MODEL_CTRL]));
     });
@@ -417,6 +411,12 @@ Configure.implementedBy(FormationControl).as(function (configuration) {
   // Set up formatters.
   if (Array.isArray(formatters)) {
     formatters.forEach(formatter => {
+      if (has(formatter, this[NG_MODEL_CTRL].$formatters)) {
+        // Formatter already exists on this control, bail.
+        this[FORM_CONTROLLER].$debug(`Control "${this.$getName()}" already has formatter:`, formatter);
+        return;
+      }
+
       assertIsFunction('formatter', formatter);
       this[NG_MODEL_CTRL].$formatters.push(formatter.bind(this[NG_MODEL_CTRL]));
     });
@@ -426,9 +426,24 @@ Configure.implementedBy(FormationControl).as(function (configuration) {
   // Set up validators.
   if (is(Object, validators)) {
     mapObjIndexed((validator, name) => {
-      if (has(name, this[NG_MODEL_CTRL].$validators)) {
-        // Validator with same key already exists on this control, bail.
-      } else if (validator && validator[CONFIGURABLE_VALIDATOR]) {
+      if (validator === false) {
+        // Remove the named validator.
+        if (has(name, this[NG_MODEL_CTRL].$validators)) {
+          this[FORM_CONTROLLER].$debug(`Removing validator "${name}" from control "${this.$getName()}".`);
+        }
+
+        Reflect.deleteProperty(this[NG_MODEL_CTRL].$validators, name);
+        this[NG_MODEL_CTRL].$setValidity(name, true);
+        return;
+      }
+
+      if (Object.values(this[NG_MODEL_CTRL].$validators).includes(validator)) {
+        // Validator already exists on this control, bail.
+        this[FORM_CONTROLLER].$debug(`Control "${this.$getName()}" already has validator:`, validator);
+        return;
+      }
+
+      if (validator && validator[CONFIGURABLE_VALIDATOR]) {
         // Check against the CONFIGURABLE_VALIDATOR constant here rather than
         // using is() because instanceof does not work across execution
         // contexts.
@@ -444,9 +459,24 @@ Configure.implementedBy(FormationControl).as(function (configuration) {
   // Set up asyncronous validators.
   if (is(Object, asyncValidators)) {
     mapObjIndexed((asyncValidator, name) => {
-      if (has(name, this[NG_MODEL_CTRL].$asyncValidators)) {
-        // Validator with same key already exists on this control, bail.
-      } else if (asyncValidator && asyncValidator[CONFIGURABLE_VALIDATOR]) {
+      if (asyncValidator === false) {
+        // Remove the named async validator.
+        if (has(name, this[NG_MODEL_CTRL].$asyncValidators)) {
+          this[FORM_CONTROLLER].$debug(`Removing async validator "${name}" from control "${this.$getName()}".`);
+        }
+
+        Reflect.deleteProperty(this[NG_MODEL_CTRL].$asyncValidators, name);
+        this[NG_MODEL_CTRL].$setValidity(name, true);
+        return;
+      }
+
+      if (Object.values(this[NG_MODEL_CTRL].$asyncValidators).includes(asyncValidator)) {
+        // Async validator already exists on this control, bail.
+        this[FORM_CONTROLLER].$debug(`Control "${this.$getName()}" already has async validator:`, asyncValidator);
+        return;
+      }
+
+      if (asyncValidator && asyncValidator[CONFIGURABLE_VALIDATOR]) {
         // Check against the CONFIGURABLE_VALIDATOR constant here rather than
         // using is() because instanceof does not work across execution
         // contexts.
