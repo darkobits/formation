@@ -12,7 +12,8 @@
     "build": "lerna run build",
     "prepare": "run-s bootstrap build",
     "prepush": "run-p lint test",
-    "depcheck": "(npm-check --skip-unused --no-emoji || true) && lerna run depcheck"
+    "depcheck": "(npm-check --skip-unused --no-emoji || true) && lerna run depcheck",
+    "postpublish": "lerna run dist-tags"
   },
   "xo": {
     "env": [

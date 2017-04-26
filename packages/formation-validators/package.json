@@ -30,7 +30,8 @@
     "build": "run-p build:commonjs build:browser",
     "build:watch": "watch \"npm run build\" ./src/",
     "depcheck": "npm-check --skip-unused --no-emoji || true",
-    "bundle-stats": "webpack --env.stats --env.dist"
+    "bundle-stats": "webpack --env.stats --env.dist",
+    "dist-tags": "npm dist-tag ls"
   },
   "xo": false,
   "peerDependencies": {

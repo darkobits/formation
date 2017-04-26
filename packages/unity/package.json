@@ -22,7 +22,8 @@
     "prebuild": "run-p clean lint",
     "build": "babel src --out-dir dist",
     "build:watch": "watch \"npm run build\" ./src/",
-    "depcheck": "npm-check --skip-unused --no-emoji || true"
+    "depcheck": "npm-check --skip-unused --no-emoji || true",
+    "dist-tags": "npm dist-tag ls"
   },
   "xo": false,
   "peerDependencies": {
