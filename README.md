@@ -183,9 +183,9 @@ Feel free to explore the [source](/src/packages) -- most of the core components 
 [codacy-img]: https://img.shields.io/codacy/coverage/e3fb8e46d6a241f5a952cf3fe6a49d06.svg?style=flat-square
 [codacy-url]: https://www.codacy.com/app/darkobits/formation
 
-[minified-img]: http://img.badgesize.io/https://unpkg.com/@darkobits/formation@1.0.0-beta.3/dist/index.min.js?label=minified&style=flat-square
-[gzipped-img]: http://img.badgesize.io/https://unpkg.com/@darkobits/formation@1.0.0-beta.3/dist/index.min.js?compression=gzip&label=gzipped&style=flat-square
-[unpkg-url]: https://unpkg.com/@darkobits/formation@1.0.0-beta.2/dist/
+[minified-img]: http://img.badgesize.io/https://unpkg.com/@darkobits/formation@1.0.0-beta.4/dist/index.min.js?label=minified&style=flat-square
+[gzipped-img]: http://img.badgesize.io/https://unpkg.com/@darkobits/formation@1.0.0-beta.4/dist/index.min.js?compression=gzip&label=gzipped&style=flat-square
+[unpkg-url]: https://unpkg.com/@darkobits/formation@1.0.0-beta.4/dist/
 
 [xo-img]: https://img.shields.io/badge/code_style-XO-f74c4c.svg?style=flat-square
 [xo-url]: https://github.com/sindresorhus/xo
