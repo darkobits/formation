@@ -1,7 +1,8 @@
 <fm controls="vm.controls"
   name="vm.addressForm"
   on-submit="vm.submit"
-  ng-disabled="vm.disableForm">
+  ng-disabled="vm.disableForm"
+  debug>
 
   <!-- Name -->
   <section>
@@ -94,7 +95,10 @@
     </fm>
   </fm-group>
 
-  <button type="submit">Submit</button>
+  <button type="submit"
+    ng-disabled="$fm.isDisabled()">
+    Submit
+  </button>
 
   <input id="disableForms"
     type="checkbox"

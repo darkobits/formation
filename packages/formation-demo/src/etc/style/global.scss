@@ -613,9 +613,7 @@ button {
   }
 
   &:disabled {
-    background-color: #270001;
-    border-color: #5A0104;
-    color: #FC7F81;
+    @include disabled;
   }
 
   &:not(:last-of-type) {

@@ -107,6 +107,12 @@ app.component('addressFormDemo', {
       });
     };
 
+    window.configure = obj => {
+      $scope.$applyAsync(() => {
+        vm.addressForm.configure(obj);
+      });
+    };
+
 
     vm.modelCollection = [
       {
