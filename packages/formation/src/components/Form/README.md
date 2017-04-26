@@ -22,7 +22,7 @@ Creates a new Formation form. This component should be used in lieu of `<form>` 
 
 The Formation controller exposes the following methods:
 
-### `getControl(controlName) => FormationControl`
+### `getControl(controlName: string) => FormationControl`
 
 Returns the first control whose name matches the provided value.
 
@@ -44,7 +44,29 @@ vm.myForm.getControl('firstName'); // => FormationControl instance
 
 ----
 
-### `getModelValues() => Object`
+### `getForm(formName: string) => Form`
+
+Returns the named child form or form group.
+
+**Parameters:**
+
+|Name|Type|Description|
+|---|---|---|
+|`formName`|`String`|Name of the child form or form group.|
+
+**Returns:**
+
+Form|[`FormGroup`](/packages/formation/src/components/FormGroup) - Form or form group instance, if found.
+
+**Example:**
+
+```js
+vm.myForm.getForm('address'); // => Form instance.
+```
+
+----
+
+### `getModelValues() => object`
 
 Returns a _new_ object containing the current non-null, non-undefined, non-`''` model values for each control.
 
@@ -61,7 +83,7 @@ vm.myForm.getModelValues();
 
 ----
 
-### `setModelValues(modelValues)`
+### `setModelValues(modelValues: object) => void`
 
 Sets the model value of each control in `modelValues` to the provided value.
 
@@ -79,7 +101,20 @@ vm.myForm.setModelValues({race: 'Hobbit', home: 'Shire'});
 
 ----
 
-### `disable()`
+### `isDisabled() => boolean`
+
+Returns true if the form is disabled.
+
+**Example:**
+
+```js
+vm.myForm..isDisabled();
+// => true
+```
+
+----
+
+### `disable() => void`
 
 Disables the form and any Formation controls therein.
 
@@ -91,7 +126,7 @@ vm.myForm.disable();
 
 ----
 
-### `enable()`
+### `enable() => void`
 
 Enables the form and any Formation controls therein. Note: Controls may still remain disabled via an `ngDisabled` directive on the control element. For this reason, it is not advised to mix `ngDisabled` with `enable`/`disable`.
 
@@ -101,10 +136,9 @@ Enables the form and any Formation controls therein. Note: Controls may still re
 vm.myForm.enable();
 ```
 
-
 ----
 
-### `reset(modelValues)`
+### `reset(modelValues?: object) => void`
 
 Resets the form and each control to a pristine state. Optionally, resets the model value of each control in `modelValues` to the provided value, and then validates all controls.
 
@@ -113,7 +147,7 @@ If you have configured the `showErrorsOn` behavior of Formation to something sen
 
 |Name|Type|Description|
 |---|---|---|
-|`modelValues`|`Object`|(Optional) Map of control names to model values.|
+|[`modelValues`]|`Object`|(Optional) Map of control names to model values.|
 
 **Example**:
 
@@ -124,6 +158,37 @@ vm.myForm.reset();
 // Resets model values to the provided data.
 vm.myForm.reset({firstName: null, lastName: null});
 ```
+
+----
+
+### `configure(config: object)`
+
+Merges the provided object with the form's existing control configuration and (re)configures each registered control, child form, or child form group.
+
+|Name|Type|Description|
+|---|---|---|
+|`config`|`Object`|Control configuration.|
+
+**Example**:
+
+```js
+// Resets model values to the provided data.
+vm.myForm.configure({
+  firstName:
+});
+```
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## Additional Behavior
 

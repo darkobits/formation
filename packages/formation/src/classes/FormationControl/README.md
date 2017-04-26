@@ -10,7 +10,7 @@ This is the base class shared by all Formation control components ([`Input`](/pa
 
 This class implements the following public methods:
 
-### `getControlId() => String`
+### `getControlId() => string`
 
 Returns the `id` attribute assigned to the control instnace.
 
@@ -27,13 +27,13 @@ vm.myForm.getControl('firstName').getControlId()
 
 ----
 
-### `getErrors() => Object`
+### `getErrors() => object|boolean`
 
 Returns the control's `$error` object, or `false` if the control is valid.
 
 **Returns:**
 
-`Object` - The `ngModel` controller's `$error` object for the control.
+`object|boolean` - The `ngModel` controller's `$error` object for the control.
 
 **Example:**
 
@@ -44,13 +44,13 @@ vm.myForm.getControl('age').getErrors()
 
 ----
 
-### `getErrorMessages() => Array`
+### `getErrorMessages() => array`
 
-Returns the configured error messages for the control.
+Returns the configured ngMessage error messages for the control.
 
 **Returns:**
 
-`Array` - List of key/message pairs for the control.
+`array` - List of key/message pairs for the control.
 
 **Example:**
 
@@ -62,7 +62,32 @@ vm.myForm.getControl('firstName').getErrorMessages()
 
 ----
 
-### `disable()`
+### `isDisabled() => boolean`
+
+Returns true if the control is disabled.
+
+**Example:**
+
+```js
+vm.myForm.getControl('firstName').isDisabled();
+// => true
+```
+
+----
+
+### `enable() => void`
+
+Sets the control's internal `$disabled` flag to `false`. Note that the control _may_ still remain disabled if any of the above conditions are also true. It is recommended that either `ngDisabled` or the form/control APIs be used, but not both.
+
+**Example:**
+
+```js
+vm.myForm.getControl('firstName').enable();
+```
+
+----
+
+### `disable() => void`
 
 Sets the control's internal `$disabled` flag to true. A control will be disabled if any of the following conditions are true:
 
@@ -79,19 +104,7 @@ vm.myForm.getControl('firstName').disable();
 
 ----
 
-### `enable()`
-
-Sets the control's internal `$disabled` flag to `false`. Note that the control _may_ still remain disabled if any of the above conditions are also true. It is recommended that either `ngDisabled` or the form/control APIs be used, but not both.
-
-**Example:**
-
-```js
-vm.myForm.getControl('firstName').enable();
-```
-
-----
-
-### `getModelValue() => *`
+### `getModelValue() => any`
 
 Return's the control's model value.
 
@@ -104,9 +117,15 @@ vm.myForm.getControl('firstName').getModelValue();
 
 ----
 
-### `setModelValue(*)`
+### `setModelValue(modelValue: any) => void`
 
 Set's the control's model value.
+
+**Parameters:**
+
+|Name|Type|Description|
+|---|---|---|
+|`modelValue`|`Any`|Model value to set for the control.|
 
 **Example:**
 
@@ -205,7 +224,7 @@ my-email {
 /* emailControl.js */
 
 import app from 'app';
-import {email} from '@darkobits/formation/etc/validaotrs';
+import {email} from '@darkobits/formation-validaotrs';
 import './emailControl.css';
 
 app.component('myEmail', {
@@ -263,7 +282,7 @@ If another developer wanted to make this control required in their form, they co
 
 ```js
 import app from 'app';
-import {required} from '@darkobits/formation/etc/validators';
+import {required} from '@darkobits/formation-validators';
 
 app.controller('MyCtrl', function () {
   const vm = this;

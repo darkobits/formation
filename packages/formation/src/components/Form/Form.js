@@ -574,7 +574,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
   };
 
 
-  // ----- Semi-Private Methods ------------------------------------------------
+  // ----- Semi-Public Methods -------------------------------------------------
 
   /**
    * Passes provided arguments to $log.log if the "debug" attribute is
@@ -744,7 +744,8 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
 
 
   /**
-   * Returns the first child form whose name matches the provided name.
+   * Returns the first child form or form group whose name matches the provided
+   * name.
    *
    * @param  {string} formName
    * @return {object} - Child form instance, if found.
