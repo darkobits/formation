@@ -8,7 +8,6 @@
 
 import {
   append,
-  clone,
   concat,
   curry,
   equals,
@@ -27,6 +26,27 @@ import {
 import {
   MODULE_NAME
 } from './constants';
+
+
+/**
+ * Returns true if the provided value is (likely) a plain object.
+ *
+ * @private
+ *
+ * @param  {any}  value
+ * @return {boolean}
+ */
+function isPlainObject (value) {
+  try {
+    return Object.getPrototypeOf(value).constructor.name === 'Object';
+  } catch (err) {
+    if (/cannot read property/ig.test(err.message)) {
+      return true;
+    }
+
+    throw err;
+  }
+}
 
 
 /**
@@ -173,7 +193,7 @@ export function lowercaseFirst (str) {
  */
 export function mergeWithDeep (f, ...objs) {
   if (objs.length >= 2) {
-    const d = clone(nth(-2, objs)) || {};
+    const d = nth(-2, objs) || {};
     const s = nth(-1, objs) || {};
     const merged = mergeWith(f, d, s);
 
@@ -206,11 +226,14 @@ export function mergeWithDeep (f, ...objs) {
  */
 const DEFAULT_MERGER = (d, s) => {
   if (Array.isArray(d) && Array.isArray(s)) {
+    // Concat arrays.
     return concat(d, s);
-  } else if (is(Object, d) && is(Object, s) && !isFunction(s)) {
+  } else if (isPlainObject(d) && isPlainObject(s)) {
+    // Deep-merge plain objects.
     return mergeWithDeep(DEFAULT_MERGER, d, s);
   }
 
+  // Otherwise, return the source value.
   return s;
 };
 
