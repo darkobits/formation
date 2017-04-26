@@ -240,6 +240,9 @@ export function match (independentControlName) {
     const {scope, form, ngModelCtrl} = this;
     const independentNgModelCtrl = path([NG_MODEL_CTRL], form.getControl(independentControlName));
 
+
+    // ----- Sanity-Checking ---------------------------------------------------
+
     // Ensure both controls use ngModel.
     if (!ngModelCtrl || !independentNgModelCtrl) {
       form.$debug(`[match] Both controls must use ngModel.`);
@@ -252,18 +255,12 @@ export function match (independentControlName) {
       return true;
     }
 
-    // Install a complementary validator on the independent control. This
-    // validator will always return true until the dependent control has been
-    // filled.
-    if (!independentNgModelCtrl.$validators.match) {
-      independentNgModelCtrl.$validators.match = (modelValue, viewValue) => {
-        return ngModelCtrl.$viewValue ? viewValue === ngModelCtrl.$viewValue : true;
-      };
-    }
 
-    // Watch for changes to the error states of both controls. When either
-    // control enters or leaves its error state, validate the other control.
+    // ----- Co-Validate Controls ----------------------------------------------
+
     if (!this.$watchersAdded) {
+      // Watch for changes to the error states of both controls. When either
+      // control enters or leaves its error state, validate the other control.
       scope.$watch(() => form.getControl(ngModelCtrl.$name).getErrors(), (newValue, oldValue) => {
         if (newValue !== oldValue) {
           independentNgModelCtrl.$validate();
@@ -279,7 +276,40 @@ export function match (independentControlName) {
       this.$watchersAdded = true;
     }
 
-    return viewValue === independentNgModelCtrl.$viewValue;
+
+    // ----- Independent Control Validator -------------------------------------
+
+    if (!independentNgModelCtrl.$validators.match) {
+      // Install a complementary validator on the independent control.
+      independentNgModelCtrl.$validators[`match:${ngModelCtrl.$name}`] = (modelValue, viewValue) => {
+        // If the dependent control has a view value...
+        if (ngModelCtrl.$viewValue) {
+          scope.$applyAsync(() => {
+            // Set the independent control's "match" validation key based on
+            // view value equality in a later digest cycle.
+            independentNgModelCtrl.$setValidity('match', viewValue === ngModelCtrl.$viewValue);
+          });
+        }
+
+        // Always return true.
+        return true;
+      };
+    }
+
+
+    // ----- Dependent Control Validator ---------------------------------------
+
+    // If the dependent control has a view value...
+    if (viewValue) {
+      scope.$applyAsync(() => {
+        // Set the dependent control's "match" validation key based on view
+        // value equality in a later digest cycle.
+        ngModelCtrl.$setValidity('match', viewValue === independentNgModelCtrl.$viewValue);
+      });
+    }
+
+    // Always return true.
+    return true;
   });
 }
 

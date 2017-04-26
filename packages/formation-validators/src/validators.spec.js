@@ -9,7 +9,8 @@ import Formation, {
 import {
   compile,
   module,
-  directive
+  directive,
+  digest
 } from '@darkobits/unity';
 
 import * as Validators from './validators';
@@ -211,6 +212,8 @@ describe('Validators', () => {
         Form.getControl('passwordMatch')[NG_MODEL_CTRL].$setViewValue('foo');
         Form.getControl('passwordMatch')[NG_MODEL_CTRL].$validate();
 
+        digest();
+
         expect(Form.getControl('passwordMatch').getErrors()).toEqual(false);
       });
 
@@ -220,6 +223,8 @@ describe('Validators', () => {
 
         Form.getControl('passwordMatch')[NG_MODEL_CTRL].$setViewValue('bar');
         Form.getControl('passwordMatch')[NG_MODEL_CTRL].$validate();
+
+        digest();
 
         expect(Form.getControl('passwordMatch').getErrors()).toEqual(expect.objectContaining({
           match: true
