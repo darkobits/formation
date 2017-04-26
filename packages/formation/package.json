@@ -1,6 +1,6 @@
 {
   "name": "@darkobits/formation",
-  "version": "1.0.0-beta.3",
+  "version": "1.0.0-beta.4",
   "license": "WTFPL",
   "contributors": [
     {
@@ -46,7 +46,7 @@
     "ramda": "0.23.x"
   },
   "devDependencies": {
-    "@darkobits/unity": "^1.0.0-beta.3",
+    "@darkobits/unity": "^1.0.0-beta.4",
     "angular-mocks": "^1.5.0",
     "babel-cli": "6.x",
     "eslint": "3.x",

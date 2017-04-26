@@ -1,6 +1,6 @@
 {
   "name": "@darkobits/formation-validators",
-  "version": "1.0.0-beta.3",
+  "version": "1.0.0-beta.4",
   "license": "WTFPL",
   "contributors": [
     {
@@ -37,16 +37,16 @@
     "babel-polyfill": "6.x"
   },
   "dependencies": {
-    "@darkobits/formation": "^1.0.0-beta.3",
+    "@darkobits/formation": "^1.0.0-beta.4",
     "ramda": "0.23.x"
   },
   "devDependencies": {
-    "@darkobits/unity": "^1.0.0-beta.3",
+    "@darkobits/unity": "^1.0.0-beta.4",
     "angular-mocks": "^1.5.0",
     "babel-cli": "6.x",
     "jest": "19.x",
-    "npm-run-all": "4.x",
     "npm-check": "5.4.x",
+    "npm-run-all": "4.x",
     "rimraf": "2.6.x",
     "watch": "1.x",
     "webpack": "2.x",

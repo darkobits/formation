@@ -1,7 +1,7 @@
 {
   "name": "@darkobits/unity",
   "description": "A library to make unit testing Angular 1 applications suck less.",
-  "version": "1.0.0-beta.3",
+  "version": "1.0.0-beta.4",
   "contributors": [
     {
       "name": "Joshua Martin",
@@ -33,8 +33,8 @@
     "babel-cli": "6.x",
     "eslint-plugin-import": "2.2.x",
     "jest": "19.x",
-    "npm-run-all": "4.x",
     "npm-check": "5.4.x",
+    "npm-run-all": "4.x",
     "rimraf": "2.6.x",
     "watch": "1.x",
     "xo": "0.18.x"
