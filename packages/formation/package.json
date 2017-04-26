@@ -16,6 +16,9 @@
     "npm": ">=4.x",
     "node": ">=6.x"
   },
+  "files": [
+    "dist"
+  ],
   "main": "dist/index.js",
   "browser": "dist/index.min.js",
   "scripts": {

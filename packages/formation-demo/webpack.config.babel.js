@@ -58,7 +58,7 @@ export default env => {
   config.module.rules.push({
     enforce: 'pre',
     test: /\.(m)?js$/,
-    exclude: /node_modules/,
+    exclude: /node_modules|packages/,
     use: [
       xoLoader
     ]
@@ -71,7 +71,7 @@ export default env => {
 
   config.module.rules.push({
     test: /\.(m)?js$/,
-    exclude: /node_modules/,
+    exclude: /node_modules|packages/,
     use: [
       babelLoader
     ]

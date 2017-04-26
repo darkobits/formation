@@ -1,6 +1,6 @@
 # formation
 
-[![travis][travis-img]][travis-url] [![david][david-img]][david-url] [![codacy][codacy-img]][codacy-url] [![Code Style][xo-img]][xo-url] [![NPM Version][npm-img]][npm-url]
+[![travis][travis-img]][travis-url] [![david][david-img]][david-url] [![codacy][codacy-img]][codacy-url] [![minified][minified-img]][unpkg-url] [![gzipped][gzipped-img]][unpkg-url] [![Code Style][xo-img]][xo-url] [![NPM Version][npm-img]][npm-url]
 
 Formation is a form framework for Angular 1.5+. It aims to address many of the shortcomings in the built-in form facilities, and increase consistensy across large code bases by reducing the amount of boilterplace needed to build robust forms.
 
@@ -163,11 +163,19 @@ Feel free to explore the [source](/src/packages) -- most of the core components 
 
 [travis-img]: https://img.shields.io/travis/darkobits/formation.svg?style=flat-square
 [travis-url]: https://travis-ci.org/darkobits/formation
+
 [david-img]: https://img.shields.io/david/darkobits/formation.svg?style=flat-square
 [david-url]: https://david-dm.org/darkobits/formation
+
 [codacy-img]: https://img.shields.io/codacy/coverage/e3fb8e46d6a241f5a952cf3fe6a49d06.svg?style=flat-square
 [codacy-url]: https://www.codacy.com/app/darkobits/formation
+
+[minified-img]: http://img.badgesize.io/https://unpkg.com/@darkobits/formation@1.0.0-beta.3/dist/index.min.js?label=minified&style=flat-square
+[gzipped-img]: http://img.badgesize.io/https://unpkg.com/@darkobits/formation@1.0.0-beta.3/dist/index.min.js?compression=gzip&label=gzipped&style=flat-square
+[unpkg-url]: https://unpkg.com/@darkobits/formation@1.0.0-beta.2/dist/
+
 [xo-img]: https://img.shields.io/badge/code_style-XO-f74c4c.svg?style=flat-square
 [xo-url]: https://github.com/sindresorhus/xo
+
 [npm-img]: https://img.shields.io/npm/v/@darkobits/formation.svg?style=flat-square
 [npm-url]: https://www.npmjs.com/package/@darkobits/formation

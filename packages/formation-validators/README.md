@@ -12,7 +12,7 @@ $ npm install @darkobits/formation-validators
 
 These examples demonstrate how to use `formation-validators` in a Formation form's control configuration object. For more information about how to configure Formation forms, see [LINK HERE].
 
-### `required(modelValue: any): boolean`
+### `required(modelValue: any) => boolean`
 
 Returns `true` if the provided model value is not `null`, `undefined`, or an empty string.
 
