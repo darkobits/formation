@@ -7,7 +7,8 @@ import {
 } from '../../etc/config';
 
 import {
-  NG_MODEL_CTRL
+  NG_MODEL_CTRL,
+  NG_MODEL_GETTER_SETTER
 } from '../../etc/constants';
 
 import {
@@ -62,7 +63,7 @@ registerControl('Textarea', {
       type="{{::Textarea.type }}"
       name="{{::Textarea.name }}"
       placeholder="{{::Textarea.placeholder }}"
-      ng-model="Textarea.$ngModelGetterSetter"
+      ng-model="Textarea.${NG_MODEL_GETTER_SETTER}"
       ng-class="{
         'has-error': Textarea.getErrors(),
         'is-pending': Textarea.${NG_MODEL_CTRL}.$pending,

@@ -18,7 +18,8 @@ import {
   CONFIGURABLE_VALIDATOR,
   CUSTOM_ERROR_KEY,
   FORM_CONTROLLER,
-  NG_MODEL_CTRL
+  NG_MODEL_CTRL,
+  NG_MODEL_GETTER_SETTER
 } from '../../etc/constants';
 
 import {
@@ -223,7 +224,7 @@ export class FormationControl {
    * @param {arglist} [args] - Arguments passed to the function.
    * @return {*} - Model value, if invoked without arguments.
    */
-  $ngModelGetterSetter (...args) {
+  [NG_MODEL_GETTER_SETTER] (...args) {
     if (args.length > 0) {
       const [newValue] = args;
 

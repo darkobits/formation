@@ -54,6 +54,15 @@ export const NG_MODEL_CTRL = '$ngModelCtrl';
 
 
 /**
+ * Scope expression at which Formation controls expose their ngModel
+ * getter/setter method.
+ *
+ * @type {string}
+ */
+export const NG_MODEL_GETTER_SETTER = '$ngModelGetterSetter';
+
+
+/**
  * Key in components' bindings that should contain control configuration.
  *
  * Shared between: form, component sub-classes.

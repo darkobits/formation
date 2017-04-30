@@ -7,7 +7,8 @@ import {
 } from '../../etc/config';
 
 import {
-  NG_MODEL_CTRL
+  NG_MODEL_CTRL,
+  NG_MODEL_GETTER_SETTER
 } from '../../etc/constants';
 
 import {
@@ -72,7 +73,7 @@ registerControl('Input', {
       type="{{::Input.type }}"
       name="{{::Input.type === 'radio' ? Input.$getFormName() + '-' + Input.name : Input.name }}"
       placeholder="{{::Input.placeholder }}"
-      ng-model="Input.$ngModelGetterSetter"
+      ng-model="Input.${NG_MODEL_GETTER_SETTER}"
       ng-value="Input.ngValue"
       ng-class="{
         'has-error': Input.getErrors(),

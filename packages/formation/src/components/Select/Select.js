@@ -11,7 +11,8 @@ import {
   COMPONENT_CONFIGURATION,
   FORM_COMPONENT_NAME,
   FORM_CONTROLLER,
-  NG_MODEL_CTRL
+  NG_MODEL_CTRL,
+  NG_MODEL_GETTER_SETTER
 } from '../../etc/constants';
 
 import {
@@ -84,7 +85,7 @@ $registerComponent($getPrefixedName('Select'), () => {
       </label>
       <select id="{{::Select.getControlId() }}"
         name="{{::Select.name }}"
-        ng-model="Select.$ngModelGetterSetter"
+        ng-model="Select.${NG_MODEL_GETTER_SETTER}"
         ng-if="::!Select.multiple"
         ng-disabled="Select.isDisabled()"
         ng-class="{
@@ -100,7 +101,7 @@ $registerComponent($getPrefixedName('Select'), () => {
       </select>
       <select id="{{::Select.getControlId() }}"
         name="{{::Select.name }}"
-        ng-model="Select.$ngModelGetterSetter"
+        ng-model="Select.${NG_MODEL_GETTER_SETTER}"
         ng-if="::Select.multiple"
         ng-disabled="Select.isDisabled()"
         ng-class="{
