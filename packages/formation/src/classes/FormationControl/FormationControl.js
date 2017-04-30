@@ -129,6 +129,11 @@ export class FormationControl {
   constructor () {
     this[NG_MESSAGES] = [];
 
+    this.$parsers = [];
+    this.$formatters = [];
+    this.$validators = {};
+    this.$asyncValidators = {};
+
     // Expose interfaces as public methods.
     this.getModelValue = this[GetModelValue];
     this.setModelValue = this[SetModelValue];
@@ -395,13 +400,19 @@ Configure.implementedBy(FormationControl).as(function (configuration) {
   // Set up parsers.
   if (Array.isArray(parsers)) {
     parsers.forEach(parser => {
-      if (has(parser, this[NG_MODEL_CTRL].$parsers)) {
+      if (contains(parser, this.$parsers)) {
         // Parser already exists on this control, bail.
         this[FORM_CONTROLLER].$debug(`Control "${this.$getName()}" already has parser:`, parser);
         return;
       }
 
       assertIsFunction('parser', parser);
+
+      // Store the original function in $parsers so we can compare against it
+      // later.
+      this.$parsers.push(parser);
+
+      // Add a bound version of the parser to ngModelCtrl.$parsers.
       this[NG_MODEL_CTRL].$parsers.push(parser.bind(this[NG_MODEL_CTRL]));
     });
   }
@@ -410,13 +421,19 @@ Configure.implementedBy(FormationControl).as(function (configuration) {
   // Set up formatters.
   if (Array.isArray(formatters)) {
     formatters.forEach(formatter => {
-      if (has(formatter, this[NG_MODEL_CTRL].$formatters)) {
+      if (contains(formatter, this.$formatters)) {
         // Formatter already exists on this control, bail.
         this[FORM_CONTROLLER].$debug(`Control "${this.$getName()}" already has formatter:`, formatter);
         return;
       }
 
       assertIsFunction('formatter', formatter);
+
+      // Store the original function in $formatters so we can compare against it
+      // later.
+      this.$formatters.push(formatter);
+
+      // Add a bound version of the formatter to ngModelCtrl.$formatters.
       this[NG_MODEL_CTRL].$formatters.push(formatter.bind(this[NG_MODEL_CTRL]));
     });
   }
@@ -436,11 +453,15 @@ Configure.implementedBy(FormationControl).as(function (configuration) {
         return;
       }
 
-      if (Object.values(this[NG_MODEL_CTRL].$validators).includes(validator)) {
+      if (this.$validators[name] === validator) {
         // Validator already exists on this control, bail.
         this[FORM_CONTROLLER].$debug(`Control "${this.$getName()}" already has validator:`, validator);
         return;
       }
+
+      // Store the original function in $validators so we can compare against it
+      // later.
+      this.$validators[name] = validator;
 
       if (validator && validator[CONFIGURABLE_VALIDATOR]) {
         // Check against the CONFIGURABLE_VALIDATOR constant here rather than
@@ -469,11 +490,15 @@ Configure.implementedBy(FormationControl).as(function (configuration) {
         return;
       }
 
-      if (Object.values(this[NG_MODEL_CTRL].$asyncValidators).includes(asyncValidator)) {
+      if (this.$asyncValidators[name] === asyncValidator) {
         // Async validator already exists on this control, bail.
         this[FORM_CONTROLLER].$debug(`Control "${this.$getName()}" already has async validator:`, asyncValidator);
         return;
       }
+
+      // Store the original function in $asyncValidators so we can compare
+      // against it later.
+      this.$asyncValidators[name] = asyncValidator;
 
       if (asyncValidator && asyncValidator[CONFIGURABLE_VALIDATOR]) {
         // Check against the CONFIGURABLE_VALIDATOR constant here rather than

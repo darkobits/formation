@@ -14,6 +14,7 @@ import {
 } from '../../components/Form/Form';
 
 import {
+  CONFIGURABLE_VALIDATOR,
   NG_MODEL_CTRL
 } from '../../etc/constants';
 
@@ -39,12 +40,13 @@ describe('FormationControl', () => {
   let T;
   let Form;
   let wrapper;
+  const formName = 'foo';
 
   beforeEach(() => {
     module(Formation);
 
     wrapper = compile({
-      template: '<fm></fm>'
+      template: `<fm name="${formName}"></fm>`
     });
 
     Form = wrapper.controller('fm');
@@ -82,6 +84,19 @@ describe('FormationControl', () => {
       it('should report its name', () => {
         expect(T.fmInput.$getName()).toEqual(forStr);
       });
+    });
+  });
+
+  describe('$getFormName', () => {
+    beforeEach(() => {
+      T = directive('fmInput', {
+        template: `<fm-input></fm-input>`,
+        wrap: wrapper
+      });
+    });
+
+    it('should return the name of the form', () => {
+      expect(T.fmInput.$getFormName()).toEqual(formName);
     });
   });
 
@@ -177,6 +192,27 @@ describe('FormationControl', () => {
     it('should attempt to get the correct control from the form', () => {
       expect(T.fmInput.$getControl()).toEqual(T.fmInput);
       expect(getControlSpy.mock.calls[0][0]).toEqual(name);
+    });
+  });
+
+  describe('$getCanonicalControlId', () => {
+    const formName = 'foo';
+    const controlName = 'bar';
+
+    beforeEach(() => {
+      T = directive('fmErrors', {
+        template: `<fm-errors for="${controlName}"></fm-errors>`,
+        wrap: `
+          <fm name="${formName}">
+            <fm-input name="${controlName}"></fm-input>
+            <transclude></transclude>
+          </fm>
+        `
+      });
+    });
+
+    it('should return the ID of the canonical control', () => {
+      expect(T.fmErrors.$getCanonicalControlId()).toMatch(new RegExp(`${formName}-${controlName}-\\d{1}`, 'g'));
     });
   });
 
@@ -477,6 +513,8 @@ describe('FormationControl', () => {
     });
 
     describe('applying parsers', () => {
+      const parser = () => {};
+
       it('should ensure each parser is a function', () => {
         expect(() => {
           T.fmInput[Configure]({
@@ -490,8 +528,6 @@ describe('FormationControl', () => {
       });
 
       it('should push parsers onto $parsers', () => {
-        const parser = () => {};
-
         T.fmInput[Configure]({
           parsers: [parser]
         });
@@ -500,9 +536,25 @@ describe('FormationControl', () => {
         // the original.
         expect(last(T.fmInput[NG_MODEL_CTRL].$parsers).name).toMatch('bound parser');
       });
+
+      it('should no-op if a parser is already installed', () => {
+        T.fmInput[Configure]({
+          parsers: [parser]
+        });
+
+        expect(T.fmInput[NG_MODEL_CTRL].$parsers.length).toBe(1);
+
+        T.fmInput[Configure]({
+          parsers: [parser]
+        });
+
+        expect(T.fmInput[NG_MODEL_CTRL].$parsers.length).toBe(1);
+      });
     });
 
     describe('applying formatters', () => {
+      const formatter = () => {};
+
       it('should ensure each formatter is a function', () => {
         expect(() => {
           T.fmInput[Configure]({
@@ -516,8 +568,6 @@ describe('FormationControl', () => {
       });
 
       it('should push formatters onto $formatters', () => {
-        function formatter () { }
-
         T.fmInput[Configure]({
           formatters: [formatter]
         });
@@ -526,9 +576,29 @@ describe('FormationControl', () => {
         // the original.
         expect(last(T.fmInput[NG_MODEL_CTRL].$formatters).name).toMatch('bound formatter');
       });
+
+      it('should no-op if a formatter is already installed', () => {
+        // Angular installs a default formatter which we must account for.
+        expect(T.fmInput[NG_MODEL_CTRL].$formatters.length).toBe(1);
+
+        T.fmInput[Configure]({
+          formatters: [formatter]
+        });
+
+
+        expect(T.fmInput[NG_MODEL_CTRL].$formatters.length).toBe(2);
+
+        T.fmInput[Configure]({
+          formatters: [formatter]
+        });
+
+        expect(T.fmInput[NG_MODEL_CTRL].$formatters.length).toBe(2);
+      });
     });
 
     describe('applying validators', () => {
+      const validator = () => {};
+
       it('should ensure each validator is a function', () => {
         expect(() => {
           T.fmInput[Configure]({
@@ -541,8 +611,6 @@ describe('FormationControl', () => {
       });
 
       it('should add validators to $validators', () => {
-        function validator () { }
-
         T.fmInput[Configure]({
           validators: {validator}
         });
@@ -551,9 +619,57 @@ describe('FormationControl', () => {
         // the original.
         expect(T.fmInput[NG_MODEL_CTRL].$validators.validator.name).toMatch('bound validator');
       });
+
+      it('should no-op if a validator is already installed', () => {
+        T.fmInput[Configure]({
+          validators: {validator}
+        });
+
+        expect(Object.keys(T.fmInput[NG_MODEL_CTRL].$validators).length).toBe(1);
+
+        T.fmInput[Configure]({
+          validators: {validator}
+        });
+
+        expect(Object.keys(T.fmInput[NG_MODEL_CTRL].$validators).length).toBe(1);
+      });
+
+      it('should remove the named validator if passed "false"', () => {
+        T.fmInput[Configure]({
+          validators: {validator}
+        });
+
+        expect(Object.keys(T.fmInput[NG_MODEL_CTRL].$validators).length).toBe(1);
+
+        T.fmInput[Configure]({
+          validators: {
+            validator: false
+          }
+        });
+
+        expect(Object.keys(T.fmInput[NG_MODEL_CTRL].$validators).length).toBe(0);
+      });
+
+      it('should configure the validator when provided a ConfigurableValidator', () => {
+        const ConfigurableValidator = {
+          configure: jest.fn(() => {
+            return () => {};
+          })
+        };
+
+        ConfigurableValidator[CONFIGURABLE_VALIDATOR] = true;
+
+        T.fmInput[Configure]({
+          validators: {ConfigurableValidator}
+        });
+
+        expect(ConfigurableValidator.configure).toHaveBeenCalledWith(T.fmInput);
+      });
     });
 
     describe('applying async validators', () => {
+      const asyncValidator = () => Promise.resolve();
+
       it('should ensure each async validator is a function', () => {
         expect(() => {
           T.fmInput[Configure]({
@@ -566,10 +682,6 @@ describe('FormationControl', () => {
       });
 
       it('should add async validators to $asyncValidators', () => {
-        function asyncValidator () {
-          return Promise.resolve();
-        }
-
         T.fmInput[Configure]({
           asyncValidators: {asyncValidator}
         });
@@ -577,6 +689,52 @@ describe('FormationControl', () => {
         // The actual function added to $asyncValidator will be a bound version of
         // the original.
         expect(T.fmInput[NG_MODEL_CTRL].$asyncValidators.asyncValidator.name).toMatch('bound asyncValidator');
+      });
+
+      it('should no-op if an async validator is already installed', () => {
+        T.fmInput[Configure]({
+          asyncValidators: {asyncValidator}
+        });
+
+        expect(Object.keys(T.fmInput[NG_MODEL_CTRL].$asyncValidators).length).toBe(1);
+
+        T.fmInput[Configure]({
+          asyncValidators: {asyncValidator}
+        });
+
+        expect(Object.keys(T.fmInput[NG_MODEL_CTRL].$asyncValidators).length).toBe(1);
+      });
+
+      it('should remove the named async validator if passed "false"', () => {
+        T.fmInput[Configure]({
+          asyncValidators: {asyncValidator}
+        });
+
+        expect(Object.keys(T.fmInput[NG_MODEL_CTRL].$asyncValidators).length).toBe(1);
+
+        T.fmInput[Configure]({
+          asyncValidators: {
+            asyncValidator: false
+          }
+        });
+
+        expect(Object.keys(T.fmInput[NG_MODEL_CTRL].$asyncValidators).length).toBe(0);
+      });
+
+      it('should configure the async validator when provided a ConfigurableValidator', () => {
+        const ConfigurableValidator = {
+          configure: jest.fn(() => {
+            return () => Promise.resolve();
+          })
+        };
+
+        ConfigurableValidator[CONFIGURABLE_VALIDATOR] = true;
+
+        T.fmInput[Configure]({
+          asyncValidators: {ConfigurableValidator}
+        });
+
+        expect(ConfigurableValidator.configure).toHaveBeenCalledWith(T.fmInput);
       });
     });
 
