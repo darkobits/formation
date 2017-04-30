@@ -7,7 +7,7 @@ This module exports the `FormationConfigurator` and `registerControl` functions,
 
 Configures global Formation behavior.
 
-**Note:** Formation uses these options during Angular's config phase, so the configurator must be invoked prior to bootstrapping (re: outside of `config` or `run` blocks);
+**Note:** Formation uses these options during Angular's config phase, so the configurator must be invoked prior to bootstrapping (re: outside of `config` or `run` blocks).
 
 **Parameters:**
 

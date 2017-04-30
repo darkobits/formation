@@ -13,6 +13,9 @@
 - Markup bloats with each validation message added.
 - Developers have to concern themselves with a model value and the control state, which are stored in different objects.
 - Consistency is difficult to maintain as each developer working on a large codebase may use slightly different markup or message copy.
+- Setting error messages returned from an API on a per-control basis is difficult.
+
+Formation addresses these issues by moving all of this logic from the template to the controller, making it easier to compose error message data and share it across a large code base.
 
 ## Bindings
 
@@ -23,10 +26,6 @@
 ## API
 
 This control extends the [`FormationControl`](/packages/formation/src/components/FormationControl) class, and does not implement any additional methods.
-
-## Additional Behavior
-
-- This component uses `ngIf` to hide itself when there are no errors to display.
 
 ## Example
 
@@ -67,7 +66,7 @@ Here's an example of what the markup for an `ngMessages` block might look like i
 
 ```
 
-It isn't difficult to imagine that a form with a dozen controls could easily require hundreds of lines of markup, most of which are related to business logic rather than the structure or presentation of the document. Formation addresses this by providing the `Errors` component, which is used thusly:
+It isn't difficult to imagine that a form with a dozen controls could easily require hundreds of lines of markup, most of which are related to business logic rather than the structure or presentation of the document. The `Errors` component consumes 1 line of markup and never causes template bloat as additional validation messages are added:
 
 ```html
 <fm name="vm.addressForm" controls="vm.controls">
@@ -79,8 +78,13 @@ It isn't difficult to imagine that a form with a dozen controls could easily req
 On the JavaScript side, we will tell Formation to display errors on invalid fields when either 1) they have been touched or 2) when the form has been submitted:
 
 ```js
-angular.module('myApp').config(Formation => {
-  Formation.showErrorsOn('touched, submitted');
+import {
+  FormationConfigurator
+} from '@darkobits/formation';
+
+
+FormationConfigurator({
+  showErrorsOn: 'touched, submitted'
 });
 ```
 
@@ -92,9 +96,10 @@ import {
   minLength,
   maxLength,
   pattern
-} from 'formation/etc/validators';
+} from '@darkobits/formation-validators';
 
-angular.module('myApp').controller('addressFormCtrl', function () {
+
+angular.module('MyApp').controller('AddressFormCtrl', function () {
   const vm = this;
 
   vm.controls = {
@@ -118,7 +123,9 @@ angular.module('myApp').controller('addressFormCtrl', function () {
 
 Now, business logic lives in the controller, presentation and strucutre in the template. The template does not bloat if we need to add new validation rules, and styles for validation errors can be written once per application instead of once per form.
 
-Note that `validators` are nothing special. Formation provides several common validators for convenience, but a validatior can be any function that returns a boolean.
+Note that `validators` here are nothing special; Formation provides several common validators for convenience, but a validatior can be any function that returns a boolean.
+
+The `Errors` component also facilitates setting custom error messages on controls that may not be known until runtime. For more information about setting custom error messages, see [Submitting](/packages/formation/src/components/Form#submitting).
 
 ## Additional Resources
 

@@ -22,7 +22,7 @@ export {
   onReady
 } from './etc/utils';
 
-// Semi-public, used by formation-validators.
+// Semi-public, required by the formation-validators package.
 export {
   $constants
 };
