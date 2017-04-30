@@ -126,7 +126,6 @@ const assertIsFunction = assertType('FormationControl', Function);
  * - `errors`: Array containing tuples of validation keys and error messages.
  */
 export class FormationControl {
-
   constructor () {
     this[NG_MESSAGES] = [];
 
