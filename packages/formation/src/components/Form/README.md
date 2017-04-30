@@ -15,7 +15,7 @@ Creates a new Formation form. This component should be used in lieu of `<form>` 
 |`name`|`@`|Name of the form, and expression in parent scope to bind controller instance to.|
 |`controls`|`<`|Expression in parent scope to use for control configuration.|
 |`onSubmit`|`<`|Function in parent scope to invoke when submitting the form.|
-|`showErrorsOn`|`@`|String of comma/space delimited control/form states to check for showing control errors.|
+|`showErrorsOn`|`@`|String of comma/space delimited control/form states to check for showing control errors. This can also be configured globally using the [FormationConfigurator](/packages/formation/src/etc/config#formationconfiguratoropts-object--void).|
 |`ngDisabled`|`<`|Expression to evaluate to determine if the form and all controls should be disabled.|
 
 ## API

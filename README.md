@@ -150,11 +150,11 @@ app.controller('MyCtrl', function () {
 });
 ```
 
-Wowza! We kept our template focused on structure, and our controller neatly describes exactly how each control in the form should behave. Check out the documentation on [Control Configuration](/src/components/FormationControl#control-configuration) for a detailed breakdown, or head over to [darkobits.github.io/formation](https://darkobits.github.io/formation/) to see a live demo.
+Wowza! We kept our template focused on structure, and our controller neatly describes exactly how each control in the form should behave. Check out the documentation on [Control Configuration](/packages/formation/src/classes/FormationControl#control-configuration) for a detailed breakdown, or head over to [darkobits.github.io/formation](https://darkobits.github.io/formation/) to see a live demo.
 
 ## Documentation
 
-Feel free to explore the [source](/src/packages) -- most of the core components are documented with inline READMEs:
+Feel free to explore the [source](/packages/formation) -- most of the core components are documented with inline READMEs:
 
 - [Configuration & Registering Components](/packages/formation/src/etc/config)
 - Components:

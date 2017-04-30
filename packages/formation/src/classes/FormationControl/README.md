@@ -4,7 +4,7 @@
 
 ## Description
 
-This is the base class shared by all Formation control components ([`Input`](/packages/formation/src/components/Input), [`Select`](/packages/formation/src/components/Select), [`Textarea`](/packages/formation/src/components/Textarea), [`Errors`](/packages/formation/src/components/Errors)). It can be extended to create custom components that work with Formation forms. You can use the [`getControl`](/packages/formation/src/components/Form#getcontrolcontrolname--object) method of the Formation [form controller](/packages/formation/src/components/FormationControl) to access individual control instnaces in a form.
+This is the base class shared by all Formation control components ([`Input`](/packages/formation/src/components/Input), [`Select`](/packages/formation/src/components/Select), [`Textarea`](/packages/formation/src/components/Textarea), [`Errors`](/packages/formation/src/components/Errors)). It can be extended to create custom components that work with Formation forms. You can use the [`getControl`](/packages/formation/src/components/Form#getcontrolcontrolname-string--formationcontrol) method of the Formation [form controller](/packages/formation/src/components/Form) to access individual control instnaces in a form.
 
 ## API
 
