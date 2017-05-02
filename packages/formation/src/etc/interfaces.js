@@ -57,8 +57,8 @@ export const SetCustomErrorMessage = new Interface('SetCustomErrorMessage');
 
 
 /**
- * Implemented by controls to set custom error messages, and by forms to ingest
- * custom error message data structures to delegate to controls.
+ * Implemented by controls to clear custom error messages, and by forms to
+ * delegate clearing custom error messgaes to known controls/child forms.
  *
  * @type {Interface}
  */
@@ -82,7 +82,7 @@ export const SetModelValue = new Interface('SetModelValue', [Any]);
 
 
 /**
- * Allows objects to implement a 'resettable' method.
+ * Implemented by controls, forms, and form groups to facilitate resetting.
  *
  * @type {Interface}
  */

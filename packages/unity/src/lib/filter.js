@@ -14,7 +14,7 @@ import {
  * import {
  *   module,
  *   filter
- * } from '@collectivehealth/unity';
+ * } from '@darkobits/unity';
  *
  * describe('MyAwesomeFilter', () => {
  *   let T;

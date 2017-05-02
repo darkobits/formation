@@ -281,7 +281,7 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
   };
 
 
-  // ----- Semi-Private Methods ------------------------------------------------
+  // ----- Semi-Public Methods -------------------------------------------------
 
   /**
    * Passes provided arguments to $log.log if the "debug" attribute is

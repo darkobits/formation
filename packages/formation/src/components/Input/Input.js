@@ -19,30 +19,6 @@ import {
 /**
  * This component creates an input control and a label. All valid HTML5 input
  * types are allowed. The label is transcluded.
- *
- * Note: For "radio" and "checkbox" types, the label will be
- * rendered after the control. For all other types, the label will be rendered
- * before the control.
- *
- * Implements the following bindings:
- * - `config`: Configuration object.
- * - `name`: Name of the control.
- * - `placeholder`: Control placeholder.
- * - `type`: Control type.
- * - `ng-disabled`: If truthy, will disable the control.
- * - `ng-value`: Value to assign to model value (for radio buttons).
- *
- * @module Input
- *
- * @example
- *
- * <my-form name="myForm">
- *   <my-input name="myControl"
- *     type="text"
- *     config="vm.myControlConfig">
- *     Enter some text:
- *   </my-input>
- *  </my-form>
  */
 class InputControl extends FormationControl {
 

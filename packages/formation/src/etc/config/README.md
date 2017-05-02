@@ -33,12 +33,11 @@ FormationConfigurator({
   prefix: 'foo'
 });
 
-app.config(() => {
-  // ...
-});
-
-app.run(() => {
-  // ...
+app.config($fooProvider => {
+  // Or, configure Formation during the config phase if you want to drive behavior using a provider.
+  FormationConfigurator({
+    showErrorsOn: $fooProvider.formErrorBehavior()
+  });
 });
 ```
 

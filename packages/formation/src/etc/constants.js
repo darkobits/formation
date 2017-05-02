@@ -65,8 +65,6 @@ export const NG_MODEL_GETTER_SETTER = '$ngModelGetterSetter';
 /**
  * Key in components' bindings that should contain control configuration.
  *
- * Shared between: form, component sub-classes.
- *
  * @type {string}
  */
 export const COMPONENT_CONFIGURATION = '$configuration';

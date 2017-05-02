@@ -8,7 +8,7 @@ import angular from 'angular';
  *
  * import {
  *   get
- * } from '@collectivehealth/unity';
+ * } from '@darkobits/unity';
  *
  * let q = get('$q');
  *

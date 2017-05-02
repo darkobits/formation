@@ -10,7 +10,7 @@ import {
  *
  * import {
  *   digest
- * } from '@collectivehealth/unity';
+ * } from '@darkobits/unity';
  *
  * digest();
  */

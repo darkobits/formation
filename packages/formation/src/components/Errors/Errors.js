@@ -16,26 +16,8 @@ import {
 
 
 /**
- * This component is responsible for displaying errors related to a control.
- *
- * It implements the following bindings:
- *
- * - `for`: Control name to show errors for.
- *
- * @module Errors
- *
- * @example
- *
- * <fm name="myForm">
- *   <fm-input name="myControl"
- *     type="text">
- *     Enter some text:
- *   </fm-input>
- *   <fm-errors for="myControl"></fm-errors>
- *  </fm-form>
+ * This component is responsible for displaying ngMessage errors for a control.
  */
-
-
 class Errors extends FormationControl {
 
 }

@@ -20,7 +20,7 @@ import {
  * import {
  *   module,
  *   componentController,
- * } from '@collectivehealth/unity';
+ * } from '@darkobits/unity';
  *
  * describe('MyAwesomeComponent', () => {
  *   let T;

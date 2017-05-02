@@ -24,34 +24,19 @@ import {
  * This component creates a select control and a label. Use "options" rather
  * than "ng-options". Supports "multiple". The label is transcluded.
  *
- * Implements the following bindings:
- * - `config`: Configuration object.
- * - `name`: Name of the control.
- * - `placeholder`: Control placeholder, implemented as a null option.
- * - `multiple`: If this attribute is present, renders a multi-select element.
- * - `ng-disabled`: If truthy, will disable the control.
- *
  * This component needs to be a directive for two reasons:
  * 1. In order to support traditional ngOptions behavior, the component needs to
  *    inherit the parent scope.
  * 2. ngOptions needs to be set on the select element during compilation,
  *    requiring a compile function.
- *
- * @example
- *
- * <fm name="myForm">
- *   <fm-select name="myControl"
- *     config="vm.mySelectConfig"
- *     options="i.value as i.label for i in vm.myOptions">
- *     Select an item:
- *   </fm-select>
- *  </fm>
  */
 class SelectControl extends FormationControl {
 
 }
 
 
+// Since we're registering a directive, we need to use the private
+// $registerComponent function, which requires that we manually prefix the name.
 $registerComponent($getPrefixedName('Select'), () => {
   return {
     restrict: 'E',

@@ -15,7 +15,7 @@ import {digest} from './digest';
  *
  * import {
  *   digest
- * } from '@collectivehealth/unity';
+ * } from '@darkobits/unity';
  *
  * // Flush $httpBackend, then run a digest cycle.
  * flush('http');

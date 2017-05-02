@@ -244,7 +244,7 @@ app.config(($compileProvider, $provide) => {
         // module and Form.js.
         const fmFormController = find(controller => path(['constructor', FORM_CONTROLLER], controller), controllers);
 
-        if (fmFormController && isFunction(fmFormController[RegisterNgForm])) {
+        if (fmFormController && RegisterNgForm.isImplementedBy(fmFormController)) {
           fmFormController[RegisterNgForm](ngFormController);
         }
       }
@@ -266,11 +266,11 @@ app.config(($compileProvider, $provide) => {
         // module and Form.js.
         const fmFormController = find(controller => path(['constructor', FORM_CONTROLLER], controller), controllers);
 
-        if (fmComponentController && isFunction(fmComponentController[RegisterNgModel])) {
+        if (fmComponentController && RegisterNgModel.isImplementedBy(fmComponentController)) {
           // If we are the child of a Formation control, register with the
           // control.
           fmComponentController[RegisterNgModel](ngModelController);
-        } else if (fmFormController && isFunction(fmFormController[RegisterNgModel])) {
+        } else if (fmFormController && RegisterNgModel.isImplementedBy(fmFormController)) {
           // Otherwise, if we are the child of a Formation form, register with
           // the form.
           fmFormController[RegisterNgModel](ngModelController);

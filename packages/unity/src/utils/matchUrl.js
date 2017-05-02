@@ -15,7 +15,7 @@ import {get} from './get';
  *   module,
  *   get,
  *   matchUrl
- * } from '@collectivehealth/unity';
+ * } from '@darkobits/unity';
  *
  * describe('MyAwesomeSpec', () => {
  *   let T;

@@ -39,7 +39,7 @@ import {
  * import {
  *   module,
  *   directive,
- * } from '@collectivehealth/unity';
+ * } from '@darkobits/unity';
  *
  * describe('MyAwesomeDirective', () => {
  *   let T;

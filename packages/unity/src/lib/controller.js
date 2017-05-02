@@ -10,7 +10,7 @@ import {getAll} from '../utils/getAll';
  * import {
  *   module,
  *   controller,
- * } from '@collectivehealth/unity';
+ * } from '@darkobits/unity';
  *
  * describe('MyAwesomeCtrl', () => {
  *   let T;

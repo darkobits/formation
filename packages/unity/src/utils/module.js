@@ -13,7 +13,7 @@ let $providerInjector;
  * import {
  *   module,
  *   get
- * } from '@collectivehealth/unity';
+ * } from '@darkobits/unity';
  *
  * describe('MyAwesomeSpec', () => {
  *   let T;

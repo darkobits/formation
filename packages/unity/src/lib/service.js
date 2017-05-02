@@ -14,7 +14,7 @@ import {
  * import {
  *   module,
  *   service
- * } from '@collectivehealth/unity';
+ * } from '@darkobits/unity';
  *
  * describe('MyAwesomeService', () => {
  *   let T;

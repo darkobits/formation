@@ -261,9 +261,9 @@ it would be non-trivial, from the context of our submit handler, to set that err
 When a Formation form is submitted, the following steps are taken:
 
 1. Determine if another submit is already in progress. If so, bail.
-2. Disable all controls in the form.
+2. Disable all controls in the form and any child forms.
 3. Clear any `$custom` validation errors on controls.
-3. Wait for any pending async validators to complete.
+4. Wait for any pending async validators to complete.
 4. Check if the form is `$valid`. If not, bail.
 5. Invoke the `onSubmit` handler for the form, passing it the model values from the form. If this function returns a promise, the following actions are performed:
   - If the promise rejects, bail.

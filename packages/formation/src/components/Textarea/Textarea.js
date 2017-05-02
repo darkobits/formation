@@ -19,23 +19,6 @@ import {
 /**
  * This component creates a textarea control and a label. The label is
  * transcluded.
- *
- *  Implements the following bindings:
- * - `config`: Configuration object.
- * - `name`: Name of the control.
- * - `placeholder`: Control placeholder, implemented as a null option.
- * - `ng-disabled`: If truthy, will disable the control.
- *
- * @module Textarea
- *
- * @example
- *
- * <my-form name="myForm">
- *   <my-textarea name="myTextarea"
- *     config="vm.myTextareaConfig">
- *     Enter some text:
- *   </my-textarea>
- *  </my-form>
  */
 class TextareaControl extends FormationControl {
 
