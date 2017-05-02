@@ -1,6 +1,6 @@
 {
   "name": "@darkobits/formation",
-  "version": "1.0.0-beta.4",
+  "version": "1.0.0-beta.5",
   "license": "WTFPL",
   "contributors": [
     {
@@ -47,7 +47,7 @@
     "ramda": "0.23.x"
   },
   "devDependencies": {
-    "@darkobits/unity": "^1.0.0-beta.4",
+    "@darkobits/unity": "^1.0.0-beta.5",
     "babel-cli": "6.x",
     "eslint": "3.x",
     "jest": "19.x",
