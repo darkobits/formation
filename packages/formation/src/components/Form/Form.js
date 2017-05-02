@@ -12,7 +12,7 @@ import {
  is,
  prop,
  propEq,
- reject
+ without
 } from 'ramda';
 
 import {
@@ -647,21 +647,25 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    * @param  {object} control
    */
   Form.$unregisterControl = control => {
-    Form.$debug(`Unregistering control "${control.name}".`);
-    registry = reject(propEq('$uid', control.$uid), registry);
+    if (registry.includes(control)) {
+      Form.$debug(`Unregistering control "${control.name}".`);
+      registry = without([control], registry);
+    }
   };
 
 
   /**
-   * Removes the provided control from the registry.
+   * Removes the provided form from the registry.
    *
    * @private
    *
    * @param  {object} control
    */
   Form.$unregisterForm = childForm => {
-    Form.$debug(`Unregistering child form "${childForm.name}".`);
-    registry = reject(propEq('name', childForm.name), registry);
+    if (registry.includes(childForm)) {
+      Form.$debug(`Unregistering child form "${childForm.name}".`);
+      registry = without([childForm], registry);
+    }
   };
 
 

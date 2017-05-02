@@ -317,8 +317,10 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
    * @param  {object} control
    */
   FormGroup.$unregisterForm = childForm => {
-    FormGroup.$debug(`Unregistering child form "${childForm.name}".`);
-    registry = without(childForm, registry);
+    if (registry.includes(childForm)) {
+      FormGroup.$debug(`Unregistering child form "${childForm.name}".`);
+      registry = without([childForm], registry);
+    }
   };
 
 
