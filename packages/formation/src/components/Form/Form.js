@@ -678,11 +678,11 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
         throw new Error('SUBMIT_IN_PROGRESS');
       }
 
-      // [2] Wait for async validators to finish.
-      await waitForAsyncValidators();
-
-      // [3] Prepare form and child forms for submit.
+      // [2] Prepare form and child forms for submit.
       initiateSubmit();
+
+      // [3] Wait for async validators to finish.
+      await waitForAsyncValidators();
 
       // [4] If the form is (still) invalid, bail.
       if (Form[NG_FORM_CONTROLLER].$invalid) {
