@@ -55,9 +55,10 @@
     "babel-runtime": "6.x",
     "eslint": "3.x",
     "husky": "0.13.x",
-    "lerna": "^2.0.0-rc.3",
+    "lerna": "^2.0.0-rc.4",
     "npm-check": "5.4.x",
     "npm-run-all": "4.x",
-    "webpack-visualizer-plugin": "0.1.x"
+    "webpack-visualizer-plugin": "0.1.x",
+    "xo-loader": "0.7.x"
   }
 }

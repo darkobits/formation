@@ -48,7 +48,6 @@
   },
   "devDependencies": {
     "@darkobits/unity": "^1.0.0-beta.4",
-    "angular-mocks": "^1.5.0",
     "babel-cli": "6.x",
     "eslint": "3.x",
     "jest": "19.x",
