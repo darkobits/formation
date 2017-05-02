@@ -86,7 +86,17 @@ let counter = -1;
 const registeredComponents = [];
 
 
-// ----- Semi-Private Functions ------------------------------------------------
+
+/**
+ * Internal reference to Angular's $compileProvider, used for registering
+ * directives.
+ *
+ * @type {object}
+ */
+let compileProvider;
+
+
+// ----- Semi-Public Functions -------------------------------------------------
 
 /**
  * Adds the provided name to the list of registered components.
@@ -96,11 +106,14 @@ const registeredComponents = [];
 export function $registerComponent (name, definition) {
   registeredComponents.push(name);
 
-  app.config($compileProvider => {
+  app.run(() => {
+    // Disallow configuration once the application has entered the "run" phase.
+    allowConfiguration = false;
+
     if (typeof definition === 'function') {
-      $compileProvider.directive(lowercaseFirst(name), definition);
+      compileProvider.directive(lowercaseFirst(name), definition);
     } else {
-      $compileProvider.component(lowercaseFirst(name), definition);
+      compileProvider.component(lowercaseFirst(name), definition);
     }
   });
 }
@@ -196,7 +209,7 @@ export function registerControl (name, definition) {
  */
 export function FormationConfigurator (opts) {
   if (!allowConfiguration) {
-    throwError('Formation cannot be configured once Angular has bootstrapped.');
+    throwError(`Formation must be configured prior to Angular's "run" phase.`);
   }
 
   check(Object, 'options', opts);
@@ -213,9 +226,9 @@ export function FormationConfigurator (opts) {
 
 // ----- Decorators ------------------------------------------------------------
 
-app.config($provide => {
-  // Disallow configuration once the application has started bootstrapping.
-  allowConfiguration = false;
+app.config(($compileProvider, $provide) => {
+  // Save a reference to Angular's $compileProvider.
+  compileProvider = $compileProvider;
 
   const decorate = [
     // Decoration spec for form/ngForm.

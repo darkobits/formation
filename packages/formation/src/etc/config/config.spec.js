@@ -1,7 +1,10 @@
+import angular from 'angular';
+
 import {
   module,
   get,
-  directive
+  directive,
+  digest
 } from '@darkobits/unity';
 
 import Formation from '../../index';
@@ -42,7 +45,7 @@ function assertIsNgModelController (value) {
 
 
 describe('Configurator', () => {
-  describe('prior to Angular bootstrapping', () => {
+  describe('prior to the Angular bootstrapping', () => {
     it('should require an object as its argument', () => {
       expect(() => {
         FormationConfigurator({});
@@ -90,7 +93,7 @@ describe('Configurator', () => {
     it('should throw an error', () => {
       expect(() => {
         FormationConfigurator();
-      }).toThrow('Formation cannot be configured once Angular has bootstrapped');
+      }).toThrow(`Formation must be configured prior to Angular's "run" phase.`);
     });
   });
 });
@@ -107,9 +110,11 @@ describe('Decorators', () => {
   });
 
   describe('Decorating ngForm', () => {
-    it('should require the Formation form controller', () => {
-      const [ngFormDirective] = get('formDirective');
-      expect(ngFormDirective.require).toEqual(expect.arrayContaining([`?^^${FORM_COMPONENT_NAME}`]));
+    describe('requiring a Formation form controller', () => {
+      it('should require the Formation form controller', () => {
+        const [ngFormDirective] = get('formDirective');
+        expect(ngFormDirective.require).toEqual(expect.arrayContaining([`?^^${FORM_COMPONENT_NAME}`]));
+      });
     });
 
     describe('registering with a Formation form', () => {
@@ -119,11 +124,6 @@ describe('Decorators', () => {
             <fm></fm>
           `
         });
-
-        get('$rootScope').$digest();
-        get('$rootScope').$digest();
-        get('$rootScope').$digest();
-        get('$rootScope').$digest();
       });
 
       it('should register with the Formation form, if present', () => {

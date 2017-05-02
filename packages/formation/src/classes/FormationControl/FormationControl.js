@@ -108,7 +108,7 @@ const assertIsFunction = assertType('FormationControl', Function);
  *
  * 2. (Optional) If the component uses `ngModel`, ensure that the `ng-model`
  *    expression in the component's template references the controller's
- *    `$ngModelGetterSetter` property (provided by `FormationControl`).
+ *    `$ngModelGetterSetter` property.
  *
  * For a reference implementation, see `Input.js`.
  *

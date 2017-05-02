@@ -7,7 +7,7 @@ This module exports the `FormationConfigurator` and `registerControl` functions,
 
 Configures global Formation behavior.
 
-**Note:** Formation uses these options during Angular's config phase, so the configurator must be invoked prior to bootstrapping (re: outside of `config` or `run` blocks).
+**Note:** Formation components are registered during Angular's `run` phase. Therefore, the configurator may only be invoked prior to bootstrapping or during the `config` phase.
 
 **Parameters:**
 
@@ -44,9 +44,11 @@ app.run(() => {
 
 ## `registerControl(name: string, definition: object) => void`
 
-Registers a Formation control as an Angular component using the provided name and component definition object. Note: The configured prefix (`'fm'` by default) will be prepended to the component's name.
+Registers a Formation control as an Angular component using the provided name and component definition object.
 
-**Note:** Components will be registered during Angular's config phase, so the this function must be invoked prior to bootstrapping (re: outside of `config` or `run` blocks);
+**Note:** The configured prefix (`'fm'` by default) will be prepended to the component's name.
+
+**Note:** Formation components are registered during Angular's `run` phase. Therefore, the configurator may only be invoked prior to bootstrapping or during the `config` phase.
 
 **Parameters:**
 
@@ -59,6 +61,7 @@ Registers a Formation control as an Angular component using the provided name an
 
 ```js
 import Formation, {
+  FormationControl,
   registerControl
 } from '@darkobits/formation';
 
@@ -66,8 +69,22 @@ const app = angular.module('MyApp', [
   Formation
 ]);
 
+
+class MyCustomControl extends FormationControl {
+
+}
+
 registerControl('datePicker', {
-  // ...
+  bindings: {
+    name: '@'
+  },
+  controller: MyCustomControl,
+  controllerAs: 'MyCustomControl',
+  template: `
+    <input type="text"
+      name="MyCustomControl.name"
+      ng-model="MyCustomControl.$ngModelGetterSetter">
+  `
 });
 ```
 
