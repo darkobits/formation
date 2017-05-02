@@ -93,7 +93,7 @@ app.component('addressFormDemo', {
             {
               streetAddress: '1 Bag End',
               locality: 'The Shire'
-            },
+            }
             // null
           ]
         });

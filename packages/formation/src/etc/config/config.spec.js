@@ -1,10 +1,7 @@
-import angular from 'angular';
-
 import {
   module,
   get,
-  directive,
-  digest
+  directive
 } from '@darkobits/unity';
 
 import Formation from '../../index';

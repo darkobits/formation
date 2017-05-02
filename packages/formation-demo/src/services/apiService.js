@@ -21,8 +21,6 @@ app.run($httpBackend => {
 
   // Request handler.
   const handleRequest = (method, url, data) => {
-    // const parsedData = typeof data === 'string' ? JSON.parse(data) : null;
-
     console.log('[Api] Got data:', data);
 
     // If request matches a key in the map, return the corresponding response.

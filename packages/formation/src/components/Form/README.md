@@ -178,23 +178,11 @@ vm.myForm.configure({
 });
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
 ## Additional Behavior
 
 - Disabling: The form can be disabled/enabled in two ways:
   - Using `ngDisabled` on the Formation form element (`<fm>`).
-  - Using the [`disable`](https://github.com/darkobits/formation/tree/canary/src/components/Form#disable)/[`enable`](https://github.com/darkobits/formation/tree/canary/src/components/Form#enable) methods of the Formation form API.
+  - Using the [`disable`](/packages/formation/src/components/Form#disable--void)/[`enable`](/packages/formation/src/components/Form#enable--void) methods of the Formation form API.
 
 ## Example
 
@@ -208,9 +196,9 @@ vm.myForm.configure({
 
 ## Working With Model Values
 
-Formation takes a "managed" approach to model values in forms; rather than requiring developers to manually bind each control to an expression using `ngModel`, Formation creates an object keyed by the name of each control in the form. Model values can be accessed and modified using the [`getModelValues`](/packages/formation/src/components/Form#getmodelvalues--object) and [`setModelValues`](/packages/formation/src/components/Form#setmodelvaluesmodelvalues) instance methods, and are also passed to the form's [`onSubmit`](/packages/formation/src/components/Form#bindings) handler. This approach allows templates to remain terse, prevents controllers from becoming cluttered with extraneous model value bindings, and encourages developers to reason about model values as inputs to and outputs from a component rather than two-way-bound data.
+Formation takes a "managed" approach to model values in forms; rather than requiring developers to manually bind each control to an expression using `ngModel`, Formation creates an object keyed by the name of each control in the form. Model values can be accessed and modified using the [`getModelValues`](/packages/formation/src/components/Form#getmodelvalues--object) and [`setModelValues`](/packages/formation/src/components/Form#setmodelvaluesmodelvalues-object--void) instance methods, and are also passed to the form's [`onSubmit`](/packages/formation/src/components/Form#bindings) handler. This approach allows templates to remain terse, prevents controllers from becoming cluttered with extraneous model value bindings, and encourages developers to reason about model values as inputs to and outputs from a component rather than two-way-bound data.
 
-It is also possible to manipulate the model value of a specific control programatically using the [`getModelValue`](/packages/formation/src/classes/FormationControl#getmodelvalue--) and [`setModelValue`](/packages/formation/src/classes/FormationControl#setmodelvalue) methods of the control API.
+It is also possible to manipulate the model value of a specific control programatically using the [`getModelValue`](/packages/formation/src/classes/FormationControl#getmodelvalue--any) and [`setModelValue`](/packages/formation/src/classes/FormationControl#setmodelvaluemodelvalue-any--void) methods of the control API.
 
 #### Scenario: Setting and Resetting to an Initial State
 
