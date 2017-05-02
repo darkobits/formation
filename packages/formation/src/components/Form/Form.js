@@ -10,7 +10,6 @@ import {
  forEach,
  fromPairs,
  is,
- partial,
  prop,
  propEq,
  reject
@@ -183,9 +182,9 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    * Remaining arguments:
    *
    * @param {string} methodName - Method name to invoke on each member.
-   * @param {object|array} [data] - Optional data to disperse to members.
+   * @param {object|array} [data] - Optional data to delegate to members.
    */
-  const applyToRegistry = partial(applyToCollection, [registry, prop('name')]);
+  const applyToRegistry = (...args) => applyToCollection(registry, prop('name'), ...args);
 
 
   /**

@@ -6,7 +6,6 @@ import {
   find,
   is,
   map,
-  partial,
   propEq,
   without
 } from 'ramda';
@@ -118,7 +117,7 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
    * @param {string} methodName - Method name to invoke on each member.
    * @param {object|array} [data] - Optional data to disperse to members.
    */
-  const applyToRegistry = partial(applyToCollection, [registry, (member, index) => index]);
+  const applyToRegistry = (...args) => applyToCollection(registry, (member, index) => index, ...args);
 
 
   // ----- Interfaces ----------------------------------------------------------
