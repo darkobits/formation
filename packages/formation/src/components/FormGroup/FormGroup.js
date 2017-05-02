@@ -259,9 +259,9 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
       FormGroup.$debugging = true;
     }
 
-    if (FormGroup.$parentForm) {
+    if (FormGroup.$parent) {
       // If we are a child form, register with our parent form.
-      FormGroup.$parentForm[RegisterForm](FormGroup);
+      FormGroup.$parent[RegisterForm](FormGroup);
     } else {
       // If we are the top-level form, throw an error.
       throwError('Form groups must have a parent form.');
@@ -275,8 +275,8 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
    * @private
    */
   FormGroup.$onDestroy = () => {
-    if (FormGroup.$parentForm) {
-      FormGroup.$parentForm.$unregisterForm(FormGroup);
+    if (FormGroup.$parent) {
+      FormGroup.$parent.$unregisterForm(FormGroup);
     }
   };
 
@@ -346,7 +346,7 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
    * @return {boolean}
    */
   FormGroup.isDisabled = () => {
-    return FormGroup.$disabled || FormGroup.$ngDisabled || (FormGroup.$parentForm && FormGroup.$parentForm.isDisabled());
+    return FormGroup.$disabled || FormGroup.$ngDisabled || (FormGroup.$parent && FormGroup.$parent.isDisabled());
   };
 
 
@@ -381,7 +381,7 @@ FormGroupController.$inject = ['$attrs', '$compile', '$element', '$log', '$parse
 
 $registerComponent(FORM_GROUP_COMPONENT_NAME, {
   require: {
-    $parentForm: `?^^${FORM_COMPONENT_NAME}`
+    $parent: `?^^${FORM_COMPONENT_NAME}`
   },
   bindings: {
     name: '@',

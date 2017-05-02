@@ -476,7 +476,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
       });
     }
 
-    if (Form.$parentForm) {
+    if (Form.$$parentForm) {
       transclude(`
         <ng-form></ng-form>
       `);
@@ -497,9 +497,16 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    * @private
    */
   Form.$onInit = () => {
-    const parent = greaterScopeId(Form.$parentForm, Form.$parentFormGroup);
+    // If we have a parent form or form group, we need to register with it. We
+    // can 'require' both types of controllers, but we want to register with our
+    // closest ancestor. Angular gives us no simple way to determine this. But,
+    // we can compare each controller's scope ID; the greater of the two is
+    // almost certainly guaranteed to be our closest ancestor. There may be some
+    // weird edge cases here if the page is creating/destroying scopes in an
+    // exotic way, but this is not likely.
+    Form.$parent = greaterScopeId(Form.$$parentForm, Form.$$parentFormGroup);
 
-    // Auto-generate name if one was not supplied.
+    // Auto-generate a name if one was not supplied.
     Form.name = Form.name || `Form-${$getNextId()}`;
 
     // Merge configuration data from the "config" attribute into our local copy.
@@ -510,10 +517,10 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
       Form.$debugging = true;
     }
 
-    if (parent) {
+    if (Form.$parent) {
       // If we are a child form, register with our parent form and set up submit
       // listeners.
-      parent[RegisterForm](Form);
+      Form.$parent[RegisterForm](Form);
 
       $scope.$on(BEGIN_SUBMIT_EVENT, () => {
         if (!Form.$submitting) {
@@ -567,8 +574,8 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    * @private
    */
   Form.$onDestroy = () => {
-    if (Form.$parentForm) {
-      Form.$parentForm.$unregisterForm(Form);
+    if (Form.$parent) {
+      Form.$parent.$unregisterForm(Form);
     }
   };
 
@@ -764,7 +771,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    * @return {boolean}
    */
   Form.isDisabled = () => {
-    return Form.$disabled || Form.$ngDisabled || (Form.$parentForm && Form.$parentForm.isDisabled());
+    return Form.$disabled || Form.$ngDisabled || (Form.$parent && Form.$parent.isDisabled());
   };
 
 
@@ -803,8 +810,8 @@ FormController.$inject = ['$attrs', '$compile', '$element', '$log', '$parse', '$
 
 $registerComponent(FORM_COMPONENT_NAME, {
   require: {
-    $parentForm: `?^^${FORM_COMPONENT_NAME}`,
-    $parentFormGroup: `?^^${FORM_GROUP_COMPONENT_NAME}`
+    $$parentForm: `?^^${FORM_COMPONENT_NAME}`,
+    $$parentFormGroup: `?^^${FORM_GROUP_COMPONENT_NAME}`
   },
   bindings: {
     name: '@',
