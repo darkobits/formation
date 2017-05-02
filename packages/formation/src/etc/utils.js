@@ -70,17 +70,6 @@ export function assertIsEntry (value, label) {
 
 
 /**
- * Returns true if the provided value is not undefined.
- *
- * @param  {any} value
- * @return {boolean}
- */
-export function isDefined (value) {
-  return value !== undefined;
-}
-
-
-/**
  * Because Jest's mocked functions fail a Function type check, we need to
  * additionally check their "typeof" property.
  *
@@ -494,7 +483,6 @@ export default {
   capitalizeFirst,
   greaterScopeId,
   invoke,
-  isDefined,
   isFunction,
   lowercaseFirst,
   mergeDeep,

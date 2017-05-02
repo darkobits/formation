@@ -11,7 +11,6 @@ import {
   capitalizeFirst,
   greaterScopeId,
   invoke,
-  isDefined,
   isFunction,
   lowercaseFirst,
   mergeDeep,
@@ -37,16 +36,6 @@ describe('Utils', () => {
       expect(() => {
         assertIsEntry(['foo', 'bar']);
       }).not.toThrow();
-    });
-  });
-
-  describe('isDefined', () => {
-    it('should assert that its argument is not "undefined"', () => {
-      expect(isDefined('foo')).toBe(true);
-      expect(isDefined(null)).toBe(true);
-      expect(isDefined(NaN)).toBe(true);
-      expect(isDefined(false)).toBe(true);
-      expect(isDefined(undefined)).toBe(false);
     });
   });
 
