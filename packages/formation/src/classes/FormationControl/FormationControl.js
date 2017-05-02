@@ -541,8 +541,14 @@ RegisterNgModel.implementedBy(FormationControl).as(function (ngModelCtrl) {
     // Create a reference to the control's ngModel controller.
     this[NG_MODEL_CTRL] = ngModelCtrl;
 
-    // Register the control with the form.
+    // Register the control with the form. This will cause the form to configure
+    // the control and set its model value, if available.
     this[FORM_CONTROLLER][RegisterControl](this);
+
+    // Ensure the control renders with the model value from the form.
+    this[FORM_CONTROLLER].$getScope().$applyAsync(() => {
+      this[NG_MODEL_CTRL].$render();
+    });
   }
 });
 
