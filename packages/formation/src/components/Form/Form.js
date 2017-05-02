@@ -105,18 +105,7 @@ const assertIsObjectOrNil = assertType('Form', [Object, undefined]);
 
 
 /**
- * The controller for Formation `<fm></fm>` components.
- *
- * This component has the following bindings:
- *
- * - `name`: Name of the form, and scope value to assign controller reference
- *   to. (Ex: `vm.myForm`)
- * - `controls`: Object containing control names and configuration. (Ex:
- *   `vm.controlConfig`)
- * - `on-submit`: Function to invoke when the form is submitted. (Ex:
- *   `vm.onSubmit`)
- * - `ng-disabled`: Expression to evaluate that, if truthy, will disable all
- *   Formation controls in the form.
+ * Controller for the Formation form component.
  */
 export function FormController ($attrs, $compile, $element, $log, $parse, $scope, $transclude) {
   const Form = this;
@@ -255,7 +244,6 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    * @private
    */
   function terminateSubmit () {
-    // Form.$debug('Broadcasting END_SUBMIT on $scope:', $scope.$parent);
     Form.$submitting = false;
     Form.enable();
     $scope.$parent.$broadcast(END_SUBMIT_EVENT);
