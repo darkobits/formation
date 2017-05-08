@@ -2,8 +2,9 @@ import 'angular-ui-router/release/stateEvents';
 import 'angular-mocks';
 import angular from 'angular';
 import ngAnimate from 'angular-animate';
-import uiRouter from 'angular-ui-router';
+import ngAria from 'angular-aria';
 import ngMessages from 'angular-messages';
+import uiRouter from 'angular-ui-router';
 
 import Formation, {
   FormationConfigurator
@@ -15,6 +16,7 @@ const app = angular.module('App', [
   'ui.router.state.events',
   Formation,
   ngAnimate,
+  ngAria,
   ngMessages,
   uiRouter
 ]);
