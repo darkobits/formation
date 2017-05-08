@@ -2,7 +2,7 @@ This document details new features and breaking changes introduced in Formation 
 
 # New Feaures
 
-### Added `FormGroup` component and support for nested forms
+### Added the `FormGroup` component and support for nested forms
 
 Concepts:
 - Forms are always objects, form groups are always arrays.
@@ -20,7 +20,7 @@ This method returns `true` if a form, form group, or control is currently disabl
 
 ### Added `configure` method to forms, form groups.
 
-Forms and form groups now have a `configure` method, which accepts the same control configuration object that can be provided via the `controls` attribute. This enables controls to be (re)configured after a form has been bootstrapped.
+Forms, form groups, and controls now have a `configure` method, which accepts the same configuration object that can be provided via the `controls` attribute on the `fm` component. This enables controls to be (re)configured after a form has bootstrapped.
 
 ### Added the `$fm` scope binding
 
@@ -45,6 +45,8 @@ Instead, we can use the `$fm` scope binding, which is not environment-dependent:
   </fieldset>
 </fm>
 ```
+
+This makes it much easier to turn the fieldset template fragment into a reusable component that can work with any form.
 
 ---
 
