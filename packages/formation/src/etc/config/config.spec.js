@@ -17,7 +17,7 @@ import {
 
 import {
   $registerComponent,
-  FormationConfigurator
+  configure
 } from '../../../src/etc/config';
 
 
@@ -45,40 +45,40 @@ describe('Configurator', () => {
   describe('prior to the Angular bootstrapping', () => {
     it('should require an object as its argument', () => {
       expect(() => {
-        FormationConfigurator({});
+        configure({});
       }).not.toThrow();
 
       expect(() => {
-        FormationConfigurator('foo');
-      }).toThrow('FormationConfigurator expected options to be of type Object');
+        configure('foo');
+      }).toThrow('configure expected options to be of type Object');
     });
 
     it('should require showErrorsOn to be a string or nil', () => {
       expect(() => {
-        FormationConfigurator({
+        configure({
           showErrorsOn: 'foo'
         });
       }).not.toThrow();
 
       expect(() => {
-        FormationConfigurator({
+        configure({
           showErrorsOn: []
         });
-      }).toThrow('FormationConfigurator expected showErrorsOn to be of type String or Undefined');
+      }).toThrow('configure expected showErrorsOn to be of type String or Undefined');
     });
 
     it('should require prefix to be a string or nil', () => {
       expect(() => {
-        FormationConfigurator({
+        configure({
           prefix: 'foo'
         });
       }).not.toThrow();
 
       expect(() => {
-        FormationConfigurator({
+        configure({
           prefix: []
         });
-      }).toThrow('FormationConfigurator expected prefix to be of type String or Undefined');
+      }).toThrow('configure expected prefix to be of type String or Undefined');
     });
   });
 
@@ -89,7 +89,7 @@ describe('Configurator', () => {
 
     it('should throw an error', () => {
       expect(() => {
-        FormationConfigurator();
+        configure();
       }).toThrow(`Formation must be configured prior to Angular's "run" phase.`);
     });
   });

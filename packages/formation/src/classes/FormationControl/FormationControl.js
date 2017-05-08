@@ -139,6 +139,7 @@ export class FormationControl {
     // Expose interfaces as public methods.
     this.getModelValue = this[GetModelValue];
     this.setModelValue = this[SetModelValue];
+    this.configure = this[Configure];
   }
 
 

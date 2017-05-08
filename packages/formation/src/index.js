@@ -1,9 +1,20 @@
 import app from './app';
+
 import './components';
+
+import {
+  configure,
+  registerControl
+} from './etc/config';
+
 import * as $constants from './etc/constants';
 
 
 // ----- Formation Public API --------------------------------------------------
+
+export {
+  $constants
+};
 
 export {
   ConfigurableValidator
@@ -13,15 +24,13 @@ export {
   FormationControl
 } from './classes/FormationControl';
 
-export {
-  FormationConfigurator,
+
+const Formation = Object.create(new String(), { // eslint-disable-line no-new-wrappers
+  toString: {value: () => app.name}
+});
+
+
+export default Object.assign(Object.create(Formation), {
+  configure,
   registerControl
-} from './etc/config';
-
-// Semi-public, required by the formation-validators package.
-export {
-  $constants
-};
-
-
-export default app.name;
+});

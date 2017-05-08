@@ -50,7 +50,7 @@ export function module (...args) {
   };
 
 
-  if (typeof args.slice(-1)[0] === 'object') {
+  if (typeof args.slice(-1)[0] === 'object' && args.slice(-1)[0].constructor.name !== 'String') {
     // If the last argument is an object, merge it with the default options and
     // use the remaining arguments as a list of modules to load.
     Object.assign(opts, args.slice(-1)[0]);
@@ -62,7 +62,7 @@ export function module (...args) {
 
 
   if (modules.length === 0) {
-    throw new Error('[unity] module() expects at least 1 module name.');
+    throw new Error('[unity] module() expects at least 1 module name. Got:' + JSON.stringify(args));
   }
 
 

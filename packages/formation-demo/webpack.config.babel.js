@@ -259,7 +259,7 @@ export default env => {
 
   config.bail = env.dist;
 
-  config.devtool = 'cheap-module-eval-source-map';
+  config.devtool = env.dist ? 'cheap-module-eval-source-map' : 'inline-source-map';
 
 
   return config;

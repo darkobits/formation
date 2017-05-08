@@ -6,10 +6,7 @@ import ngAria from 'angular-aria';
 import ngMessages from 'angular-messages';
 import uiRouter from 'angular-ui-router';
 
-import Formation, {
-  FormationConfigurator
-} from '@darkobits/formation';
-
+import Formation from '@darkobits/formation';
 
 const app = angular.module('App', [
   'ngMockE2E',
@@ -27,9 +24,11 @@ app.constant('API_DELAY', 1000);
 
 
 // Set-up Formation error behavior.
-FormationConfigurator({
+Formation.configure({
   showErrorsOn: 'touched, submitted'
 });
+
+console.log('Formation', Formation);
 
 
 export default app;

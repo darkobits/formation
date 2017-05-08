@@ -1,4 +1,7 @@
+import angular from 'angular';
+
 import {
+  adjust,
   concat,
   find,
   is,
@@ -170,7 +173,7 @@ export function $getPrefixedName (name) {
  *
  * @return {boolean}
  */
-const check = assertType('FormationConfigurator');
+const check = assertType('configure');
 
 
 // ----- Public Functions ------------------------------------------------------
@@ -207,7 +210,7 @@ export function registerControl (name, definition) {
  * @param {string} [opts.prefix] - Overrides the default component prefix for
  *   all formation controls.
  */
-export function FormationConfigurator (opts) {
+export function configure (opts) {
   if (!allowConfiguration) {
     throwError(`Formation must be configured prior to Angular's "run" phase.`);
   }
@@ -225,6 +228,18 @@ export function FormationConfigurator (opts) {
 
 
 // ----- Decorators ------------------------------------------------------------
+
+const oModule = angular.module;
+
+// Invoke toString() on dependencies in calls to angular.module.
+angular.module = (...args) => {
+  return Reflect.apply(oModule, angular, adjust(dependencies => {
+    if (Array.isArray(dependencies)) {
+      return dependencies.map(d => d.toString());
+    }
+  }, 1, args));
+};
+
 
 app.config(($compileProvider, $provide) => {
   // Save a reference to Angular's $compileProvider.
