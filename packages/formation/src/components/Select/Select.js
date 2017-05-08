@@ -77,7 +77,8 @@ $registerComponent($getPrefixedName('Select'), () => {
           'has-error': Select.getErrors(),
           'is-pending': Select.${NG_MODEL_CTRL}.$pending,
           'is-disabled': Select.isDisabled()
-        }">
+        }"
+        aria-required="{{::Select.$isRequired() }}">
         <option value=""
           ng-if="::Select.placeholder"
           hidden>

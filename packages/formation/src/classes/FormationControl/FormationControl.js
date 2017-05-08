@@ -5,6 +5,7 @@
 import {
   clone,
   contains,
+  forEach,
   has,
   is,
   isNil,
@@ -210,6 +211,22 @@ export class FormationControl {
    */
   $getCanonicalControlId () {
     return this.$getControl().getControlId();
+  }
+
+
+  /**
+   * Returns true if the canonical control has a 'required' validator. This is
+   * used to determine whether to add an "aria-required" attribute to the
+   * control.
+   *
+   * @return {boolean}
+   */
+  $isRequired () {
+    try {
+      return Object.keys(this.$getControl()[NG_MODEL_CTRL].$validators).includes('required');
+    } catch (err) {
+      return false;
+    }
   }
 
 
@@ -549,6 +566,13 @@ RegisterNgModel.implementedBy(FormationControl).as(function (ngModelCtrl) {
     this[FORM_CONTROLLER].$getScope().$applyAsync(() => {
       this[NG_MODEL_CTRL].$render();
     });
+
+    // Expose common ngModel states.
+    forEach(prop => {
+      Reflect.defineProperty(this, prop, {
+        get: () => this[NG_MODEL_CTRL][prop]
+      });
+    }, ['$dirty', '$invalid', '$pending', '$pristine', '$touched', '$untouched', '$valid']);
   }
 });
 

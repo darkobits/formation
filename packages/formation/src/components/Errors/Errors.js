@@ -35,7 +35,8 @@ registerControl('Errors', {
       ng-class="{
         'is-disabled': Errors.isDisabled()
       }"
-      ng-messages="Errors.getErrors()">
+      ng-messages="Errors.getErrors()"
+      role="alert">
       <span ng-repeat="error in Errors.getErrorMessages()"
         ng-message="{{::error[0] }}">
         {{::error[1] }}

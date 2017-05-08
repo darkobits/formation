@@ -56,7 +56,9 @@ registerControl('Input', {
         'is-pending': Input.${NG_MODEL_CTRL}.$pending,
         'is-disabled': Input.isDisabled()
       }"
-      ng-disabled="Input.isDisabled()">
+      ng-disabled="Input.isDisabled()"
+      aria-required="{{::Input.$isRequired() ? 'true' : 'false' }}"
+      aria-invalid="{{ Input.$invalid ? 'true' : 'false' }}">
     <label for="{{::Input.getControlId() }}"
       ng-if="Input.type === 'radio' || Input.type === 'checkbox'"
       ng-class="{

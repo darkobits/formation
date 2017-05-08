@@ -52,6 +52,7 @@ registerControl('Textarea', {
         'is-pending': Textarea.${NG_MODEL_CTRL}.$pending,
         'is-disabled': Textarea.isDisabled()
       }"
-      ng-disabled="Textarea.isDisabled()">
+      ng-disabled="Textarea.isDisabled()"
+      aria-required="{{::Textarea.$isRequired() }}">
   `
 });
