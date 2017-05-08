@@ -143,7 +143,7 @@ vm.myForm.enable();
 Resets the form and each control to a pristine state. Optionally, resets the model value of each control in `modelValues` to the provided value, and then validates all controls.
 
 > **If all controls are re-validated, won't this cause errors to be displayed?**<br><br>
-If you have configured the `showErrorsOn` behavior of Formation to something sensible, like `'touched, submitted'`, then no errors will be shown because, even though certain fields may be invalid, these flags will be false. This is exactly the same state the form is usually in when the page first loads.
+If `showErrorsOn` has been set to something sensible, like `'touched, submitted'`, then no errors will be shown because, even though certain fields may be invalid, these flags will be false because the controls are in a pristine state. This is the same state the form is usually in when the page first loads.
 
 |Name|Type|Description|
 |---|---|---|

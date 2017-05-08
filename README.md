@@ -2,7 +2,18 @@
 
 [![travis][travis-img]][travis-url] [![david][david-img]][david-url] [![codacy][codacy-img]][codacy-url] [![minified][minified-img]][unpkg-url] [![gzipped][gzipped-img]][unpkg-url] [![Code Style][xo-img]][xo-url] [![NPM Version][npm-img]][npm-url]
 
-Formation is a form framework for Angular 1.5+.
+Formation is a form framework for Angular 1.5+. It is designed for medium-to-large applications that require consistent, robust forms.
+
+## Feature Overview
+
+- Controls are configured using Plain Old JavaScript Objects rather than directives. Configuration definitions can be shared across an application or abstracted into custom components. (See: [Control Configuration](/packages/formation/src/classes/FormationControl#control-configuration))
+- Model values are managed by the form and passed to the form's submit handler, completely eliminating the need to bind model values to a scope. (See: [Working With Model Values](/packages/formation/src/components/Form#working-with-model-values))
+- A form's submit handler will only be called when it should be, eliminating the need for repititious boilerplate in submit handlers. (See: [Submitting](/packages/formation/src/components/Form#submitting))
+- Using `ngMessages` for validation has been greatly simplified; error messages are defined in code, reducing template bloat, eliminating the need to bind error messages to a scope, and making it easier to share common messages across an application.
+- Easily assign custom error messages on form controls at runtime (from your API, for example). (See: [Errors](/packages/formation/src/components/Errors))
+- Configuring when to display validation errors can be done application-wide or for each form, and is as simple as providing a list of states (ex: `touched`, `submitted`) to match against. (See: [showErrorsOn](/packages/formation/src/services/Formation#showerrorsonflags))
+- Reset all controls to a pristine, untouched state and optionally reset their model values to an initial state. (See: [reset](/packages/formation/src/components/Form#resetmodelvalues-object--void))
+- Accessibility: Formation uses [ARIA](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA) attributes where applicable, and assigns matching `id` and `for` attributes to controls and labels, ensuring they are correctly associated with each other.
 
 ## Setup
 
@@ -19,26 +30,15 @@ angular.module('MyApp', [
   Formation
 ]);
 
-// Set-up Formation error behavior.
+// Configure global error behavior.
 FormationConfigurator({
   showErrorsOn: 'touched, submitted'
 });
 ```
 
-## Feature Overview
-
-- Controls are configured using Plain Old JavaScript Objects rather than directives. Configuration definitions can be shared across an application or abstracted into custom components, improving consistency. (See: [Control Configuration](/packages/formation/src/classes/FormationControl#control-configuration))
-- Model values are managed by the form, so developers no longer need to manage a mess of scope bindings. (See: [Working With Model Values](/packages/formation/src/components/Form#working-with-model-values))
-- A form's submit handler will only be invoked when it should be, and will be passed the model values of all controls in the form. (See: [Submitting](/packages/formation/src/components/Form#submitting))
-- Using `ngMessages` for validation has been greatly simplified; errors are defined in code, and one line of markup in templates. Sharing error messages across forms no longer requres exposing error copy to templates.
-- Easily assign custom error messages on form controls at runtime -- from your API, for example. (See: [Errors](/packages/formation/src/components/Errors))
-- Configuring when to display validation errors is trivial; either set the behavior application-wide or for each form by providing a list of states (ex: `"touched, submitted"`) to match against. (See: [showErrorsOn](/packages/formation/src/services/Formation#showerrorsonflags))
-- Reset all controls to a pristine, untouched state and optionally reset their model values to an initial state.
-- Accessibility: `id` and `for` attributes are managed by the form, so controls and labels are correctly associated without any extra markup.
-
 ## Example
 
-Here's the template strucutre you might use to construct a simple address form using Formation:
+Here's the template strucutre you might use to construct an address form using Formation:
 
 ```html
 <div ng-app="MyApp" ng-controller="MyCtrl">
@@ -79,8 +79,6 @@ Everything else is configured via the form's parent controller:
 
 ```js
 import angular from 'angular';
-
-import Formation from '@darkobits/formation';
 
 import {
   required,

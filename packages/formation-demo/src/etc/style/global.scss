@@ -172,7 +172,8 @@ fm-group {
 
 // ----- Text Inputs -----------------------------------------------------------
 
-fm-input[type='text'] {
+fm-input[type='text'],
+fm-input[type='email'] {
   display: inline-block;
   margin-bottom: $error-element-min-height;
   width: 100%;
