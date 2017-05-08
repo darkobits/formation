@@ -6,10 +6,6 @@ import {
   email
 } from '@darkobits/formation-validators';
 
-import {
-  onReady
-} from '@darkobits/formation';
-
 import templateUrl from './addressFormDemo.html';
 
 
@@ -84,19 +80,17 @@ app.component('addressFormDemo', {
     };
 
 
-    vm.$onInit = () => {
-      onReady(vm, 'addressForm').then(form => {
-        form.setModelValues({
-          name: 'Frodo Baggins',
-          gender: 'M',
-          addresses: [
-            {
-              streetAddress: '1 Bag End',
-              locality: 'The Shire'
-            }
-            // null
-          ]
-        });
+    vm.fmReady = form => {
+      form.setModelValues({
+        name: 'Frodo Baggins',
+        gender: 'M',
+        addresses: [
+          {
+            streetAddress: '1 Bag End',
+            locality: 'The Shire'
+          }
+          // null
+        ]
       });
     };
 

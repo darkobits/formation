@@ -265,35 +265,6 @@ export function parseFlags (string) {
 
 
 /**
- * Spies on a key in the provided object and returns a promise that resolves
- * when the value becomes defined or rejects when a timeout is reached.
- *
- * @param  {object} obj - Base object.
- * @param  {string} key - Key in base object to spy on.
- * @param  {number} [timeout=10000] - Timeout period. Default is 10 seconds.
- * @return {promise<*>} - Promise that resolves with the value at the named key
- *   once it is defined.
- */
-export function onReady (obj, key, timeout = 1000) {
-  const start = new Date().getTime() / 1000;
-
-  return new Promise((resolve, reject) => {
-    const cancel = setInterval(() => {
-      const now = new Date().getTime() / 1000;
-
-      if (obj[key] !== undefined) {
-        resolve(obj[key]);
-        clearInterval(cancel);
-      } else if (now - start > timeout) {
-        reject(new Error('[onReady] Timed-out.'));
-        clearInterval(cancel);
-      }
-    }, 1);
-  });
-}
-
-
-/**
  * Assigns a value to an expression on the provided scope.
  *
  * @param {object} $parse - Angular $parse service.
@@ -488,7 +459,6 @@ export default {
   mergeDeep,
   mergeEntries,
   mergeWithDeep,
-  onReady,
   parseFlags,
   throwError,
   toPairsWith

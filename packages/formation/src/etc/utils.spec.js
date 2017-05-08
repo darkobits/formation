@@ -15,7 +15,6 @@ import {
   lowercaseFirst,
   mergeDeep,
   mergeEntries,
-  onReady,
   parseFlags,
   throwError,
   toPairsWith
@@ -180,27 +179,6 @@ describe('Utils', () => {
       const input = 'foo, bar, baz';
       const expected = ['$foo', '$bar', '$baz'];
       expect(parseFlags(input)).toEqual(expected);
-    });
-  });
-
-  describe('onReady', () => {
-    // Note: Improve these tests when Jest's timers API sucks less.
-
-    it('should resolve when the spied value becomes truthy', done => {
-      expect.assertions(1);
-
-      const obj = {
-        foo: false
-      };
-
-      onReady(obj, 'foo').then(() => {
-        expect(true).toBe(true);
-        done();
-      });
-
-      setTimeout(() => {
-        obj.foo = true;
-      }, 1);
     });
   });
 

@@ -18,10 +18,6 @@ export {
   registerControl
 } from './etc/config';
 
-export {
-  onReady
-} from './etc/utils';
-
 // Semi-public, required by the formation-validators package.
 export {
   $constants

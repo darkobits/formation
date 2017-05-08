@@ -522,6 +522,22 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
         }
       });
     } else {
+      // If the user has provided an onReady callback, invoke it when the form's
+      // element is ready. This happens once all child forms have been compiled
+      // and a user can safely call setModelValues, for example, and be sure
+      // they will propagate down to children.
+      //
+      // This mechanism is necessary, as opposed to using the $postLink
+      // lifecycle hook in a parent controller, because if the user is using
+      // ng-repeat on a <fm> element (likely in a form group) then those forms
+      // will not be compiled until after the parent controller's $postLink has
+      // fired.
+      $element.ready(() => {
+        if (is(Function, Form.$onReady)) {
+          Form.$onReady(Form);
+        }
+      });
+
       // If we are the top-level form, assign to parent scope expression.
       assignName(Form.name);
     }
@@ -809,6 +825,7 @@ $registerComponent(FORM_COMPONENT_NAME, {
     name: '@',
     $controlConfiguration: '<controls',
     $onSubmit: '<onSubmit',
+    $onReady: '<onReady',
     $showErrorsOn: '@showErrorsOn',
     $ngDisabled: '<ngDisabled'
   },
