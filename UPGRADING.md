@@ -54,7 +54,53 @@ This makes it much easier to turn the fieldset template fragment into a reusable
 
 ### Removed `onReady`
 
-The `$postLink` lifecycle hook will be called after `$onInit`, when any Formation form controllers are ready. Migrate code inside `onReady` callbacks to a `$postLink` lifecycle hook.
+This method has been removed. Instead, use the `on-ready` attribute of a top-level form to specify a callback which will be invoked when the form and any child forms have finished compiling. The callback is passed a reference to the form controller.
+
+**Before:**
+
+```html
+<fm name="vm.myForm">
+  ...
+</fm>
+```
+
+```js
+import app from 'app';
+
+import {
+  onReady
+} from '@darkobits/formation';
+
+app.controller('myCtrl', function () => {
+  const vm = this;
+
+  vm.$onInit = () => {
+    onReady(vm, 'myForm').then(form => {
+      // Do something with vm.myForm/form.
+    });
+  };
+});
+```
+
+**After:**
+
+```html
+<fm name="vm.myForm" on-ready="vm.fmReady">
+  ...
+</fm>
+```
+
+```js
+import app from 'app';
+
+app.controller('myCtrl', function () => {
+  const vm = this;
+
+  vm.fmReady = form => {
+    // Do something with vm.myForm/form.
+  };
+});
+```
 
 ### Replaced `Formation` provider/service with `FormationConfigurator` and `registerControl`.
 
