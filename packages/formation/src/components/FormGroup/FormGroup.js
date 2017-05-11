@@ -3,10 +3,16 @@
 // -----------------------------------------------------------------------------
 
 import {
+  filter,
   find,
+  head,
+  identity,
   is,
   map,
   propEq,
+  range,
+  slice,
+  tail,
   without
 } from 'ramda';
 
@@ -82,7 +88,7 @@ export const END_SUBMIT_EVENT = '$fmTerminateSubmit';
 const assertIsArrayOrNil = assertType('Form Group', [Array, undefined]);
 
 
-export function FormGroupController ($attrs, $compile, $element, $log, $parse, $scope, $transclude) {
+export function FormGroupController ($attrs, $compile, $element, $log, $parse, $q, $scope, $transclude) {
   const FormGroup = this;
 
 
@@ -106,6 +112,24 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
   let registry = [];
 
 
+  /**
+   * Caches model data that the Form Group was not able to distribute to child
+   * forms.
+   *
+   * @type {Array}
+   */
+  let unusedModelValues = [];
+
+
+  /**
+   * Tracks known transclusion scopes, which we are responsible for manually
+   * $destroy-ing when we remove transcluded content.
+   *
+   * @type {Array}
+   */
+  let transclusionScopes = [];
+
+
   // ----- Private Methods -----------------------------------------------------
 
   /**
@@ -118,6 +142,40 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
    * @param {object|array} [data] - Optional data to disperse to members.
    */
   const applyToRegistry = (...args) => applyToCollection(registry, (member, index) => index, ...args);
+
+
+  /**
+   * Creates the provided number of transclusion clones. Resolves when created
+   * elements are ready.
+   *
+   * @param  {number} num
+   * @return {promise}
+   */
+  function createTransclusionClones (num) {
+    $element.empty();
+
+    // Destroy all transclusion scopes and clear the tracking array.
+    transclusionScopes = filter(identity, map(s => s.$destroy(), transclusionScopes));
+
+    // For each model value, create a new child form and resolve when all
+    // compilation has finished. Then, set model values.
+    return $q.all(range(0, num).map(() => {
+      return $q(resolve => {
+        $transclude((compiledElement, scope) => {
+          scope.$fmGroup = FormGroup;
+
+          // Add transclusion scope to tracking array so it can be destroyed
+          // later.
+          transclusionScopes.push(scope);
+
+          // Append the clone to our element.
+          $element.append(compiledElement);
+
+          compiledElement.ready(resolve);
+        });
+      });
+    }));
+  }
 
 
   // ----- Interfaces ----------------------------------------------------------
@@ -144,6 +202,14 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
 
     // Configure the child form.
     invoke(Configure, childForm, controlConfiguration[registry.indexOf(childForm)]);
+
+    // If we have unused model values, apply the first value in the collection
+    // to the new child form and remove it from the cache.
+    if (unusedModelValues.length > 0) {
+      const modelValues = head(unusedModelValues);
+      unusedModelValues = tail(unusedModelValues);
+      invoke(SetModelValue, childForm, modelValues);
+    }
   });
 
 
@@ -185,8 +251,26 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
   SetModelValue.implementedBy(FormGroup).as(function (newValues) {
     assertIsArrayOrNil('model values', newValues);
 
-    // Delegate to each child form's SetModelValue method.
-    applyToRegistry(SetModelValue, newValues);
+    function setModelValues () {
+      // Delegate the first N members of newValues to the registry, where N is
+      // the size of the registry.
+      applyToRegistry(SetModelValue, slice(0, registry.length, newValues));
+
+      // Cache the rest of the array in unusedModelValues. The first item in
+      // this cache will be applied to the next form that registers.
+      unusedModelValues = slice(registry.length, newValues.length, newValues);
+    }
+
+    if (FormGroup.$repeat) {
+      // If repeat is truthy, clone our transcluded content one for each member
+      // in newValues.
+      createTransclusionClones(newValues.length).then(() => {
+        setModelValues();
+      });
+    } else {
+      // Otherwise, set values immediately.
+      setModelValues();
+    }
   });
 
 
@@ -239,11 +323,21 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
    * @private
    */
   FormGroup.$postLink = () => {
-    $transclude($scope.$parent.$new(), compiledElement => {
-      $element.append(compiledElement);
+    createTransclusionClones(1);
+  };
+
+
+  window.$postLink = () => {
+    $scope.$apply(() => {
+      FormGroup.$postLink();
     });
   };
 
+  window.empty = () => {
+    $scope.$apply(() => {
+      $element.children().detach();
+    });
+  };
 
   /**
    * Set up form name and assign controller instance to its name attribute.
@@ -378,7 +472,7 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
 }
 
 
-FormGroupController.$inject = ['$attrs', '$compile', '$element', '$log', '$parse', '$scope', '$transclude'];
+FormGroupController.$inject = ['$attrs', '$compile', '$element', '$log', '$parse', '$q', '$scope', '$transclude'];
 
 
 $registerComponent(FORM_GROUP_COMPONENT_NAME, {
@@ -387,7 +481,8 @@ $registerComponent(FORM_GROUP_COMPONENT_NAME, {
   },
   bindings: {
     name: '@',
-    $ngDisabled: '<ngDisabled'
+    $ngDisabled: '<ngDisabled',
+    $repeat: '<repeat'
   },
   transclude: true,
   controller: FormGroupController,

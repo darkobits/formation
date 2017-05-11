@@ -454,7 +454,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
       // Handle transcluded content from the user by appending it to the above
       // form/ngForm template and using a new scope that inherits from our outer
       // scope, mimicing the default Angular behavior.
-      $transclude($scope.$parent.$new(), (compiledElement, scope) => {
+      $transclude((compiledElement, scope) => {
         // Assign a reference to the form controller in the transclusion scope.
         // This allows users to reference the Form API from templates:
         // <div ng-if="$fm.getControl('foo').$valid"></div>
