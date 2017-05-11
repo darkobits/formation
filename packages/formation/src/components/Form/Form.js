@@ -385,6 +385,9 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
   SetModelValue.implementedBy(Form).as(function (newValues) {
     assertIsObjectOrNil('model values', newValues);
 
+    // TODO: Document this.
+    Form.model = newValues;
+
     // Delegate to each member's SetModelValue method.
     applyToRegistry(SetModelValue, newValues);
   });
