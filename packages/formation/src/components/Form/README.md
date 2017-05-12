@@ -178,12 +178,6 @@ vm.myForm.configure({
 });
 ```
 
-## Additional Behavior
-
-- Disabling: The form can be disabled/enabled in two ways:
-  - Using `ngDisabled` on the Formation form element (`<fm>`).
-  - Using the [`disable`](/packages/formation/src/components/Form#disable--void)/[`enable`](/packages/formation/src/components/Form#enable--void) methods of the Formation form API.
-
 ## Example
 
 ```html
@@ -239,6 +233,67 @@ app.controller('MyCtrl', function () {
   <button ng-click="vm.resetForm()">Reset</button>
 </fm>
 ```
+
+## Nesting
+
+When working with complex model data, it often becomes necessary to nest forms inside one another to mirror the structure of the data. HTML does not natively support nested `<form>` elements, and Angular offers limited support for nested forms out of the box.
+
+### Concepts and Limitations
+
+1. An object is always modeled using the form component. Arrays are always modeled using the form group component.
+2. Form groups may only have forms as direct descendants.
+2. The top-level of a nested form structure must always be a form. Consequently, the root level of your model data must be an object.
+3. The entire nested form is submitted at once; it is not possible to submit individual child forms.
+4. The form component delegates model values and configuration data by matching object keys to control names. The form group component delegates model values and configuration data to child forms by matching array indexes to their position in the DOM.
+
+### Example
+
+Given the following data:
+
+```json
+{
+  "name": "Jack Dibbert",
+  "email": "Jack_Dibbert@gmail.com",
+  "phone": "819-032-4356",
+  "addresses": [
+    {
+      "type": "home",
+      "streetAddress": "24262 Kertzmann Village",
+      "locality": "Mayerberg",
+      "administrativeArea": "KS",
+      "postalCode": "44194",
+      "country": "United States"
+    },
+    {
+      "type": "work",
+      "streetAddress": "365 Halvorson Parkway",
+      "locality": "Maudeland",
+      "administrativeArea": "KS",
+      "postalCode": "44197",
+      "country": "United States"
+    }
+  ]
+}
+```
+
+We can build a Formation form to model it thusly:
+
+```html
+<fm name="userForm">
+  <fm-input type="text" name="name"></fm-input>
+  <fm-input type="email" name="email"></fm-input>
+  <fm-input type="tel" name="phone"></fm-input>
+  <fm-group name="addresses">
+    <fm ng-repeat="">
+
+    </fm>
+  </fm-group>
+</fm>
+```
+
+
+
+
 
 ## Submitting
 
