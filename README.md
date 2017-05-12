@@ -2,7 +2,7 @@
 
 [![travis][travis-img]][travis-url] [![david][david-img]][david-url] [![codacy][codacy-img]][codacy-url] [![minified][minified-img]][unpkg-url] [![gzipped][gzipped-img]][unpkg-url] [![Code Style][xo-img]][xo-url] [![NPM Version][npm-img]][npm-url]
 
-Formation is a form framework for Angular 1.5+. It is designed for medium-to-large applications that require consistent, robust forms.
+Formation is a form framework for Angular 1.5+ designed for medium-to-large applications that require consistent, robust forms. It aims to reduce template size by moving business logic to controllers, which also encourages code-reuse and improves consistency.
 
 ## Feature Overview
 
@@ -13,7 +13,7 @@ Formation is a form framework for Angular 1.5+. It is designed for medium-to-lar
 - Easily assign custom error messages on form controls at runtime (from your API, for example). (See: [Errors](/packages/formation/src/components/Errors))
 - Configuring when to display validation errors can be done application-wide or for each form, and is as simple as providing a list of states (ex: `touched`, `submitted`) to match against. (See: [showErrorsOn](/packages/formation/src/services/Formation#showerrorsonflags))
 - Reset all controls to a pristine, untouched state and optionally reset their model values to an initial state. (See: [reset](/packages/formation/src/components/Form#resetmodelvalues-object--void))
-- Accessibility: Formation uses [ARIA](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA) attributes where applicable, and assigns matching `id` and `for` attributes to controls and labels, ensuring they are correctly associated with each other.
+- Accessibility: Formation uses [ARIA](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA) attributes where applicable, and assigns matching `id` and `for` attributes to controls and labels, ensuring they are correctly associated with each other. Formation is also [`ngAria`](https://docs.angularjs.org/api/ngAria)-friendly.
 
 ## Setup
 
@@ -22,16 +22,14 @@ $ npm install @darkobits/formation
 ```
 
 ```js
-import Formation, {
-  FormationConfigurator
-} from '@darkobits/formation';
+import Formation from '@darkobits/formation';
 
 angular.module('MyApp', [
   Formation
 ]);
 
 // Configure global error behavior.
-FormationConfigurator({
+Formation.configure({
   showErrorsOn: 'touched, submitted'
 });
 ```
@@ -79,6 +77,7 @@ Everything else is configured via the form's parent controller:
 
 ```js
 import angular from 'angular';
+import Formation from '@darkobits/formation';
 
 import {
   required,
@@ -148,7 +147,7 @@ app.controller('MyCtrl', function () {
 });
 ```
 
-Wowza! We kept our template focused on structure, and our controller neatly describes exactly how each control in the form should behave. Check out the documentation on [Control Configuration](/packages/formation/src/classes/FormationControl#control-configuration) for a detailed breakdown, or head over to [darkobits.github.io/formation](https://darkobits.github.io/formation/) to see a live demo.
+_Wowza!_ We kept our template focused on structure, and our controller neatly describes exactly how each control in the form should behave. Check out the documentation on [Control Configuration](/packages/formation/src/classes/FormationControl#control-configuration) for a detailed breakdown, or head over to [darkobits.github.io/formation](https://darkobits.github.io/formation/) to see a live demo.
 
 ## Documentation
 

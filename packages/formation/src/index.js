@@ -25,7 +25,7 @@ export {
 } from './classes/FormationControl';
 
 
-const Formation = Object.create(new String(), { // eslint-disable-line no-new-wrappers
+const Formation = Object.create(new String(app.name), { // eslint-disable-line no-new-wrappers
   toString: {value: () => app.name}
 });
 

@@ -1,13 +1,13 @@
 # Formation Configuration
 
-This module exports the `FormationConfigurator` and `registerControl` functions, both of which are part of the Formation package's public API.
+This module provides the `configure` and `registerControl` functions, both of which are part of the Formation package's public API.
 
 
-## `FormationConfigurator(opts: object) => void`
+## `configure(opts: object) => void`
 
 Configures global Formation behavior.
 
-**Note:** Formation components are registered during Angular's `run` phase. Therefore, the configurator may only be invoked prior to bootstrapping or during the `config` phase.
+**Note:** Formation components are registered during Angular's `run` phase. Therefore, configuration must be done prioer to prior to bootstrapping or during the `config` phase.
 
 **Parameters:**
 
@@ -20,22 +20,20 @@ Configures global Formation behavior.
 **Example:**
 
 ```js
-import Formation, {
-  FormationConfigurator
-} from '@darkobits/formation';
+import Formation from '@darkobits/formation';
 
 const app = angular.module('MyApp', [
   Formation
 ]);
 
-FormationConfigurator({
+Formation.configure({
   showErrorsOn: 'touched, submitted',
   prefix: 'foo'
 });
 
 app.config($fooProvider => {
   // Or, configure Formation during the config phase if you want to drive behavior using a provider.
-  FormationConfigurator({
+  Formation.configure({
     showErrorsOn: $fooProvider.formErrorBehavior()
   });
 });
@@ -47,7 +45,7 @@ Registers a Formation control as an Angular component using the provided name an
 
 **Note:** The configured prefix (`'fm'` by default) will be prepended to the component's name.
 
-**Note:** Formation components are registered during Angular's `run` phase. Therefore, the configurator may only be invoked prior to bootstrapping or during the `config` phase.
+**Note:** Formation components are registered during Angular's `run` phase. Therefore, configuration must be done prior to bootstrapping or during the `config` phase.
 
 **Parameters:**
 
@@ -60,8 +58,7 @@ Registers a Formation control as an Angular component using the provided name an
 
 ```js
 import Formation, {
-  FormationControl,
-  registerControl
+  FormationControl
 } from '@darkobits/formation';
 
 const app = angular.module('MyApp', [
@@ -73,7 +70,7 @@ class MyCustomControl extends FormationControl {
 
 }
 
-registerControl('datePicker', {
+Formation.registerControl('datePicker', {
   bindings: {
     name: '@'
   },

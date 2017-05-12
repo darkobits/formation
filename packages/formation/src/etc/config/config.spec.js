@@ -41,7 +41,7 @@ function assertIsNgModelController (value) {
 }
 
 
-describe('Configurator', () => {
+describe('#configure', () => {
   describe('prior to the Angular bootstrapping', () => {
     it('should require an object as its argument', () => {
       expect(() => {
