@@ -240,11 +240,11 @@ When working with complex model data, it often becomes necessary to nest forms i
 
 ### Concepts and Limitations
 
-1. An object is always modeled using the form component. Arrays are always modeled using the form group component.
-2. Form groups may only have forms as direct descendants.
+1. An object is always modeled using the **form** component. Arrays are always modeled using the **form group** component.
+2. Form groups may only have forms as direct descendants. In other words, Formation can only model _collections of objects_.
 2. The top-level of a nested form structure must always be a form. Consequently, the root level of your model data must be an object.
 3. The entire nested form is submitted at once; it is not possible to submit individual child forms.
-4. The form component delegates model values and configuration data by matching object keys to control names. The form group component delegates model values and configuration data to child forms by matching array indexes to their position in the DOM.
+4. The form component delegates model values and configuration data by matching **object keys** to **control names**. The form group component delegates model values and configuration data to child forms by matching **array indexes** to their **position in the DOM**.
 
 ### Example
 
@@ -283,17 +283,22 @@ We can build a Formation form to model it thusly:
   <fm-input type="text" name="name"></fm-input>
   <fm-input type="email" name="email"></fm-input>
   <fm-input type="tel" name="phone"></fm-input>
-  <fm-group name="addresses">
-    <fm ng-repeat="">
-
+  <fm-group name="addresses" repeat="true">
+    <fm>
+      <fm-input name="streetAddress"></fm-input>
+      <fm-input name="locality"></fm-input>
+      <fm-select name="administrativeArea"></fm-select>
+      <fm-input name="postalCode"></fm-input>
+      <fm-select name="country"></fm-select>
     </fm>
   </fm-group>
 </fm>
 ```
 
+There are some important things to note about the above template:
 
-
-
+1. We do not need to `name` forms that are direct descendants of a form group; these forms operate based on their position in the template.
+2. Notice we only provide _one_ address form template. Because we are working with a collection of uniform objects, we can use the `repeat` attribute on our form group to instruct it to re-use the same template for each member in the collection.
 
 ## Submitting
 

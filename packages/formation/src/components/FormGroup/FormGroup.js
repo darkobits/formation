@@ -262,7 +262,7 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
     }
 
     if (FormGroup.$repeat) {
-      // If repeat is truthy, clone our transcluded content one for each member
+      // If repeat is truthy, clone our transcluded content once for each member
       // in newValues.
       createTransclusionClones(newValues.length).then(() => {
         setModelValues();
