@@ -68,7 +68,7 @@ export function module (...args) {
 
   // Load each module.
   modules.forEach(moduleName => {
-    angular.mock.module(moduleName);
+    angular.mock.module(moduleName.toString());
   });
 
 
