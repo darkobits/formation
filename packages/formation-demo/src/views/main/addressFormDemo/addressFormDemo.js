@@ -16,6 +16,28 @@ app.component('addressFormDemo', {
 
     vm.disableForm = false;
 
+    vm.initialData = {
+      name: 'Frodo Baggins',
+      gender: 'M',
+      addresses: [
+        {
+          type: 'Home',
+          streetAddress: '1 Bag End',
+          locality: 'The Shire'
+        },
+        {
+          type: 'Work',
+          streetAddress: 'asdf1',
+          locality: 'foo'
+        },
+        {
+          type: 'Other',
+          streetAddress: 'asdf2',
+          locality: 'foo'
+        }
+      ]
+    };
+
     // // Configuration for root-level controls.
     vm.controls = {
       name: {
@@ -81,17 +103,7 @@ app.component('addressFormDemo', {
 
 
     vm.fmReady = form => {
-      form.setModelValues({
-        name: 'Frodo Baggins',
-        gender: 'M',
-        addresses: [
-          {
-            streetAddress: '1 Bag End',
-            locality: 'The Shire'
-          }
-          // null
-        ]
-      });
+      form.setModelValues(vm.initialData);
     };
 
 

@@ -2,8 +2,7 @@
   name="vm.addressForm"
   on-submit="vm.submit"
   on-ready="vm.fmReady"
-  ng-disabled="vm.disableForm"
-  debug>
+  ng-disabled="vm.disableForm">
 
   <!-- Name -->
   <section>
@@ -53,13 +52,12 @@
   </section>
 
   <!-- Addresses -->
-  <fm-group name="addresses">
-    <fm ng-repeat="address in [{type: 'home'}, {type: 'work'}]"
-      controls="vm.addressFormControls">
+  <fm-group name="addresses" repeat="true" debug>
+    <fm controls="vm.addressFormControls">
 
       <label class="label"
         ng-class="{'is-disabled': $fm.isDisabled()}">
-        {{ address.type }}
+        {{ $fm.model.type }}
       </label>
       <br>
 
