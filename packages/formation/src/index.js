@@ -25,12 +25,8 @@ export {
 } from './classes/FormationControl';
 
 
-const Formation = Object.create(new String(app.name), { // eslint-disable-line no-new-wrappers
-  toString: {value: () => app.name}
-});
-
-
-export default Object.assign(Object.create(Formation), {
+export default {
   configure,
-  registerControl
-});
+  registerControl,
+  toString: () => app.name
+};

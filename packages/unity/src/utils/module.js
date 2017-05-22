@@ -68,12 +68,12 @@ export function module (...args) {
 
   // Load each module.
   modules.forEach(moduleName => {
-    angular.mock.module(moduleName.toString());
+    angular.mock.module(moduleName);
   });
 
 
   angular.mock.module(($provide, $injector) => {
-    // Safe a reference to the provider injector.
+    // Save a reference to the provider injector.
     $providerInjector = $injector;
 
     // Disable ui-router.

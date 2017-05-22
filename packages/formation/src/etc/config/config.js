@@ -1,7 +1,6 @@
 import angular from 'angular';
 
 import {
-  adjust,
   concat,
   find,
   is,
@@ -89,7 +88,6 @@ let counter = -1;
 const registeredComponents = [];
 
 
-
 /**
  * Internal reference to Angular's $compileProvider, used for registering
  * directives.
@@ -109,10 +107,9 @@ let compileProvider;
 export function $registerComponent (name, definition) {
   registeredComponents.push(name);
 
+  // Add a run block that will register the provided component during
+  // bootstrapping.
   app.run(() => {
-    // Disallow configuration once the application has entered the "run" phase.
-    allowConfiguration = false;
-
     if (typeof definition === 'function') {
       compileProvider.directive(lowercaseFirst(name), definition);
     } else {
@@ -229,22 +226,29 @@ export function configure (opts) {
 
 // ----- Decorators ------------------------------------------------------------
 
-const oModule = angular.module;
+function decorateModuleFn (obj, fnKey, context) {
+  const origModuleFn = obj[fnKey];
 
-// Invoke toString() on dependencies in calls to angular.module.
-angular.module = (...args) => {
-  return Reflect.apply(oModule, angular, adjust(dependencies => {
-    if (Array.isArray(dependencies)) {
-      return dependencies.map(d => d.toString());
+  obj[fnKey] = (name, requires, configFn) => {
+    if (Array.isArray(requires)) {
+      requires = map(req => req.toString(), requires);
     }
-  }, 1, args));
-};
+
+    return Reflect.apply(origModuleFn, context, [name, requires, configFn]);
+  };
+}
+
+// Mildly naughty: Decorate angular.module such that it will invoke toString()
+// on dependencies so we can pass string objects (or anything that implements
+// toString) as dependencies.
+decorateModuleFn(angular, 'module', angular);
+
+if (angular.mock) {
+  decorateModuleFn(angular.mock, 'module', angular);
+}
 
 
-app.config(($compileProvider, $provide) => {
-  // Save a reference to Angular's $compileProvider.
-  compileProvider = $compileProvider;
-
+app.config($provide => {
   const decorate = [
     // Decoration spec for form/ngForm.
     {
@@ -332,4 +336,17 @@ app.config(($compileProvider, $provide) => {
       });
     });
   });
+});
+
+// ----- Misc ------------------------------------------------------------------
+
+app.config($compileProvider => {
+  // Save a reference to Angular's $compileProvider. Used by registerComponent.
+  compileProvider = $compileProvider;
+});
+
+
+app.run(() => {
+  // Prevent calls to configure() once the "run" phase has started.
+  allowConfiguration = false;
 });
