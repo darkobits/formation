@@ -28,7 +28,7 @@ describe('Utils', () => {
       });
     });
 
-    it('should append arrays', () => {
+    it('should prepend arrays', () => {
       let objA = {
         foo: [1, 2, 3]
       };
@@ -38,7 +38,7 @@ describe('Utils', () => {
       };
 
       expect(Utils.mergeDeep(objA, objB)).toEqual({
-        foo: [1, 2, 3, 4, 5, 6]
+        foo: [4, 5, 6, 1, 2, 3]
       });
     });
 

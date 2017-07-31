@@ -97,7 +97,7 @@ export function mergeWithDeep (f, ...objs) {
  */
 const DEFAULT_MERGER = (d, s) => {
   if (Array.isArray(d) && Array.isArray(s)) {
-    return R.concat(d, s);
+    return R.concat(s, d);
   } else if (R.is(Object, d) && R.is(Object, s) && !R.is(Function, s)) {
     return mergeWithDeep(DEFAULT_MERGER, d, s);
   }
