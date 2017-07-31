@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 import {
   concat,
   find,
@@ -225,28 +223,6 @@ export function configure (opts) {
 
 
 // ----- Decorators ------------------------------------------------------------
-
-function decorateModuleFn (obj, fnKey, context) {
-  const origModuleFn = obj[fnKey];
-
-  obj[fnKey] = (name, requires, configFn) => {
-    if (Array.isArray(requires)) {
-      requires = map(req => req.toString(), requires);
-    }
-
-    return Reflect.apply(origModuleFn, context, [name, requires, configFn]);
-  };
-}
-
-// Mildly naughty: Decorate angular.module such that it will invoke toString()
-// on dependencies so we can pass string objects (or anything that implements
-// toString) as dependencies.
-decorateModuleFn(angular, 'module', angular);
-
-if (angular.mock) {
-  decorateModuleFn(angular.mock, 'module', angular);
-}
-
 
 app.config($provide => {
   const decorate = [

@@ -13,7 +13,9 @@ import * as $constants from './etc/constants';
 // ----- Formation Public API --------------------------------------------------
 
 export {
-  $constants
+  $constants,
+  configure,
+  registerControl
 };
 
 export {
@@ -25,8 +27,4 @@ export {
 } from './classes/FormationControl';
 
 
-export default {
-  configure,
-  registerControl,
-  toString: () => app.name
-};
+export default app.name;

@@ -21,8 +21,9 @@ describe('Select Component', () => {
     module(Formation);
 
     T = directive('fmSelect', {
-      template: `<fm-select
-        options="${options}"></fm-select>`,
+      template: `
+        <fm-select options="${options}"></fm-select>
+      `,
       wrap: `<fm></fm>`,
       scope: {
         items
@@ -36,8 +37,17 @@ describe('Select Component', () => {
     Array.from(T.$element.find('option')).forEach((optionEl, index) => {
       const label = angular.element(optionEl).text();
       const value = angular.element(optionEl).attr('value');
-      expect(label).toEqual(items[index].label);
-      expect(value).toEqual(`number:${items[index].value}`);
+
+      // This accounts for the fact that because no model value has been set
+      // which matches an available option, Angular will add a null <option> tag
+      // with a value of "?" to the top of the <select>.
+      if (index === 0) {
+        expect(label).toEqual('');
+        expect(value).toEqual('?');
+      } else {
+        expect(label).toEqual(items[index - 1].label);
+        expect(value).toEqual(`number:${items[index - 1].value}`);
+      }
     });
   });
 });

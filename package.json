@@ -10,7 +10,7 @@
     "lint": "lerna run lint",
     "test": "lerna run test",
     "build": "lerna run build",
-    "prepare": "run-s bootstrap build",
+    "prepare": "run-s bootstrap test build",
     "prepush": "run-p lint test",
     "postpublish": "lerna run dist-tags"
   },
