@@ -21,9 +21,7 @@
     "lint": "xo",
     "prebuild": "run-p clean lint",
     "build": "babel src --out-dir dist",
-    "build:watch": "watch \"npm run build\" ./src/",
-    "depcheck": "npm-check --skip-unused --no-emoji || true",
-    "dist-tags": "npm dist-tag ls"
+    "build:watch": "watch \"npm run build\" ./src/"
   },
   "xo": false,
   "peerDependencies": {
@@ -32,9 +30,8 @@
   },
   "devDependencies": {
     "babel-cli": "6.x",
+    "eslint": "4.x",
     "eslint-plugin-import": "2.2.x",
-    "jest": "19.x",
-    "npm-check": "5.4.x",
     "npm-run-all": "4.x",
     "rimraf": "2.6.x",
     "watch": "1.x",

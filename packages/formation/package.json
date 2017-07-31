@@ -32,9 +32,7 @@
     "build:browser": "webpack --env.dist --progress",
     "build": "run-p build:commonjs build:browser",
     "build:watch": "watch \"npm run build\" ./src/",
-    "depcheck": "npm-check --skip-unused --no-emoji || true",
-    "bundle-stats": "webpack --env.stats --env.dist",
-    "dist-tags": "npm dist-tag ls"
+    "bundle-stats": "webpack --env.stats --env.dist"
   },
   "xo": false,
   "peerDependencies": {
@@ -49,9 +47,8 @@
   "devDependencies": {
     "@darkobits/unity": "^1.0.0-beta.5",
     "babel-cli": "6.x",
-    "eslint": "3.x",
-    "jest": "19.x",
-    "npm-check": "5.4.x",
+    "eslint": "4.x",
+    "jest": "20.x",
     "npm-run-all": "4.x",
     "rimraf": "2.6.x",
     "watch": "1.x",
