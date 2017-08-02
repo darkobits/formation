@@ -1,6 +1,6 @@
 {
   "name": "@darkobits/formation",
-  "version": "1.0.0-beta.5",
+  "version": "1.0.0-beta.6",
   "license": "WTFPL",
   "contributors": [
     {
@@ -24,9 +24,9 @@
   "scripts": {
     "clean": "rimraf dist",
     "lint": "xo",
-    "test": "jest --config jest.json",
+    "test": "jest",
     "test:watch": "npm t -- --watch",
-    "test:coverage": "npm t -- --coverage; open ./coverage/lcov-report/index.html",
+    "test:coverage": "npm t -- --coverage",
     "prebuild": "run-p clean lint",
     "build:commonjs": "babel src --out-dir dist",
     "build:browser": "webpack --env.dist --progress",
@@ -34,25 +34,25 @@
     "build:watch": "watch \"npm run build\" ./src/",
     "bundle-stats": "webpack --env.stats --env.dist"
   },
-  "xo": false,
   "peerDependencies": {
+    "angular": "^1.5.0",
+    "angular-messages": "^1.5.0",
     "babel-polyfill": "6.x"
   },
   "dependencies": {
     "@darkobits/interface": "1.x",
-    "angular": "^1.5.0",
-    "angular-messages": "^1.5.0",
-    "ramda": "0.23.x"
+    "ramda": "0.24.x"
   },
   "devDependencies": {
-    "@darkobits/unity": "^1.0.0-beta.5",
+    "@darkobits/unity": "1.x",
     "babel-cli": "6.x",
     "eslint": "4.x",
     "jest": "20.x",
     "npm-run-all": "4.x",
     "rimraf": "2.6.x",
     "watch": "1.x",
-    "webpack": "2.x",
+    "webpack": "3.x",
     "xo": "0.18.x"
-  }
+  },
+  "xo": false
 }
