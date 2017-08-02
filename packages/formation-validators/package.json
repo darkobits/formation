@@ -45,6 +45,7 @@
     "babel-cli": "6.x",
     "babel-jest": "20.x",
     "babel-loader": "6.x",
+    "babel-polyfill": "6.x",
     "babel-preset-env": "1.4.x",
     "eslint": "4.x",
     "jest": "20.x",

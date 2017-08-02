@@ -12,6 +12,9 @@ module.exports = {
     '/dist/',
     '/tests/'
   ],
+  setupFiles: [
+    '<rootDir>/src/etc/testSetup.js'
+  ],
   coverageThreshold: {
     global: {
       statements: 90,
