@@ -216,7 +216,7 @@ export function mergeWithDeep (f, ...objs) {
 const DEFAULT_MERGER = (d, s) => {
   if (Array.isArray(d) && Array.isArray(s)) {
     // Concat arrays.
-    return concat(d, s);
+    return concat(s, d);
   } else if (isPlainObject(d) && isPlainObject(s)) {
     // Deep-merge plain objects.
     return mergeWithDeep(DEFAULT_MERGER, d, s);
