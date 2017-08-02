@@ -29,7 +29,8 @@
     "build:browser": "webpack --env.dist --progress",
     "build": "run-p build:commonjs build:browser",
     "build:watch": "watch \"npm run build\" ./src/",
-    "bundle-stats": "webpack --env.stats --env.dist"
+    "bundle-stats": "webpack --env.stats --env.dist",
+    "prepublish": "run-p test build"
   },
   "xo": false,
   "peerDependencies": {
@@ -42,6 +43,9 @@
   "devDependencies": {
     "@darkobits/unity": "1.x",
     "babel-cli": "6.x",
+    "babel-jest": "20.x",
+    "babel-loader": "6.x",
+    "babel-preset-env": "1.4.x",
     "eslint": "4.x",
     "jest": "20.x",
     "npm-run-all": "4.x",

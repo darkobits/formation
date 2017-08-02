@@ -38,7 +38,7 @@ app.component('addressFormDemo', {
       ]
     };
 
-    // // Configuration for root-level controls.
+    // Configuration for root-level controls.
     vm.controls = {
       name: {
         validators: {

@@ -10,9 +10,14 @@
     "lint": "lerna run lint",
     "test": "lerna run test",
     "build": "lerna run build",
-    "prepare": "run-s bootstrap test build",
+    "prepare": "run-s bootstrap",
     "prepush": "run-p lint test",
     "postpublish": "lerna run dist-tags"
+  },
+  "devDependencies": {
+    "husky": "0.14.x",
+    "lerna": "2.0.0",
+    "npm-run-all": "4.x"
   },
   "xo": {
     "env": [
@@ -40,23 +45,5 @@
       ],
       "unicorn/filename-case": "off"
     }
-  },
-  "devDependencies": {
-    "angular": "^1.5.0",
-    "angular-messages": "^1.5.0",
-    "angular-mocks": "^1.5.0",
-    "babel-core": "6.x",
-    "babel-jest": "20.x",
-    "babel-loader": "6.4.x",
-    "babel-plugin-angularjs-annotate": "0.8.x",
-    "babel-polyfill": "6.x",
-    "babel-preset-env": "1.4.x",
-    "babel-runtime": "6.x",
-    "eslint": "4.x",
-    "husky": "0.14.x",
-    "lerna": "2.0.0",
-    "npm-run-all": "4.x",
-    "webpack-visualizer-plugin": "0.1.x",
-    "xo-loader": "0.8.x"
   }
 }

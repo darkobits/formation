@@ -52,7 +52,7 @@ export default {
         required,
         minLength,
         pattern
-      } from '@darkobits/formation/etc/validators';
+      } from '@darkobits/formation-validators';
 
       app.controller('MyCtrl', function () {
         const vm = this;

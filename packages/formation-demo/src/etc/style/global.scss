@@ -136,14 +136,14 @@ a {
 
 fm {
   & form {
-    border: 1px solid red;
+    border: 1px solid #FF0000;
     display: block;
     margin: 8px 0;
     padding: 8px;
   }
 
   & ng-form {
-    border: 1px solid blue;
+    border: 1px solid #0000FF;
     display: block;
     margin: 8px 0;
     padding: 8px;
@@ -151,7 +151,7 @@ fm {
 }
 
 fm-group {
-  border: 1px solid orange;
+  border: 1px solid #FFA500;
   display: block;
   margin: 8px 0;
   padding: 0px 8px;

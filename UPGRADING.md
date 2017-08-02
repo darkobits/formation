@@ -1,4 +1,4 @@
-This document details new features and breaking changes introduced in Formation 1.0.
+This document details new features and breaking changes introduced in Formation 1.x.
 
 # New Feaures
 
@@ -102,7 +102,7 @@ app.controller('myCtrl', function () => {
 });
 ```
 
-### Replaced `Formation` provider/service with `FormationConfigurator` and `registerControl`.
+### Replaced `Formation` provider/service with `configure` and `registerControl` exports.
 
 **Before:**
 
@@ -127,7 +127,7 @@ app.config(FormationProvider => {
 import angular from 'angular';
 
 import Formation, {
-  FormationConfigurator,
+  configure,
   registerControl
 } from '@darkobits/formation';
 
@@ -135,7 +135,7 @@ angular.module('MyApp', [
   Formation
 ]);
 
-FormationConfigurator({
+configure({
   showErrorsOn: /* ... */,
   prefix: /* ... */
 });
@@ -161,7 +161,7 @@ import {
 **After:**
 
 ```bash
-npm install --save @darkobits/formation-validators
+$ npm install --save @darkobits/formation-validators
 ```
 
 ```js

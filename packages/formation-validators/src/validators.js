@@ -2,20 +2,6 @@
 // ----- Formation Validators --------------------------------------------------
 // -----------------------------------------------------------------------------
 
-/**
- * @module Validators
- *
- * @description
- *
- * This module contains several common validators that can be used to configure
- * Formation controls.
- *
- * Note: Functions in the `validators` control configuration object will be
- * copied to a control's `$validators`, so they can be any function that accepts
- * a model value (and/or view value) and returns a boolean.
- */
-
-
 import {
   isNil,
   path
@@ -25,6 +11,19 @@ import {
   ConfigurableValidator,
   $constants
 } from '@darkobits/formation';
+
+
+/**
+ * This module contains several common validators that can be used to configure
+ * Formation controls.
+ *
+ * Note: Functions in the `validators` control configuration object will be
+ * copied to a control's `$validators`, so they can be any function with the
+ * signature:
+ *
+ * (modelValue: object[, viewValue: object]): boolean
+ */
+
 
 const {
   NG_MODEL_CTRL
@@ -37,7 +36,9 @@ const {
  *
  * @example
  *
- * import {required} from 'formation/etc/validators';
+ * import {
+ *   required
+ * } from '@darkobits/formation-validators';
  *
  * vm.controls = {
  *   name: {
@@ -61,7 +62,9 @@ export function required (modelValue) {
  *
  * @example
  *
- * import {min} from 'formation/etc/validators';
+ * import {
+ *   min
+ * } from '@darkobits/formation-validators';
  *
  * vm.controls = {
  *   age: {
@@ -88,7 +91,9 @@ export function min (value) {
  *
  * @example
  *
- * import {minLength} from 'formation/etc/validators';
+ * import {
+ *   minLength
+ * } from '@darkobits/formation-validators';
  *
  * vm.controls = {
  *   address: {
@@ -114,7 +119,9 @@ export function minLength (length) {
  *
  * @example
  *
- * import {max} from 'formation/etc/validators';
+ * import {
+ *   max
+ * } from '@darkobits/formation-validators';
  *
  * vm.controls = {
  *   quantity: {
@@ -141,7 +148,9 @@ export function max (value) {
  *
  * @example
  *
- * import {maxLength} from 'formation/etc/validators';
+ * import {
+ *   maxLength
+ * } from '@darkobits/formation-validators';
  *
  * vm.controls = {
  *   message: {
@@ -169,7 +178,9 @@ const EMAIL_PATTERN = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"
  *
  * @example
  *
- * import {email} from 'formation/etc/validators';
+ * import {
+ *   email
+ * } from '@darkobits/formation-validators';
  *
  * vm.controls = {
  *   email: {
@@ -193,7 +204,9 @@ export function email (modelValue) {
  *
  * @example
  *
- * import {pattern} from 'formation/etc/validators';
+ * import {
+ *   pattern
+ * } from '@darkobits/formation-validators';
  *
  * vm.controls = {
  *   postalCode: {
@@ -221,7 +234,9 @@ export function pattern (pattern) {
  *
  * @example
  *
- * import {match} from 'formation/etc/validators';
+ * import {
+ *   match
+ * } from '@darkobits/formation-validators';
  *
  * vm.controls = {
  *   password: { ... },
@@ -279,7 +294,7 @@ export function match (independentControlName) {
 
     // ----- Independent Control Validator -------------------------------------
 
-    if (!independentNgModelCtrl.$validators.match) {
+    if (!independentNgModelCtrl.$validators[`match:${ngModelCtrl.$name}`]) {
       // Install a complementary validator on the independent control.
       independentNgModelCtrl.$validators[`match:${ngModelCtrl.$name}`] = (modelValue, viewValue) => {
         // If the dependent control has a view value...

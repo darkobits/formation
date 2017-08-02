@@ -95,6 +95,7 @@ export default env => {
   const postCssLoader = {
     loader: 'postcss-loader',
     options: {
+      sourceMap: true,
       plugins () {
         return [
           autoprefixer
