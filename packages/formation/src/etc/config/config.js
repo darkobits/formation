@@ -118,8 +118,8 @@ export function $registerComponent (name, definition) {
 
 
 /**
- * Returns the next available ID, used for assigning ID attributes to
- * unnamed form instances.
+ * Returns the next available ID, used for assigning ID attributes to unnamed
+ * form instances.
  *
  * @private
  *
@@ -158,7 +158,7 @@ export function $getPrefixedName (name) {
 
 
 /**
- * Curried assertType.
+ * Curried assertType with "label" pre-applied.
  *
  * Remaining arguments:
  *
