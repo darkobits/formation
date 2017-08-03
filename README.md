@@ -184,7 +184,7 @@ Feel free to explore the [source](/packages/formation) -- most of the core compo
 [gzipped-img]: http://img.badgesize.io/https://unpkg.com/@darkobits/formation@1.0.0-beta.4/dist/index.min.js?compression=gzip&label=gzipped&style=flat-square
 [unpkg-url]: https://unpkg.com/@darkobits/formation@1.0.0-beta.4/dist/
 
-[xo-img]: https://img.shields.io/badge/code_style-XO-f74c4c.svg?style=flat-square
+[xo-img]: https://img.shields.io/badge/code_style-XO-e271a5.svg?style=flat-square
 [xo-url]: https://github.com/sindresorhus/xo
 
 [npm-img]: https://img.shields.io/npm/v/@darkobits/formation.svg?style=flat-square
