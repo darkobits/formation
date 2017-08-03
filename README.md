@@ -15,10 +15,16 @@ Formation is a form framework for Angular 1.5+ designed for medium-to-large appl
 - Reset all controls to a pristine, untouched state and optionally reset their model values to an initial state. (See: [reset](/packages/formation/src/components/Form#resetmodelvalues-object--void))
 - Accessibility: Formation uses [ARIA](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA) attributes where applicable, and assigns matching `id` and `for` attributes to controls and labels, ensuring they are correctly associated with each other. Formation is also [`ngAria`](https://docs.angularjs.org/api/ngAria)-friendly.
 
-## Setup
+## Installation
 
 ```bash
-$ npm install @darkobits/formation
+$ yarn add @darkobits/formation
+```
+
+or
+
+```bash
+$ npm install --save @darkobits/formation
 ```
 
 ```js
@@ -147,7 +153,6 @@ _Wowza!_ We kept our template focused on structure, and our controller neatly de
 
 Feel free to explore the [source](/packages/formation) -- most of the core components are documented with inline READMEs:
 
-- [Configuration & Registering Components](/packages/formation/src/etc/config)
 - Components:
   - [Form](/packages/formation/src/components/Form)
   - [FormGroup](/packages/formation/src/components/FormGroup)
@@ -158,6 +163,7 @@ Feel free to explore the [source](/packages/formation) -- most of the core compo
 - Classes:
   - [FormationControl](/packages/formation/src/classes/FormationControl)
   - [ConfigurableValidator](/packages/formation/src/classes/ConfigurableValidator)
+- [Configuration & Registering Components](/packages/formation/src/etc/config)
 
 ## &nbsp;
 <p align="center">
@@ -168,16 +174,11 @@ Feel free to explore the [source](/packages/formation) -- most of the core compo
 [travis-img]: https://img.shields.io/travis/darkobits/formation.svg?style=flat-square
 [travis-url]: https://travis-ci.org/darkobits/formation
 
-[codacy-img]: https://img.shields.io/codacy/coverage/e3fb8e46d6a241f5a952cf3fe6a49d06.svg?style=flat-square
-[codacy-url]: https://www.codacy.com/app/darkobits/formation
-
-[minified-img]: http://img.badgesize.io/https://unpkg.com/@darkobits/formation@1.0.0-beta.4/dist/index.min.js?label=minified&style=flat-square
-[gzipped-img]: http://img.badgesize.io/https://unpkg.com/@darkobits/formation@1.0.0-beta.4/dist/index.min.js?compression=gzip&label=gzipped&style=flat-square
-[unpkg-url]: https://unpkg.com/@darkobits/formation@1.0.0-beta.4/dist/
-
-[xo-img]: https://img.shields.io/badge/code_style-XO-e271a5.svg?style=flat-square
-[xo-url]: https://github.com/sindresorhus/xo
-
 [npm-img]: https://img.shields.io/npm/v/@darkobits/formation.svg?style=flat-square
 [npm-url]: https://www.npmjs.com/package/@darkobits/formation
 
+[codacy-img]: https://img.shields.io/codacy/coverage/e3fb8e46d6a241f5a952cf3fe6a49d06.svg?style=flat-square
+[codacy-url]: https://www.codacy.com/app/darkobits/formation
+
+[xo-img]: https://img.shields.io/badge/code_style-XO-e271a5.svg?style=flat-square
+[xo-url]: https://github.com/sindresorhus/xo

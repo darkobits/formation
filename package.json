@@ -11,7 +11,7 @@
     "test": "lerna run test",
     "build": "lerna run build",
     "prepare": "run-s bootstrap",
-    "prepush": "run-p lint test",
+    "prepush": "npm run lint",
     "postpublish": "lerna run dist-tags"
   },
   "devDependencies": {

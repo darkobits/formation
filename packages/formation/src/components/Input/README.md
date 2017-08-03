@@ -41,10 +41,12 @@ This control extends the [`FormationControl`](/packages/formation/src/classes/Fo
   <fm-input name="firstName" type="text">First Name:</fm-input>
   <fm-input name="lastName" type="text">Last Name:</fm-input>
 
-  <label>What is your favorite color?</label>
-  <fm-input name="favoriteColor" type="radio" ng-value="red">Red</fm-input>
-  <fm-input name="favoriteColor" type="radio" ng-value="green">Green</fm-input>
-  <fm-input name="favoriteColor" type="radio" ng-value="blue">Blue</fm-input>
+  <fieldset>
+    <legend>What is your favorite color?</legend>
+    <fm-input name="favoriteColor" type="radio" ng-value="red">Red</fm-input>
+    <fm-input name="favoriteColor" type="radio" ng-value="green">Green</fm-input>
+    <fm-input name="favoriteColor" type="radio" ng-value="blue">Blue</fm-input>
+  </fieldset>
 </fm>
 ```
 

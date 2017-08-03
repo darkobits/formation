@@ -242,15 +242,15 @@ app.controller('MyCtrl', function () {
 });
 ```
 
-### `pattern(pattern: RegExp) => (modelValue: any) => boolean`
+### `pattern(pattern: RegExp) => (modelValue: any, viewValue: any) => boolean`
 
-Accepts a pattern and returns a function that, when provided a view value, returns `true` if the view value matches the pattern.
+Accepts a pattern and returns a function that, when provided a model value and view value, returns `true` if the _view value_ matches the pattern.
 
 **Parameters:**
 
 |Name|Type|Description|
 |---|---|---|
-|`pattern`|`RegExp`|Pattern to test model values against.|
+|`pattern`|`RegExp`|Pattern to test view values against.|
 
 **Returns:**
 
@@ -291,7 +291,7 @@ Accepts a control name and returns a configurable validator which will be config
 
 **Returns:**
 
-`ConfigurableValidator` - Configurable validator instance.
+[`ConfigurableValidator`](/packages/formation/src/classes/ConfigurableValidator) - Configurable validator instance.
 
 **Example:**
 

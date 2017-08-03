@@ -40,9 +40,9 @@
   "devDependencies": {
     "@darkobits/unity": "1.x",
     "babel-jest": "20.x",
-    "babel-loader": "6.x",
+    "babel-loader": "7.x",
     "babel-polyfill": "6.x",
-    "babel-preset-env": "1.4.x",
+    "babel-preset-env": "1.6.x",
     "eslint": "4.x",
     "jest": "20.x",
     "npm-run-all": "4.x",
