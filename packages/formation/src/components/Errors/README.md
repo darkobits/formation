@@ -78,10 +78,12 @@ It isn't difficult to imagine that a form with a dozen controls could easily req
 On the JavaScript side, we will tell Formation to display errors on invalid fields when either 1) they have been touched or 2) when the form has been submitted:
 
 ```js
-import Formation from '@darkobits/formation';
+import Formation, {
+  configure as configureFormation
+} from '@darkobits/formation';
 
 
-Formation.configure({
+configureFormation({
   showErrorsOn: 'touched, submitted'
 });
 ```

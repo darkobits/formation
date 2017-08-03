@@ -1,9 +1,5 @@
-// -----------------------------------------------------------------------------
-// ----- Webpack Configuration -------------------------------------------------
-// -----------------------------------------------------------------------------
-'use strict';
-
 import path from 'path';
+
 import autoprefixer from 'autoprefixer';
 import bourbon from 'bourbon';
 import bourbonNeat from 'bourbon-neat';
@@ -13,10 +9,10 @@ import HtmlWebpackPlugin from 'html-webpack-plugin';
 import SassLintPlugin from 'sasslint-webpack-plugin';
 import VisualizerWebpackPlugin from 'webpack-visualizer-plugin';
 import webpack from 'webpack';
+
 import packageJson from './package';
 
 const resolve = path.resolve;
-
 const CONTEXT = resolve(__dirname, 'src');
 const MODULE_NAME = packageJson.name;
 const VERSION = packageJson.version;
@@ -43,7 +39,7 @@ export default env => {
   };
 
 
-  // ----- Loaders -------------------------------------------------------------
+  // ----- JavaScript Loaders --------------------------------------------------
 
   const xoLoader = {
     loader: 'xo-loader',
@@ -77,6 +73,8 @@ export default env => {
     ]
   });
 
+
+  // ----- CSS Loaders ---------------------------------------------------------
 
   const sassLoader = {
     loader: 'sass-loader',
@@ -129,32 +127,7 @@ export default env => {
   });
 
 
-  const urlLoader = {
-    loader: 'url-loader',
-    options: {
-      limit: 10000
-    }
-  };
-
-  config.module.rules.push({
-    test: /\.(png|jpg|gif|eot|ttf|woff|woff2)$/,
-    use: [
-      urlLoader
-    ]
-  });
-
-
-  const svgSpriteLoader = {
-    loader: 'svg-sprite-loader'
-  };
-
-  config.module.rules.push({
-    test: /\.svg$/,
-    use: [
-      svgSpriteLoader
-    ]
-  });
-
+  // ----- Template Loaders ----------------------------------------------------
 
   const ngTemplateLoader = {
     loader: 'ngtemplate-loader',
@@ -181,9 +154,36 @@ export default env => {
   });
 
 
+  // ----- Misc Loaders --------------------------------------------------------
+
+  const urlLoader = {
+    loader: 'url-loader',
+    options: {
+      limit: 10000
+    }
+  };
+
+  config.module.rules.push({
+    test: /\.(png|jpg|gif|eot|ttf|woff|woff2)$/,
+    use: [
+      urlLoader
+    ]
+  });
+
+  const svgSpriteLoader = {
+    loader: 'svg-sprite-loader'
+  };
+
+  config.module.rules.push({
+    test: /\.svg$/,
+    use: [
+      svgSpriteLoader
+    ]
+  });
+
+
   // ----- Module Resolving ----------------------------------------------------
 
-  // Resolve modules from the build context and node_modules.
   config.resolve = {
     modules: [
       CONTEXT,

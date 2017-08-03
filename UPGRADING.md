@@ -10,6 +10,8 @@ Concepts:
 - Forms inside form groups do not need names. Configuration and model values are delegated to forms in form groups based on their index, which is determined by their position in the DOM.
 - Only the top-level form is "submittable".
 
+For more information, read the [documentation for the FormGroup component](/packages/formation/src/components/FormGroup).
+
 ### Added the `ConfigurableValidator` class
 
 This class allows developers to write complex validators that may need to access the form or other controls. For more information, see the [documentation for ConfigurableValidator](/packages/formation/src/classes/ConfigurableValidator).
@@ -102,6 +104,8 @@ app.controller('myCtrl', function () => {
 });
 ```
 
+---
+
 ### Replaced `Formation` provider/service with `configure` and `registerControl` exports.
 
 **Before:**
@@ -159,6 +163,12 @@ import {
 ```
 
 **After:**
+
+```bash
+$ yarn add @darkobits/formation-validators
+```
+
+or
 
 ```bash
 $ npm install --save @darkobits/formation-validators

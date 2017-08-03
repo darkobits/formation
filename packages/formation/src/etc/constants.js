@@ -27,7 +27,7 @@ export const FORM_GROUP_COMPONENT_NAME = 'fmGroup';
 
 
 /**
- * Prefix used for all components registered with Formation.registerComponent.
+ * Prefix used for all components registered with registerComponent.
  * This incluedes all built-in components.
  *
  * @type {string}

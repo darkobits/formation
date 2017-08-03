@@ -20,20 +20,22 @@ Configures global Formation behavior.
 **Example:**
 
 ```js
-import Formation from '@darkobits/formation';
+import Formation, {
+  configure as configureFormation
+} from '@darkobits/formation';
 
 const app = angular.module('MyApp', [
   Formation
 ]);
 
-Formation.configure({
+configureFormation({
   showErrorsOn: 'touched, submitted',
   prefix: 'foo'
 });
 
 app.config($fooProvider => {
   // Or, configure Formation during the config phase if you want to drive behavior using a provider.
-  Formation.configure({
+  configureFormation({
     showErrorsOn: $fooProvider.formErrorBehavior()
   });
 });
@@ -58,7 +60,8 @@ Registers a Formation control as an Angular component using the provided name an
 
 ```js
 import Formation, {
-  FormationControl
+  FormationControl,
+  registerControl
 } from '@darkobits/formation';
 
 const app = angular.module('MyApp', [
@@ -70,7 +73,7 @@ class MyCustomControl extends FormationControl {
 
 }
 
-Formation.registerControl('datePicker', {
+registerControl('datePicker', {
   bindings: {
     name: '@'
   },

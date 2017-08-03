@@ -147,7 +147,7 @@ export function $getShowErrorsOnStr () {
  *
  * @private
  *
- * Formation.$getPrefixedName('Input') // => 'fmInput';
+ * $getPrefixedName('Input') // => 'fmInput';
  *
  * @param  {string} name
  * @return {string}

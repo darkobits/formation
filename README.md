@@ -1,6 +1,6 @@
-# formation
+[![][travis-img]][travis-url] [![][npm-img]][npm-url] [![][codacy-img]][codacy-url] [![][xo-img]][xo-url]
 
-[![travis][travis-img]][travis-url] [![david][david-img]][david-url] [![codacy][codacy-img]][codacy-url] [![minified][minified-img]][unpkg-url] [![gzipped][gzipped-img]][unpkg-url] [![Code Style][xo-img]][xo-url] [![NPM Version][npm-img]][npm-url]
+# formation
 
 Formation is a form framework for Angular 1.5+ designed for medium-to-large applications that require consistent, robust forms. It aims to reduce template size by moving business logic to controllers, which also encourages code-reuse and improves consistency.
 
@@ -22,14 +22,16 @@ $ npm install @darkobits/formation
 ```
 
 ```js
-import Formation from '@darkobits/formation';
+import Formation, {
+  configure as configureFormation
+} from '@darkobits/formation';
 
 angular.module('MyApp', [
   Formation
 ]);
 
 // Configure global error behavior.
-Formation.configure({
+configureFormation({
   showErrorsOn: 'touched, submitted'
 });
 ```
@@ -76,20 +78,12 @@ Here's the template strucutre you might use to construct an address form using F
 Everything else is configured via the form's parent controller:
 
 ```js
-import angular from 'angular';
-import Formation from '@darkobits/formation';
 
 import {
   required,
   minLength,
   pattern
 } from '@darkobits/formation-validators';
-
-
-const app = angular.module('MyApp', [
-  Formation
-]);
-
 
 app.controller('MyCtrl', function () {
   const vm = this;
@@ -174,9 +168,6 @@ Feel free to explore the [source](/packages/formation) -- most of the core compo
 [travis-img]: https://img.shields.io/travis/darkobits/formation.svg?style=flat-square
 [travis-url]: https://travis-ci.org/darkobits/formation
 
-[david-img]: https://img.shields.io/david/darkobits/formation.svg?style=flat-square
-[david-url]: https://david-dm.org/darkobits/formation
-
 [codacy-img]: https://img.shields.io/codacy/coverage/e3fb8e46d6a241f5a952cf3fe6a49d06.svg?style=flat-square
 [codacy-url]: https://www.codacy.com/app/darkobits/formation
 
@@ -189,3 +180,4 @@ Feel free to explore the [source](/packages/formation) -- most of the core compo
 
 [npm-img]: https://img.shields.io/npm/v/@darkobits/formation.svg?style=flat-square
 [npm-url]: https://www.npmjs.com/package/@darkobits/formation
+

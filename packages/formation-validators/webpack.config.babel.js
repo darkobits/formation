@@ -1,9 +1,5 @@
-// -----------------------------------------------------------------------------
-// ----- Webpack Configuration -------------------------------------------------
-// -----------------------------------------------------------------------------
-
 import path from 'path';
-import webpack from 'webpack';
+
 
 const resolve = path.resolve;
 const CONTEXT = resolve(__dirname, 'src');
@@ -45,7 +41,7 @@ export default () => {
   };
 
 
-  // ----- Loaders -------------------------------------------------------------
+  // ----- JavaScript Loaders --------------------------------------------------
 
   const babelLoader = {
     loader: 'babel-loader'
@@ -58,21 +54,6 @@ export default () => {
       babelLoader
     ]
   });
-
-
-  // ----- Plugins -------------------------------------------------------------
-
-  config.plugins.push(new webpack.optimize.UglifyJsPlugin({
-    compress: {
-      warnings: false,
-      dead_code: true // eslint-disable-line camelcase
-    },
-    mangle: true,
-    output: {
-      comments: false
-    },
-    sourceMap: true
-  }));
 
 
   // ----- Miscellany ----------------------------------------------------------

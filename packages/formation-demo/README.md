@@ -6,6 +6,15 @@ To run locally:
 
 ```bash
 $ git clone git@github.com:darkobits/formation.git
+$ yarn
+$ cd packages/formation-demo
+$ yarn start
+```
+
+or
+
+```bash
+$ git clone git@github.com:darkobits/formation.git
 $ npm install
 $ cd packages/formation-demo
 $ npm start

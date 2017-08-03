@@ -1,10 +1,6 @@
-// -----------------------------------------------------------------------------
-// ----- Webpack Configuration -------------------------------------------------
-// -----------------------------------------------------------------------------
-
 import path from 'path';
 import VisualizerWebpackPlugin from 'webpack-visualizer-plugin';
-import webpack from 'webpack';
+
 
 const resolve = path.resolve;
 const CONTEXT = resolve(__dirname, 'src');
@@ -31,6 +27,12 @@ export default env => {
   };
 
   config.externals = {
+    '@darkobits/interface': {
+      commonjs: '@darkobits/interface',
+      commonjs2: '@darkobits/interface',
+      amd: '@darkobits/interface',
+      root: 'Interface'
+    },
     angular: 'angular',
     'angular-messages': {
       commonjs: 'angular-messages',
@@ -46,7 +48,7 @@ export default env => {
   };
 
 
-  // ----- Loaders -------------------------------------------------------------
+  // ----- JavaScript Loaders --------------------------------------------------
 
   const babelLoader = {
     loader: 'babel-loader'
@@ -68,18 +70,6 @@ export default env => {
       filename: 'stats.html'
     }));
   }
-
-  config.plugins.push(new webpack.optimize.UglifyJsPlugin({
-    compress: {
-      warnings: false,
-      dead_code: true // eslint-disable-line camelcase
-    },
-    mangle: true,
-    output: {
-      comments: false
-    },
-    sourceMap: true
-  }));
 
 
   // ----- Miscellany ----------------------------------------------------------
