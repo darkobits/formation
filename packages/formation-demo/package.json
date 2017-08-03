@@ -26,8 +26,8 @@
     "build": "webpack --env.dist --progress",
     "deploy": "git push origin `git subtree split --prefix dist`:gh-pages --force",
     "precommit": "run-s lint build && git add dist/",
-    "start": "webpack-dev-server --env.dev",
-    "prepublish": "run-p lint build"
+    "prepublish": "run-p lint build",
+    "start": "webpack-dev-server --env.dev"
   },
   "dependencies": {
     "@darkobits/formation": "^1.0.0-beta.6",

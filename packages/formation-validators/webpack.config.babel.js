@@ -23,7 +23,7 @@ export default () => {
 
   config.output = {
     path: resolve(__dirname, 'dist'),
-    filename: '[name].min.js',
+    filename: '[name].js',
     sourceMapFilename: '[file].map',
     library: 'FormationValidators',
     libraryTarget: 'umd'

@@ -20,7 +20,6 @@
     "dist"
   ],
   "main": "dist/index.js",
-  "browser": "dist/index.min.js",
   "scripts": {
     "clean": "rimraf dist",
     "lint": "xo",
@@ -28,9 +27,7 @@
     "test:watch": "npm t -- --watch",
     "test:coverage": "npm t -- --coverage",
     "prebuild": "run-p clean lint",
-    "build:commonjs": "babel src --out-dir dist",
-    "build:browser": "webpack --env.dist --progress",
-    "build": "run-p build:commonjs build:browser",
+    "build": "webpack --env.dist --progress",
     "build:watch": "watch \"npm run build\" ./src/",
     "bundle-stats": "webpack --env.stats --env.dist",
     "prepublish": "run-p test build"
@@ -46,7 +43,6 @@
   },
   "devDependencies": {
     "@darkobits/unity": "1.x",
-    "babel-cli": "6.x",
     "babel-jest": "20.x",
     "babel-loader": "6.x",
     "babel-plugin-angularjs-annotate": "0.8.x",

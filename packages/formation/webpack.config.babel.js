@@ -24,7 +24,7 @@ export default env => {
 
   config.output = {
     path: resolve(__dirname, 'dist'),
-    filename: '[name].min.js',
+    filename: '[name].js',
     sourceMapFilename: '[file].map',
     library: 'Formation',
     libraryTarget: 'umd'
