@@ -2,8 +2,7 @@ language: node_js
 node_js: 6
 
 install:
-  - npm install
-  - npm run prepare
+  - yarn
 
 env:
   - PACKAGE=formation
@@ -12,12 +11,13 @@ env:
 script:
   - cd packages/$PACKAGE
   - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> .npmrc
-  - npm run test -- --coverage
+  - yarn test -- --coverage
 
 after_success:
-  - npm install codacy-coverage
+  - yarn add codacy-coverage
   - $(npm bin)/codacy-coverage -v < ./coverage/lcov.info
 
 cache:
+  yarn: true
   directories:
     - node_modules
