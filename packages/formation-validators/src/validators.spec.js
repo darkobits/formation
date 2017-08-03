@@ -145,11 +145,11 @@ describe('Validators', () => {
       beforeEach(() => {
         const wrap = compile({
           template: `
-          <fm controls="controls">
-            <fm-input name="password"></fm-input>
-            <transclude></transclude>
-          </fm>
-        `,
+            <fm controls="controls">
+              <fm-input name="password"></fm-input>
+              <transclude></transclude>
+            </fm>
+          `,
           scope: {
             controls: {
               passwordMatch: {

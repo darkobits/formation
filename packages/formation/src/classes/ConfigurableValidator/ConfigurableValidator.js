@@ -17,28 +17,31 @@ import {
  *
  * @example
  *
- * const myValidator = new ConfigurableValidator(function (modelValue) {
- *   const {form, ngModelCtrl, scope} = this;
- *
- *   // Do something with modelValue/ngModelCtrl/form.
+ * const myValidator = new ConfigurableValidator(function ({form, ngModelCtrl, scope}) {
+ *   return function(modelValue, viewValue) {
+ *     // Do something with modelValue/ngModelCtrl/form, return a boolean.
+ *   }
  * });
  */
-export class ConfigurableValidator {
-  constructor (validator) {
-    assertType('ConfigurableValidator', [Function], 'validator', validator);
+export function ConfigurableValidator (validatorConfigurationFn) {
+  assertType('ConfigurableValidator', [Function], 'validator configurator', validatorConfigurationFn);
 
-    this.validator = validator.bind(this);
+  function configure (formationControl) {
+    const form = formationControl[FORM_CONTROLLER];
+    const scope = form.$getScope();
+    const ngModelCtrl = formationControl[NG_MODEL_CTRL];
 
-    // Assign the CONFIGURABLE_VALIDATOR flag so that the instance can be
-    // identified as such by Formation. This must be used because instanceof
-    // does not work across execution contexts.
-    this[CONFIGURABLE_VALIDATOR] = true;
+    const validatorFn = validatorConfigurationFn({form, scope, ngModelCtrl});
+    assertType('ConfigurableValidator', [Function], 'validator', validatorFn);
+    return validatorFn;
   }
 
-  configure (formationControl) {
-    this.form = formationControl[FORM_CONTROLLER];
-    this.scope = this.form.$getScope();
-    this.ngModelCtrl = formationControl[NG_MODEL_CTRL];
-    return this.validator;
-  }
+  /**
+   * Assign the CONFIGURABLE_VALIDATOR flag so that the validator can be
+   * identified as such by Formation. This must be used because instanceof
+   * does not work across execution contexts.
+   */
+  configure[CONFIGURABLE_VALIDATOR] = true;
+
+  return configure;
 }

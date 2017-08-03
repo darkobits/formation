@@ -472,6 +472,12 @@ describe('FormationControl', () => {
   // ----- Interfaces ----------------------------------------------------------
 
   describe('[Interface] Configure', () => {
+    const ConfigurableValidator = () => {
+      const configure = jest.fn(() => () => Promise.resolve(true));
+      configure[CONFIGURABLE_VALIDATOR] = true;
+      return configure;
+    };
+
     beforeEach(() => {
       T = directive('fmInput', {
         template: `<fm-input></fm-input>`,
@@ -651,19 +657,13 @@ describe('FormationControl', () => {
       });
 
       it('should configure the validator when provided a ConfigurableValidator', () => {
-        const ConfigurableValidator = {
-          configure: jest.fn(() => {
-            return () => {};
-          })
-        };
-
-        ConfigurableValidator[CONFIGURABLE_VALIDATOR] = true;
+        const configFn = ConfigurableValidator(() => {});
 
         T.fmInput[Configure]({
-          validators: {ConfigurableValidator}
+          validators: {configFn}
         });
 
-        expect(ConfigurableValidator.configure).toHaveBeenCalledWith(T.fmInput);
+        expect(configFn).toHaveBeenCalledWith(T.fmInput);
       });
     });
 
@@ -722,19 +722,13 @@ describe('FormationControl', () => {
       });
 
       it('should configure the async validator when provided a ConfigurableValidator', () => {
-        const ConfigurableValidator = {
-          configure: jest.fn(() => {
-            return () => Promise.resolve();
-          })
-        };
-
-        ConfigurableValidator[CONFIGURABLE_VALIDATOR] = true;
+        const configFn = ConfigurableValidator(() => {});
 
         T.fmInput[Configure]({
-          asyncValidators: {ConfigurableValidator}
+          asyncValidators: {configFn}
         });
 
-        expect(ConfigurableValidator.configure).toHaveBeenCalledWith(T.fmInput);
+        expect(configFn).toHaveBeenCalledWith(T.fmInput);
       });
     });
 

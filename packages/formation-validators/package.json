@@ -16,7 +16,7 @@
     "npm": ">=4.x",
     "node": ">=6.x"
   },
-  "main": "dist/validators.js",
+  "main": "dist/index.js",
   "scripts": {
     "clean": "rimraf dist",
     "lint": "xo",

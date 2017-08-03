@@ -14,7 +14,7 @@ export default () => {
   config.context = CONTEXT;
 
   config.entry = {
-    validators: resolve(CONTEXT, 'validators.js')
+    index: resolve(CONTEXT, 'validators.js')
   };
 
   config.output = {

@@ -1,13 +1,12 @@
 # ConfigurableValidator
 
-**Type:** `class`
+**Type:** `function`
 
 ## Description
 
-Allows for the creation of complex validators/asyncValidators that may need to access other controls in the form. The provided function will be bound to the `ConfigurableValidator` instance. Once configured, the validator will have references to the Formation form controller, its scope, and the control's ngModel controller.
+Allows for the creation of complex validators/asyncValidators that may need to access other controls in the form. The provided function will be invoked when the control is registered with the form, and will be passed an object containing references to the `form`, the control's `ngModelCtrl`, and the form's `scope`. This function should return the final validation function that the form will invoke to validate the control.
 
-
-### `ConfigurableValidator(validator: function) => ConfigurableValidator`
+### `ConfigurableValidator(validatorConfigurator: function) => function`
 
 Creates a new configurable validator with the provided validator function.
 
@@ -15,11 +14,11 @@ Creates a new configurable validator with the provided validator function.
 
 |Name|Type|Description|
 |---|---|---|
-|`validator`|`Function`|Validator function.|
+|`validatorConfigurator`|`Function`|Validator configuration function.|
 
 **Returns:**
 
-`ConfigurableValidator` - Instance.
+`function` - Intermediate configuration function invoked by the form during control registration.
 
 **Example:**
 
@@ -32,10 +31,10 @@ import {
 
 
 // Create a new configurable validator.
-const myValidator = new ConfigurableValidator(function (modelValue) {
-  const {form, ngModelCtrl, scope} = this;
-
-  // Do something with form/ngModelCtrl/scope/modelValue.
+const myValidator = ConfigurableValidator(({form, ngModelCtrl, scope}) => {
+  return modelValue => {
+    // Do something with form/ngModelCtrl/scope/modelValue, return a boolean.
+  };
 });
 
 

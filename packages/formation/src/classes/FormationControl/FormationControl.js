@@ -486,7 +486,7 @@ Configure.implementedBy(FormationControl).as(function (configuration) {
         // Check against the CONFIGURABLE_VALIDATOR constant here rather than
         // using is() because instanceof does not work across execution
         // contexts.
-        this[NG_MODEL_CTRL].$validators[name] = validator.configure(this);
+        this[NG_MODEL_CTRL].$validators[name] = validator(this);
       } else {
         assertIsFunction('validator', validator);
         this[NG_MODEL_CTRL].$validators[name] = validator.bind(this[NG_MODEL_CTRL]);
@@ -523,7 +523,7 @@ Configure.implementedBy(FormationControl).as(function (configuration) {
         // Check against the CONFIGURABLE_VALIDATOR constant here rather than
         // using is() because instanceof does not work across execution
         // contexts.
-        this[NG_MODEL_CTRL].$asyncValidators[name] = asyncValidator.configure(this);
+        this[NG_MODEL_CTRL].$asyncValidators[name] = asyncValidator(this);
       } else {
         assertIsFunction('async validator', asyncValidator);
         this[NG_MODEL_CTRL].$asyncValidators[name] = asyncValidator.bind(this[NG_MODEL_CTRL]);
