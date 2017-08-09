@@ -1,6 +1,6 @@
 {
   "name": "@darkobits/formation",
-  "version": "1.0.0-beta.6",
+  "version": "1.0.0-beta.8",
   "license": "WTFPL",
   "contributors": [
     {
@@ -30,7 +30,8 @@
     "build": "webpack --env.dist --progress",
     "build:watch": "watch \"npm run build\" ./src/",
     "bundle-stats": "webpack --env.stats --env.dist",
-    "prepublish": "run-p test build"
+    "prepublish": "run-p test build",
+    "postpublish": "npm dist-tag ls"
   },
   "peerDependencies": {
     "angular": "^1.5.0",
