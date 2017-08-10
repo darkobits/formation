@@ -1,6 +1,6 @@
 {
   "name": "@darkobits/formation-demo",
-  "version": "1.0.0-beta.8",
+  "version": "1.0.0-beta.9",
   "private": true,
   "license": "WTFPL",
   "contributors": [
@@ -31,7 +31,7 @@
   },
   "dependencies": {
     "@darkobits/formation": "^1.0.0-beta.8",
-    "@darkobits/formation-validators": "^1.0.0-beta.8",
+    "@darkobits/formation-validators": "^1.0.0-beta.9",
     "angular": "^1.5.0",
     "angular-animate": "^1.5.0",
     "angular-aria": "^1.5.0",
