@@ -252,6 +252,8 @@ export function pattern (pattern) {
  */
 export function match (independentControlName) {
   return new ConfigurableValidator(({form, ngModelCtrl, scope}) => {
+    let watchersAdded = false;
+
     return (modelValue, viewValue) => {
       const independentNgModelCtrl = path([NG_MODEL_CTRL], form.getControl(independentControlName));
 
@@ -273,7 +275,7 @@ export function match (independentControlName) {
 
       // ----- Co-Validate Controls --------------------------------------------
 
-      if (!this.$watchersAdded) {
+      if (!watchersAdded) {
         // Watch for changes to the error states of both controls. When either
         // control enters or leaves its error state, validate the other control.
         scope.$watch(() => form.getControl(ngModelCtrl.$name).getErrors(), (newValue, oldValue) => {
@@ -288,7 +290,7 @@ export function match (independentControlName) {
           }
         });
 
-        this.$watchersAdded = true;
+        watchersAdded = true;
       }
 
 
