@@ -26,7 +26,7 @@
     "build": "webpack --env.dist --progress",
     "deploy": "git push origin `git subtree split --prefix dist`:gh-pages --force",
     "precommit": "run-s lint build && git add dist/",
-    "prepublish": "run-p lint build",
+    "prepublish": "run-s lint build",
     "start": "webpack-dev-server --env.dev"
   },
   "dependencies": {
@@ -37,16 +37,16 @@
     "angular-aria": "^1.5.0",
     "angular-messages": "^1.5.0",
     "angular-mocks": "^1.5.0",
-    "angular-ui-router": "1.0.0-rc.1",
+    "angular-ui-router": "^1.0.0",
     "babel-polyfill": "6.x",
     "ramda": "0.24.x"
   },
   "devDependencies": {
     "animate.css": "3.5.x",
     "autoprefixer": "7.x",
-    "babel-loader": "6.x",
+    "babel-loader": "7.x",
     "babel-plugin-angularjs-annotate": "0.8.x",
-    "babel-preset-env": "1.4.x",
+    "babel-preset-env": "1.6.x",
     "bourbon": "4.3.x",
     "bourbon-neat": "1.9.x",
     "css-loader": "0.28.x",

@@ -11,7 +11,7 @@ import Formation, {
 } from '@darkobits/formation';
 
 
-const app = angular.module('App', [
+const app = angular.module('FormationDemo', [
   'ngMockE2E',
   'ui.router.state.events',
   Formation,

@@ -60,14 +60,13 @@ export default env => {
     ]
   });
 
-
   const babelLoader = {
     loader: 'babel-loader'
   };
 
   config.module.rules.push({
     test: /\.(m)?js$/,
-    exclude: /node_modules|packages/,
+    exclude: /node_modules/,
     use: [
       babelLoader
     ]
@@ -252,7 +251,8 @@ export default env => {
     inline: true,
     host: '0.0.0.0',
     port: env.port || 8080,
-    historyApiFallback: true
+    historyApiFallback: true,
+    disableHostCheck: true
   };
 
 
