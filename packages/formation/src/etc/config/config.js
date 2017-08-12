@@ -186,6 +186,7 @@ export function registerControl (name, definition) {
 
   $registerComponent(normalizedName, mergeDeep({
     bindings: {
+      name: '@',
       [COMPONENT_CONFIGURATION]: '<config',
       $ngDisabled: '<ngDisabled'
     },
