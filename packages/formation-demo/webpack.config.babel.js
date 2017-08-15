@@ -250,7 +250,6 @@ export default env => {
   config.devServer = {
     inline: true,
     host: '0.0.0.0',
-    port: env.port || 8080,
     historyApiFallback: true,
     disableHostCheck: true
   };
