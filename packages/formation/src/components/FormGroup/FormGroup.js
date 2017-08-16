@@ -216,6 +216,8 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
   /**
    * Updates the form group's configuration data and configures each registered
    * child form.
+   *
+   * @param  {array} - Configuration data.
    */
   Configure.implementedBy(FormGroup).as(function (config) {
     assertIsArrayOrNil('configuration', config);
@@ -326,18 +328,6 @@ export function FormGroupController ($attrs, $compile, $element, $log, $parse, $
     createTransclusionClones(1);
   };
 
-
-  window.$postLink = () => {
-    $scope.$apply(() => {
-      FormGroup.$postLink();
-    });
-  };
-
-  window.empty = () => {
-    $scope.$apply(() => {
-      $element.children().detach();
-    });
-  };
 
   /**
    * Set up form name and assign controller instance to its name attribute.
