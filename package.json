@@ -12,7 +12,10 @@
     "build": "lerna run build",
     "prepare": "run-s bootstrap",
     "prepush": "npm run lint",
-    "postpublish": "lerna run dist-tags"
+    "postpublish": "lerna run dist-tags",
+    "prerelease": "run-p lint test build",
+    "release": "lerna publish --conventional-commits",
+    "release:canary": "npm run release -- --npm-tag=canary"
   },
   "devDependencies": {
     "husky": "0.14.x",
