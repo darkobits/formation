@@ -1,33 +1,31 @@
-# Errors Component
+# Errors
 
-**Name:** `fmErrors` (Prefix Configurable)
+**Name:** `fmErrors` \(Prefix Configurable\)
 
 **Type:** [`component`](https://docs.angularjs.org/guide/component)
 
-## Description
-
 `ngMessages` is a powerful Angular 1.x module that allows developers to display validation error messages for individual form controls. However, in large applications, it can be cumbersome to work with for the following reaons:
 
-- All message strings must be template literals or exposed to the template via the controller.
-- Determining when to show/hide errors is tedious.
-- Markup bloats with each validation message added.
-- Developers have to concern themselves with a model value and the control state, which are stored in different objects.
-- Consistency is difficult to maintain as each developer working on a large codebase may use slightly different markup or message copy.
-- Setting error messages returned from an API on a per-control basis is difficult.
+* All message strings must be template literals or exposed to the template via the controller.
+* Determining when to show/hide errors is tedious.
+* Markup bloats with each validation message added.
+* Developers have to concern themselves with a model value and the control state, which are stored in different objects.
+* Consistency is difficult to maintain as each developer working on a large codebase may use slightly different markup or message copy.
+* Setting error messages returned from an API on a per-control basis is difficult.
 
 Formation addresses these issues by moving all of this logic from the template to the controller, making it easier to compose error message data and share it across a large code base.
 
-## Bindings
+### Bindings
 
-|Name|Type|Description|
-|---|---|---|
-|`for`|`<`|Control name to show errors for.|
+| Name | Type | Description |
+| --- | --- | --- |
+| `for` | `<` | Control name to show errors for. |
 
-## API
+### API
 
 This control extends the [`FormationControl`](/packages/formation/src/components/FormationControl) class, and does not implement any additional methods.
 
-## Example
+### Example
 
 Here's an example of what the markup for an `ngMessages` block might look like in a typical application:
 
@@ -63,10 +61,9 @@ Here's an example of what the markup for an `ngMessages` block might look like i
     </div>
   </div>
 </form>
-
 ```
 
-It isn't difficult to imagine that a form with a dozen controls could easily require hundreds of lines of markup, most of which are related to business logic rather than the structure or presentation of the document. The `Errors` component consumes 1 line of markup and never causes template bloat as additional validation messages are added:
+_Oof!_ It isn't difficult to imagine that a form with a dozen controls could easily require hundreds of lines of markup, most of which are related to _business logic_ rather than the _structure_ or _presentation_ of the document. The `Errors` component consumes 1 line of markup and never causes template bloat as additional validation messages are added:
 
 ```html
 <fm name="vm.addressForm" controls="vm.controls">
@@ -75,7 +72,10 @@ It isn't difficult to imagine that a form with a dozen controls could easily req
 </fm>
 ```
 
-On the JavaScript side, we will tell Formation to display errors on invalid fields when either 1) they have been touched or 2) when the form has been submitted:
+On the JavaScript side, we will tell Formation to display errors on invalid fields when either:
+
+1. They have been touched, or
+2. When the form has been submitted.
 
 ```js
 import Formation, {
@@ -91,6 +91,8 @@ configureFormation({
 And here's what our controller would look like:
 
 ```js
+import app from 'app';
+
 import {
   required,
   minLength,
@@ -99,7 +101,7 @@ import {
 } from '@darkobits/formation-validators';
 
 
-angular.module('MyApp').controller('AddressFormCtrl', function () {
+app.controller('AddressFormCtrl', function () {
   const vm = this;
 
   vm.controls = {
@@ -127,7 +129,10 @@ Note that `validators` here are nothing special; Formation provides several comm
 
 The `Errors` component also facilitates setting custom error messages on controls that may not be known until runtime. For more information about setting custom error messages, see [Submitting](/packages/formation/src/components/Form#submitting).
 
-## Additional Resources
+### Additional Resources
 
-- [AngularJS: API: ngMessages](https://docs.angularjs.org/api/ngMessages/directive/ngMessages)
-- [AngularJS: API: ngModel.ngModelController](https://docs.angularjs.org/api/ng/type/ngModel.NgModelController)
+* [AngularJS: API: ngMessages](https://docs.angularjs.org/api/ngMessages/directive/ngMessages)
+* [AngularJS: API: ngModel.ngModelController](https://docs.angularjs.org/api/ng/type/ngModel.NgModelController)
+
+
+

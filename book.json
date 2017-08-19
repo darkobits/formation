@@ -1,0 +1,31 @@
+{
+  "gitbook": "3.2.3",
+  "title": "Formation",
+  "root": "./docs",
+  "plugins": [
+    "-highlight",
+    "github",
+    "prism",
+    "styles-sass",
+    "versions"
+  ],
+  "styles": {
+    "website": "./styles/website.scss"
+  },
+  "pluginsConfig": {
+    "github": {
+      "url": "https://github.com/darkobits/formation/"
+    },
+    "sharing": {
+      "facebook": false,
+      "twitter": false,
+      "google": false,
+      "weibo": false,
+      "instapaper": false,
+      "vk": false
+    },
+    "versions": {
+      "type": "tags"
+    }
+  }
+}

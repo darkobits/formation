@@ -1,0 +1,177 @@
+$prism-selector: '.book-body .page-wrapper .page-inner section.normal pre';
+
+// Base16 Ocean Colors
+$base00: #2B303B;
+$base01: #343d46;
+$base02: #4F5B66;
+$base03: #65737E;
+$base04: #A7ADBA;
+$base05: #C0C5CE;
+$base06: #DFE1E8;
+$base07: #EFF1F5;
+$base08: #BF616A;
+$base09: #D08770;
+$base0A: #EBCB8B;
+$base0B: #A3BE8C;
+$base0C: #96B5B4;
+$base0D: #8FA1B3;
+$base0E: #B48EAD;
+$base0F: #AB7967;
+
+.book {
+  // Common
+  & #{$prism-selector} {
+    --prism-attr: $base09;
+    --prism-interpolation: $base0D;
+    --prism-number: $base09;
+    --prism-regex: $base0C;
+    --prism-tag: $base08;
+
+    direction: ltr;
+    font-family: /* 'Operator Mono Ssm', */ Consolas, Menlo, 'Roboto Mono', Monaco, 'Andale Mono WT', 'Andale Mono', 'Lucida Console', 'Lucida Sans Typewriter', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', 'Liberation Mono', 'Nimbus Mono L', 'Courier New', Courier, monospace;
+    font-size: 1em;
+    hyphens: none;
+    line-height: 1.2em;
+    margin: 0.85em 0;
+    overflow: auto;
+    padding: 1em;
+    tab-size: 2;
+    text-align: left;
+    text-shadow: none;
+    white-space: pre;
+    word-break: normal;
+    word-spacing: normal;
+  }
+
+  // White.
+  &:not(.color-theme-1):not(.color-theme-2) #{$prism-selector} {
+    --prism-comment: $base04;
+    --prism-foreground: $base03;
+    --prism-keyword: saturate($base0E, 20%);
+    --prism-string: darken(saturate($base0B, 10%), 10%);
+
+    background-color: #FAFAFA;
+    border: 1px solid #E8E8E8;
+
+    & code {
+      background: none;
+      color: $base03;
+    }
+  }
+
+  // Sepia.
+  &.color-theme-1 #{$prism-selector} {
+
+  }
+
+  // Night.
+  &.color-theme-2 #{$prism-selector} {
+    --prism-comment: $base03;
+    --prism-foreground: $base05;
+    --prism-keyword: $base0E;
+    --prism-string: $base0B;
+
+    background-color: #2D3143;
+    border: 1px solid #3B3F54;
+
+    & code {
+      background: none;
+      color: $base05;
+      font-weight: normal;
+    }
+  }
+}
+
+.token.punctuation,
+.token.operator,
+.token.boolean,
+.token.property,
+.token.function {
+  background: none;
+  color: var(--prism-foreground);
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: var(--prism-comment);
+}
+
+.token.keyword,
+.token.control,
+.token.directive,
+.token.unit {
+  color: var(--prism-keyword);
+  // font-style: italic;
+}
+
+.token.important {
+  color: var(--prism-keyword);
+}
+
+.token.string,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string,
+.token.attr-value {
+  color: var(--prism-string);
+}
+
+.token.interpolation-punctuation,
+.token.placeholder,
+.token.variable {
+  color: var(--prism-interpolation);
+}
+
+.token.regex,
+.token.statement,
+.token.atrule {
+  color: var(--prism-regex);
+}
+
+.token.number,
+.token.selector {
+  color: var(--prism-number);
+}
+
+.token.tag {
+  color: var(--prism-tag);
+}
+
+.token.attr-name {
+  color: var(--prism-attr);
+  // font-style: italic;
+}
+
+.token.deleted {
+  text-decoration: line-through;
+}
+
+.token.inserted {
+  border-bottom: 1px dotted $base07;
+  text-decoration: none;
+}
+
+.token.italic {
+  font-style: italic;
+}
+
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
+
+.token.namespace {
+  opacity: 0.7;
+}
+
+.token.entity {
+  cursor: help;
+}
+
+pre > code.highlight {
+  outline: 0.4em solid var(--prism-tag);
+  outline-offset: 0.4em;
+}

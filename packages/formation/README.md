@@ -18,35 +18,7 @@ $ npm install --save @darkobits/formation
 
 ## Setup
 
-1. Add the Formation module to your application's dependencies.
-
-```js
-import Formation from '@darkobits/formation';
-
-angular.module('MyApp', [
-  Formation
-]);
-```
-
-2. [Configure](/packages/formation/src/etc/config#configureopts-object--void) error behavior. _(Optional)_
-
-```js
-import {
-  configure
-} from '@darkobits/formation';
-
-configure({
-  showErrorsOn: 'touched, submitted'
-});
-```
-
-3. Begin using Formation [components](/packages/formation/src/components), or [building your own](/formation/src/etc/config#registercontrolname-string-definition-object--void)!
-
-## &nbsp;
-<p align="center">
-  <br>
-  <img width="22" height="22" src="https://cloud.githubusercontent.com/assets/441546/25318539/db2f4cf2-2845-11e7-8e10-ef97d91cd538.png">
-</p>
+See the [official documentation](https://darkobits.gitbooks.io/formation/) for setup instructions.
 
 [travis-img]: https://img.shields.io/travis/darkobits/formation.svg?style=flat-square
 [travis-url]: https://travis-ci.org/darkobits/formation
