@@ -18,7 +18,7 @@ Here's the code for the existing form, written using vanilla Angular:
 <form name="vm.addressForm"
   ng-submit="vm.submit"
   novalidate>
-  
+
   <!-- Name -->
   <div>
     <input type="text"
@@ -36,7 +36,7 @@ Here's the code for the existing form, written using vanilla Angular:
       Please enter at least 6 characters.
     </span>
   </div>
-  
+
   <!-- Street Address -->
   <div>
     <input type="text"
@@ -50,21 +50,21 @@ Here's the code for the existing form, written using vanilla Angular:
       This field is required.
     </span>
   </div>
-  
-  <!-- Locality (City) -->
+
+  <!-- City -->
   <div>
     <input type="text"
-      name="locality"
-      ng-model="vm.locality"
+      name="city"
+      ng-model="vm.city"
       required>
   </div>
-  <div ng-messages="vm.addressForm.locality.$error"
-      ng-if="vm.addressForm.locality.$invalid && (vm.addressForm.$submitted || vm.addressForm.locality.$touched)">
+  <div ng-messages="vm.addressForm.city.$error"
+      ng-if="vm.addressForm.city.$invalid && (vm.addressForm.$submitted || vm.addressForm.city.$touched)">
     <span ng-message="required">
       This field is required.
     </span>
   </div>
-  
+
   <!-- State -->
   <div>
     <select name="state"
@@ -79,7 +79,7 @@ Here's the code for the existing form, written using vanilla Angular:
       This field is required.
     </span>
   </div>
-  
+
   <!-- Postal Code -->
   <div>
     <input type="text"
@@ -97,7 +97,7 @@ Here's the code for the existing form, written using vanilla Angular:
       Please enter a valid U.S. postal code.
     </span>
   </div>
-  
+
   <!-- Submit -->
   <div>
     <button type="submit">
@@ -114,20 +114,20 @@ import templateUrl from './addressForm.html';
 
 function AddressFormCtrl ($http) {
   const vm = this;
-  
+
   vm.states = [
     // State data.
   ];
-  
+
   vm.submit = () => {
     if(vm.addressForm.$invalid) {
       return;
     }
-    
+
     $http.post('/api/address', {
       name: vm.name,
       streetAddress: vm.streetAddress,
-      locality: vm.locality,
+      city: vm.city,
       state: vm.state,
       postalCode: vm.postalCode
     });
@@ -141,13 +141,15 @@ app.component('addressForm', {
 });
 ```
 
- Notice a few things about this component:
+Notice a few things about this component:
 
-* There is a substantial amount of business logic is in the template, and much of it is very repetitious.
-* The size of the template will grow as we add additional validation error messages to controls, even though the structure of the document has not fundamentally changed.
-* There are two very separate models that developers must reason about:
-  * The form controller, used to access a controls errors \(among other things\): `vm.addressForm.someControl`
-  * The bindings where model values for each control are written: `vm.someControl`.
+* There is a substantial amount of business logic is in the template, and much of it is repetitious. For example, every control requires a hefty `ngIf` expression to display validation errors if the control has been touched or if the form has been submitted -- typically a behavior that doesn't change from form to form in a large application.
+* The size of the template will grow as we add additional validation error messages to controls, even though the structure of the document has not fundamentally changed. In large applications, this copy may be centralized in a constants file or even delivered from an API, but to expose these messages to the template would entail even more scope bindings.
+* The form's data model \(constructed using `ngModel` directives\) is completely separate from the form controller's API, meaning developers must reason about two different    models that developers must reason about:
+  * The form controller, used to access a controls errors \(among other things\): `vm.addressForm.name.$error`
+  * The bindings where model values for each control are written: `vm.name`
+* The form's submit handler is invoked even if the form is not valid, requiring that a check for validity be made before proceeding.
+* There are a total of **22** references to `vm.addressForm` between the template and the controller, all of which must be updated if the name of the form is changed.
 
 ---
 
@@ -183,7 +185,7 @@ Next, lets update our template:
 
 ```html
 <!-- addressForm.html -->
-<fm name="vm.addressForm" controls="vm.controls" on-submit="vm.submit">
+<fm controls="vm.controls" on-submit="vm.submit">
   <fm-input type="text" name="name">
     Name
   </fm-input>
@@ -199,7 +201,7 @@ Next, lets update our template:
   </fm-input>
   <fm-errors for="locality"></fm-errors>
 
-  <fm-select name="state" options="s.value as s.label for s in vm.states">
+  <fm-select name="state" options="state.value as state.label for state in vm.states">
     State
   </fm-select>
   <fm-errors for="state"></fm-errors>
@@ -291,7 +293,7 @@ function AddressFormCtrl ($http) {
   vm.submit = modelValues => {
     // No need to check for $invalid here, because Formation will not invoke
     // a submit handler on invalid forms.
-    
+
     // We return the promise for our asynchronous submit action so that
     // Formation can automatically disable the form until the API request
     // finishes.
@@ -306,7 +308,15 @@ app.component('addressForm', {
 });
 ```
 
-_Wowza!_
+_Wowza_ <img src="https://user-images.githubusercontent.com/441546/29554975-f3d790fe-86d5-11e7-9e17-5fee853a49f7.png" width="14" height="14">
 
-We kept our template focused on structure, and our controller neatly describes exactly how each control in the form should behave. Notice there are no `ngModel` directives present, no bindings exposed to the template for error copy, and no verbose `ngIf` expressions to determine when to show/hide error messages.
+* Zero business logic in the template; it is focused only on the structure of the document.
+* Template size will never increase if validators/error messages are added to controls.
+* The form's data model is reflected by its controls, eliminating the need for `ngModel` and reducing scope bindings.
+* The form's submit handler is only invoked if the form is valid, and Formation automatically disables the form while our API request is pending.
+* There are **0** references to `vm.addressForm` in our refactored component.
+
+
+
+
 
