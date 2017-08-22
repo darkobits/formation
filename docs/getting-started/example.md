@@ -308,7 +308,9 @@ app.component('addressForm', {
 });
 ```
 
-_Wowza_
+_Wowza!_
+
+Let's look at how things have improved:
 
 * Zero business logic in the template; it is focused only on the structure of the document.
 * Template size will never increase if validators/error messages are added to controls.
@@ -319,8 +321,8 @@ _Wowza_
 <p align="center">
   <br>
   <img src="https://user-images.githubusercontent.com/441546/29554975-f3d790fe-86d5-11e7-9e17-5fee853a49f7.png"
-    width="32"
-    height="32">
+    width="42"
+    height="42">
 </p>
 
 
