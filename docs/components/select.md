@@ -15,6 +15,7 @@ This component creates a `<label>` and a `<select>` control. The control and lab
 | `multiple` | `@` | Whether to render a single select or a multi-select. |
 | `options` | `@` | Comprehension expression to pass to `ngOptions`. |
 | `config` | `<` | Control configuration object. \(See: [Control Configuration](/packages/formation/src/classes/FormationControl#control-configuration)\) |
+| `ngDisabled` | `<` | Expression to evaluate to determine if the form and all controls should be disabled. |
 
 ### API
 
