@@ -308,7 +308,7 @@ app.component('addressForm', {
 });
 ```
 
-_Wowza_ <img src="https://user-images.githubusercontent.com/441546/29554975-f3d790fe-86d5-11e7-9e17-5fee853a49f7.png" width="14" height="14">
+_Wowza_
 
 * Zero business logic in the template; it is focused only on the structure of the document.
 * Template size will never increase if validators/error messages are added to controls.
@@ -316,7 +316,12 @@ _Wowza_ <img src="https://user-images.githubusercontent.com/441546/29554975-f3d7
 * The form's submit handler is only invoked if the form is valid, and Formation automatically disables the form while our API request is pending.
 * There are **0** references to `vm.addressForm` in our refactored component.
 
-
+<p align="center">
+  <br>
+  <img src="https://user-images.githubusercontent.com/441546/29554975-f3d790fe-86d5-11e7-9e17-5fee853a49f7.png"
+    width="32"
+    height="32">
+</p>
 
 
 
