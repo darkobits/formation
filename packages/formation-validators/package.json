@@ -25,7 +25,7 @@
     "test:coverage": "npm t -- --coverage",
     "prebuild": "run-p clean lint",
     "build": "webpack --env.dist --progress",
-    "build:watch": "watch \"npm run build\" ./src/",
+    "build:watch": "npm run build -- --watch",
     "bundle-stats": "webpack --env.stats --env.dist",
     "prepublish": "run-p test build",
     "postpublish": "npm dist-tag ls"
@@ -48,7 +48,6 @@
     "jest": "20.x",
     "npm-run-all": "4.x",
     "rimraf": "2.6.x",
-    "watch": "1.x",
     "webpack": "3.x",
     "xo": "0.18.x"
   }
