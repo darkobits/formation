@@ -6,6 +6,8 @@
  * TODO: Consider replacing mergeDeep with webpack-merge et. al.
  */
 
+import isPlainObject from 'is-plain-object';
+
 import {
   append,
   concat,
@@ -26,27 +28,6 @@ import {
 import {
   MODULE_NAME
 } from './constants';
-
-
-/**
- * Returns true if the provided value is (likely) a plain object.
- *
- * @private
- *
- * @param  {any}  value
- * @return {boolean}
- */
-function isPlainObject (value) {
-  try {
-    return Object.getPrototypeOf(value).constructor.name === 'Object';
-  } catch (err) {
-    if (/cannot read property/ig.test(err.message)) {
-      return true;
-    }
-
-    throw err;
-  }
-}
 
 
 /**

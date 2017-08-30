@@ -39,6 +39,12 @@ export default env => {
       commonjs2: 'angular-messages',
       amd: 'angular-messages'
     },
+    'is-plain-object': {
+      commonjs: 'is-plain-object',
+      commonjs2: 'is-plain-object',
+      amd: 'is-plain-object',
+      root: 'isPlainObject'
+    },
     ramda: {
       commonjs: 'ramda',
       commonjs2: 'ramda',

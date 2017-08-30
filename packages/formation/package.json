@@ -40,6 +40,7 @@
   },
   "dependencies": {
     "@darkobits/interface": "1.x",
+    "is-plain-object": "2.0.x",
     "ramda": "0.24.x"
   },
   "devDependencies": {
