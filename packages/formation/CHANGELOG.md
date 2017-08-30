@@ -1,7 +1,18 @@
 # Change Log
 
 All notable changes to this project will be documented in this file.
-See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+<a name="1.0.0-beta.11"></a>
+# [1.0.0-beta.11](https://github.com/darkobits/formation/compare/v1.0.0-beta.10...v1.0.0-beta.11) (2017-08-30)
+
+
+### Bug Fixes
+
+* Deep merging works correctly in IE11. ([9383c12](https://github.com/darkobits/formation/commit/9383c12))
+
+
+
 
 <a name="1.0.0-beta.10"></a>
 # 1.0.0-beta.10 (2017-08-19)
