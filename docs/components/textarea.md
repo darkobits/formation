@@ -13,7 +13,7 @@ This component creates a `<label>` and a `<textarea>` control. The control and l
 | `name` | `@` | Name of the control. |
 | `placeholder` | `@` | Textarea placeholder. |
 | `config` | `<` | Control configuration object. \(See: [Control Configuration](/packages/formation/src/classes/FormationControl#control-configuration)\) |
-| `ngDisabled` | `<` | Expression to evaluate to determine if the form and all controls should be disabled. |
+| `ng-disabled` | `<` | Expression to evaluate to determine if the component should be disabled. (Passed-through to the underlying `<textarea>` element.) |
 
 ### API
 

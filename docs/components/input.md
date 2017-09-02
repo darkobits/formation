@@ -13,9 +13,9 @@ This component creates a label and an input control. It supports any [valid HTML
 | `name` | `@` | Name of the control. |
 | `placeholder` | `@` | Input placeholder \(if applicable\). |
 | `type` | `@` | Input type \(`text`, `radio`, `checkbox`, etc\). |
-| `ngValue` | `<` | Value to set the control's model to when selected \(for radios\). |
+| `ng-value` | `<` | Value to set the control's model to when selected \(for radios\). |
 | `config` | `<` | Control configuration object. \(See: [Control Configuration](/packages/formation/src/components/FormationControl#control-configuration)\) |
-| `ngDisabled` | `<` | Expression to evaluate to determine if the form and all controls should be disabled. |
+| `ng-disabled` | `<` | Expression to evaluate to determine if the component should be disabled. (Passed-through to the underlying `<input>` element.) |
 
 ### API
 

@@ -12,7 +12,7 @@ Creates a new Formation form group; a collection of child Formation forms.
 | --- | --- | --- |
 | `name` | `@` | Name of the form, and expression in parent scope to bind controller instance to. |
 | `repeat` | `<` | Whether or not to re-use the form group's transcluded template for each member in its model value collection. |
-| `ngDisabled` | `<` | Expression to evaluate to determine if the form and all controls should be disabled. |
+| `ng-disabled` | `<` | Expression to evaluate to determine if the form group and all child forms should be disabled. |
 
 ### API
 

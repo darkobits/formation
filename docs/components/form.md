@@ -12,9 +12,10 @@ Creates a new Formation form. This component should be used in lieu of `<form>` 
 | --- | --- | --- |
 | `name` | `@` | Name of the form, and expression in parent scope to bind controller instance to. |
 | `controls` | `<` | Expression in parent scope to use for control configuration. |
-| `onSubmit` | `<` | Function in parent scope to invoke when submitting the form. |
-| `showErrorsOn` | `@` | String of comma/space delimited control/form states to check for showing control errors. This can also be configured globally using the [configure](/packages/formation/src/etc/config#configureopts-object--void) method. |
-| `ngDisabled` | `<` | Expression to evaluate to determine if the form and all controls should be disabled. |
+| `on-submit` | `<` | Function in parent scope to invoke when submitting the form. |
+| `on-ready` | `<` | Function in parent scope to invoke when the form has finished compiling and the component's API is ready. |
+| `show-errorson` | `@` | String of comma/space delimited control/form states to check for showing control errors. This can also be configured globally using the [configure](/packages/formation/src/etc/config#configureopts-object--void) method. |
+| `ng-disabled` | `<` | Expression to evaluate to determine if the form and all controls should be disabled. |
 
 ### Properties
 
@@ -60,6 +61,10 @@ Whether or not the form has been submitted \(successfully or not\). This is a pa
 
 Returns the first control whose name matches the provided value.
 
+> **Why does this method only return "the first control"?**
+>
+> When using radio buttons, there will be multiple registered controls that share the same name. However, their state and model values will be kept in sync by the form, so providing the first matching control is sufficient.
+
 #### **Parameters:**
 
 | Name | Type | Description |
@@ -90,7 +95,7 @@ Returns the named child form or form group.
 
 #### **Returns**
 
-Form\|[`FormGroup`](/packages/formation/src/components/FormGroup) - Form or form group instance, if found.
+Form or [`FormGroup`](/packages/formation/src/components/FormGroup) - Form or form group instance, if found.
 
 #### **Example**
 
@@ -118,7 +123,7 @@ vm.formationForm.getModelValues(); // => {firstName: 'Frodo', lastName: 'Baggins
 
 ### `setModelValues(modelValues: object): void`
 
-Sets the model value of each control in `modelValues` to the provided value.
+Sets the model value of each control in `modelValues` to the provided value. Model values that are omitted from the provided object will not be updated. If there are nested forms and/or form groups present, you may pass a nested data structure and the parent form will delegate to its children.
 
 #### **Parameters**
 

@@ -15,7 +15,7 @@ This component creates a `<label>` and a `<select>` control. The control and lab
 | `multiple` | `@` | Whether to render a single select or a multi-select. |
 | `options` | `@` | Comprehension expression to pass to `ngOptions`. |
 | `config` | `<` | Control configuration object. \(See: [Control Configuration](/packages/formation/src/classes/FormationControl#control-configuration)\) |
-| `ngDisabled` | `<` | Expression to evaluate to determine if the form and all controls should be disabled. |
+| `ng-disabled` | `<` | Expression to evaluate to determine if the component should be disabled. (Passed-through to the underlying `<select>` element.) |
 
 ### API
 
@@ -44,6 +44,7 @@ This control extends the [`FormationControl`](/packages/formation/src/classes/Fo
 ### Additional Resources
 
 * [AngularJS: API: select](https://docs.angularjs.org/api/ng/directive/select)
+* [AngularJS: API: ngOptions](https://docs.angularjs.org/api/ng/directive/ngOptions)
 
 
 

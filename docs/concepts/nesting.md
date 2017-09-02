@@ -12,6 +12,10 @@ In order to keep things sane, Formation imposes a few important limitations when
 * Nested forms are submitted as a single unit; it is not possible to submit individual child forms.
 * The `fm` component delegates model values and configuration data to child forms and controls by matching **object keys** to **form/control names**. However, the `fmGroup` component delegates model values and configuration data to child forms by matching **array indexes** to the form's **position in the template**.
 
+Additionally, the following guidelines should be followed whenever possible to keep managing your form components easy:
+
+* Formation forms delegate to their children whenever possible, so methods like `getModelValues`, `setModelValues`, and `reset` only need to be called from the root-level form controller. You should very rarely need to drill-down to the form controller of a deeply-nested form, though this is possible to do using the `getForm` method.
+
 ### Example
 
 Given the following data:
