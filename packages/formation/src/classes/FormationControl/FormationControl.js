@@ -2,6 +2,8 @@
 // ----- Control Base Class ----------------------------------------------------
 // -----------------------------------------------------------------------------
 
+import angular from 'angular';
+
 import {
   clone,
   contains,
@@ -19,6 +21,7 @@ import {
   CONFIGURABLE_VALIDATOR,
   CUSTOM_ERROR_KEY,
   FORM_CONTROLLER,
+  HTML5_ATTRIBUTES,
   NG_MODEL_CTRL,
   NG_MODEL_GETTER_SETTER
 } from '../../etc/constants';
@@ -128,7 +131,7 @@ const assertIsFunction = assertType('FormationControl', Function);
  * - `errors`: Array containing tuples of validation keys and error messages.
  */
 export class FormationControl {
-  constructor () {
+  constructor ($attrs, $element) {
     this[NG_MESSAGES] = [];
 
     this.$parsers = [];
@@ -140,6 +143,15 @@ export class FormationControl {
     this.getModelValue = this[GetModelValue];
     this.setModelValue = this[SetModelValue];
     this.configure = this[Configure];
+
+    // Watch attributes on the component's outer element and mirror them to
+    // the relevent inner element, as determined by checking for the presence of
+    // ng-model.
+    this.$attributeWatchers = HTML5_ATTRIBUTES.map(attr => {
+      return $attrs.$observe(attr, newValue => {
+        angular.element($element[0].querySelector('[ng-model]')).attr(attr, newValue);
+      });
+    });
   }
 
 
@@ -180,6 +192,9 @@ export class FormationControl {
     if (this[NG_MODEL_CTRL]) {
       this[FORM_CONTROLLER].$unregisterControl(this);
     }
+
+    // De-register attribute watchers.
+    this.$attributeWatchers.forEach(deregistrationFn => deregistrationFn());
   }
 
 
@@ -374,6 +389,9 @@ export class FormationControl {
     this.$disabled = true;
   }
 }
+
+
+FormationControl.$inject = ['$attrs', '$element'];
 
 
 // ----- Interfaces ------------------------------------------------------------

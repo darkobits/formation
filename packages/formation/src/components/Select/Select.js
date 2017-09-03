@@ -44,7 +44,6 @@ $registerComponent($getPrefixedName('Select'), () => {
     bindToController: {
       [COMPONENT_CONFIGURATION]: '<config',
       name: '@',
-      placeholder: '@',
       multiple: '@',
       $ngDisabled: '<ngDisabled'
     },

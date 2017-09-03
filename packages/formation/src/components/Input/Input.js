@@ -28,7 +28,6 @@ class InputControl extends FormationControl {
 registerControl('Input', {
   bindings: {
     name: '@',
-    placeholder: '@',
     type: '@',
     ngValue: '<'
   },
@@ -46,9 +45,7 @@ registerControl('Input', {
       ng-transclude>
     </label>
     <input id="{{::Input.getControlId() }}"
-      type="{{::Input.type }}"
       name="{{::Input.type === 'radio' ? Input.$getFormName() + '-' + Input.name : Input.name }}"
-      placeholder="{{::Input.placeholder }}"
       ng-model="Input.${NG_MODEL_GETTER_SETTER}"
       ng-value="Input.ngValue"
       ng-class="{

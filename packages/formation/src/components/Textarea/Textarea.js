@@ -27,8 +27,7 @@ class TextareaControl extends FormationControl {
 
 registerControl('Textarea', {
   bindings: {
-    name: '@',
-    placeholder: '@'
+    name: '@'
   },
   transclude: true,
   controller: TextareaControl,
@@ -43,9 +42,7 @@ registerControl('Textarea', {
       ng-transclude>
     </label>
     <textarea id="{{::Textarea.getControlId() }}"
-      type="{{::Textarea.type }}"
       name="{{::Textarea.name }}"
-      placeholder="{{::Textarea.placeholder }}"
       ng-model="Textarea.${NG_MODEL_GETTER_SETTER}"
       ng-class="{
         'has-error': Textarea.getErrors(),

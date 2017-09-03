@@ -85,3 +85,25 @@ export const CUSTOM_ERROR_KEY = '$custom';
  * @type {string}
  */
 export const CONFIGURABLE_VALIDATOR = '$configurableValidator';
+
+
+/**
+ * List of HTML5 attributes that should be mirrored from component elements to
+ * form controls.
+ *
+ * @type {array}
+ */
+export const HTML5_ATTRIBUTES = [
+  'autocomplete',
+  'autofocus',
+  'max',
+  'maxlength',
+  'min',
+  // 'multiple',
+  'placeholder',
+  'readonly',
+  'size',
+  'step',
+  'type',
+  'wrap'
+];
