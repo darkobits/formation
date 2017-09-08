@@ -624,7 +624,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    * @return {*}
    */
   Form.$getModelValue = controlName => {
-    return clone(modelValues.get(controlName));
+    return modelValues.get(controlName);
   };
 
 
