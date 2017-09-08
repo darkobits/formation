@@ -3,6 +3,7 @@
   "private": true,
   "engines": {
     "node": ">=6.0",
+    "npm": ">=4.0",
     "yarn": ">=1.0"
   },
   "scripts": {

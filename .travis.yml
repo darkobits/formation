@@ -6,7 +6,8 @@ before_install:
   - export PATH="$HOME/.yarn/bin:$PATH"
 
 install:
-  - yarn install
+  - yarn install --ignore-scripts
+  - yarn build
 
 env:
   - PACKAGE=formation
@@ -15,7 +16,8 @@ env:
 script:
   - cd packages/$PACKAGE
   - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> .npmrc
-  - yarn test -- --coverage
+  - yarn lint
+  - yarn test --coverage
 
 after_success:
   - yarn add codacy-coverage
