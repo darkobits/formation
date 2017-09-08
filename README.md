@@ -1,4 +1,4 @@
-[![][travis-img]][travis-url] [![][npm-img]][npm-url] [![][codacy-img]][codacy-url] [![][xo-img]][xo-url]
+[![][travis-img]][travis-url] [![][npm-img]][npm-url] [![][codacy-img]][codacy-url] [![][xo-img]][xo-url] [![][cc-img]][cc-url]
 
 ![](https://user-images.githubusercontent.com/441546/29477821-f495ba52-841e-11e7-8e90-10671c59b739.png)
 
@@ -54,3 +54,6 @@ The Formation documentation is [available on GitBook](https://darkobits.gitbooks
 
 [xo-img]: https://img.shields.io/badge/code_style-XO-e271a5.svg?style=flat-square
 [xo-url]: https://github.com/sindresorhus/xo
+
+[cc-img]: https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg?style=flat-square
+[cc-url]: https://conventionalcommits.org/
