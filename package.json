@@ -11,7 +11,7 @@
     "lint": "lerna run lint",
     "test": "lerna run test",
     "build": "lerna run build",
-    "prepare": "run-s lint test build",
+    "prepare": "run-s lint build test",
     "prerelease": "lerna updated && npm run prepare",
     "release": "lerna publish",
     "release:canary": "npm run release -- --npm-tag=canary",
