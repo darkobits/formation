@@ -2,28 +2,30 @@
   "name": "formation",
   "private": true,
   "engines": {
-    "npm": ">=4.x",
-    "node": ">=6.x"
+    "node": ">=6.0",
+    "yarn": ">=1.0"
   },
   "scripts": {
-    "bootstrap": "lerna bootstrap --hoist --npm-client=yarn",
+    "clean": "rimraf ./node_modules && lerna clean",
     "lint": "lerna run lint",
     "test": "lerna run test",
     "build": "lerna run build",
-    "prepare": "run-s bootstrap",
-    "prepush": "npm run lint",
-    "postpublish": "lerna run dist-tags",
-    "prerelease": "run-p lint test build",
-    "release": "lerna publish --conventional-commits",
+    "prepare": "run-s lint test build",
+    "prerelease": "lerna updated && npm run prepare",
+    "release": "lerna publish",
     "release:canary": "npm run release -- --npm-tag=canary",
     "release:beta": "npm run release:canary -- --cd-version=prerelease --preid=beta",
     "start": "(cd packages/formation-demo; yarn start)"
   },
   "devDependencies": {
     "husky": "0.14.x",
-    "lerna": "^2.1.0",
-    "npm-run-all": "4.x"
+    "lerna": "2.1.x",
+    "npm-run-all": "4.x",
+    "rimraf": "2.6.x"
   },
+  "workspaces": [
+    "packages/*"
+  ],
   "xo": {
     "env": [
       "browser",
