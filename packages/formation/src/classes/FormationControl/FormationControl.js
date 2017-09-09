@@ -158,8 +158,20 @@ export class FormationControl {
   // ----- Semi-Public Methods -------------------------------------------------
 
   /**
+   * Returns the name of the form that this control belongs to.
+   *
+   * @private
+   *
+   * @return {string}
+   */
+  $getFormName () {
+    return this[FORM_CONTROLLER] && this[FORM_CONTROLLER].name;
+  }
+
+
+  /**
    * Returns the name of the control, or the name of the control that this
-   * component is for.
+   * component is for, as assigned by the "name" or "for" binding.
    *
    * @private
    *
@@ -171,14 +183,15 @@ export class FormationControl {
 
 
   /**
-   * Returns the name of the form that this control belongs to.
-   *
-   * @private
+   * Returns the "name" attribute that should be used on the inner control
+   * element. This cannot be set to the "name" binding, because in nested forms
+   * it is necessary to disambiguate radio controls in different forms that
+   * share the same name.
    *
    * @return {string}
    */
-  $getFormName () {
-    return this[FORM_CONTROLLER] && this[FORM_CONTROLLER].name;
+  $getNameAttribute () {
+    return `${this.$getFormName()}-${this.name}`;
   }
 
 

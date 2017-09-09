@@ -45,7 +45,7 @@ registerControl('Input', {
       ng-transclude>
     </label>
     <input id="{{::Input.getControlId() }}"
-      name="{{::Input.type === 'radio' ? Input.$getFormName() + '-' + Input.name : Input.name }}"
+      name="{{::Input.$getNameAttribute() }}"
       ng-model="Input.${NG_MODEL_GETTER_SETTER}"
       ng-value="Input.ngValue"
       ng-class="{

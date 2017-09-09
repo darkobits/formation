@@ -68,7 +68,7 @@ $registerComponent($getPrefixedName('Select'), () => {
         ng-transclude>
       </label>
       <select id="{{::Select.getControlId() }}"
-        name="{{::Select.name }}"
+        name="{{::Select.$getNameAttribute() }}"
         ng-model="Select.${NG_MODEL_GETTER_SETTER}"
         ng-if="::!Select.multiple"
         ng-disabled="Select.isDisabled()"
@@ -85,7 +85,7 @@ $registerComponent($getPrefixedName('Select'), () => {
         </option>
       </select>
       <select id="{{::Select.getControlId() }}"
-        name="{{::Select.name }}"
+        name="{{::Select.$getNameAttribute() }}"
         ng-model="Select.${NG_MODEL_GETTER_SETTER}"
         ng-if="::Select.multiple"
         ng-disabled="Select.isDisabled()"

@@ -42,7 +42,7 @@ registerControl('Textarea', {
       ng-transclude>
     </label>
     <textarea id="{{::Textarea.getControlId() }}"
-      name="{{::Textarea.name }}"
+      name="{{::Textarea.$getNameAttribute() }}"
       ng-model="Textarea.${NG_MODEL_GETTER_SETTER}"
       ng-class="{
         'has-error': Textarea.getErrors(),
