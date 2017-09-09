@@ -3,8 +3,7 @@
 // -----------------------------------------------------------------------------
 
 import {
-  isNil,
-  path
+  isNil
 } from 'ramda';
 
 import {
@@ -251,83 +250,124 @@ export function pattern (pattern) {
  * @return {function}
  */
 export function match (independentControlName) {
-  return new ConfigurableValidator(({form, ngModelCtrl, scope}) => {
-    let watchersAdded = false;
-
-    return (modelValue, viewValue) => {
-      const independentNgModelCtrl = path([NG_MODEL_CTRL], form.getControl(independentControlName));
-
-
-      // ----- Sanity-Checking -------------------------------------------------
-
-      // Ensure both controls use ngModel.
-      if (!ngModelCtrl || !independentNgModelCtrl) {
-        form.$debug(`[match] Both controls must use ngModel.`);
-        return false;
-      }
-
-      // Ensure we are not trying to match ourself.
-      if (ngModelCtrl.$name === independentNgModelCtrl.$name) {
-        form.$debug(`Control "${ngModelCtrl.$name}" is trying to match itself.`);
-        return true;
-      }
+  return new ConfigurableValidator(({form, control, scope}) => {
+    /**
+     * Reference to the independent (control we are matching against) Formation
+     * controller.
+     *
+     * @type {FormationControl}
+     */
+    const iCtrl = form.getControl(independentControlName);
 
 
-      // ----- Co-Validate Controls --------------------------------------------
+    /**
+     * Reference to the independent control's ngModel controller.
+     *
+     * @type {object}
+     */
+    const iNgModelCtrl = iCtrl[NG_MODEL_CTRL];
 
-      if (!watchersAdded) {
+
+    /**
+     * Reference to the dependent (this) Formation control.
+     *
+     * @type {FormationControl}
+     */
+    const dCtrl = control;
+
+
+    /**
+     * Reference to the dependent control's ngModel controller.
+     *
+     * @type {object}
+     */
+    const dNgModelCtrl = control[NG_MODEL_CTRL];
+
+
+    /**
+     * Whether or not we have installed watchers on controls (one-time process).
+     *
+     * @type {boolean}
+     */
+    let initialized = false;
+
+
+    /**
+     * Match validator function that will be installed onto this control's
+     * ngModel controller's $validators.
+     *
+     * @param  {any} modelValue - Current model value.
+     * @param  {any} viewValue - Current view value.
+     * @return {boolean}
+     */
+    function matchValidator (modelValue, viewValue) {
+      if (!initialized) {
         // Watch for changes to the error states of both controls. When either
         // control enters or leaves its error state, validate the other control.
-        scope.$watch(() => form.getControl(ngModelCtrl.$name).getErrors(), (newValue, oldValue) => {
+        scope.$watch(() => form.getControl(dCtrl.$getName()).getErrors(), (newValue, oldValue) => {
           if (newValue !== oldValue) {
-            independentNgModelCtrl.$validate();
+            iNgModelCtrl.$validate();
           }
         });
 
-        scope.$watch(() => form.getControl(independentNgModelCtrl.$name).getErrors(), (newValue, oldValue) => {
+        scope.$watch(() => form.getControl(iCtrl.$getName()).getErrors(), (newValue, oldValue) => {
           if (newValue !== oldValue) {
-            ngModelCtrl.$validate();
+            dNgModelCtrl.$validate();
           }
         });
 
-        watchersAdded = true;
-      }
-
-
-      // ----- Independent Control Validator -----------------------------------
-
-      if (!independentNgModelCtrl.$validators[`match:${ngModelCtrl.$name}`]) {
-        // Install a complementary validator on the independent control.
-        independentNgModelCtrl.$validators[`match:${ngModelCtrl.$name}`] = (modelValue, viewValue) => {
-          // If the dependent control has a view value...
-          if (ngModelCtrl.$viewValue) {
+        // Install a complementary validator on the independent control that
+        // will cause it to re-validate against this control's view value.
+        iNgModelCtrl.$validators[`match:${dCtrl.$getName()}`] = (modelValue, viewValue) => {
+          // Set the independent control's "match" validation key based on
+          // whether its view value matches this control's view value. We must
+          // always return true and set the validation key in a later digest
+          // cycle or the co-validation process can cause an infinite loop.
+          if (dNgModelCtrl.$viewValue) {
             scope.$applyAsync(() => {
-              // Set the independent control's "match" validation key based on
-              // view value equality in a later digest cycle.
-              independentNgModelCtrl.$setValidity('match', viewValue === ngModelCtrl.$viewValue);
+              iNgModelCtrl.$setValidity('match', viewValue === dNgModelCtrl.$viewValue);
             });
           }
 
-          // Always return true.
           return true;
         };
+
+        initialized = true;
       }
 
 
       // ----- Dependent Control Validator -------------------------------------
 
-      // If the dependent control has a view value...
       if (viewValue) {
         scope.$applyAsync(() => {
-          // Set the dependent control's "match" validation key based on view
-          // value equality in a later digest cycle.
-          ngModelCtrl.$setValidity('match', viewValue === independentNgModelCtrl.$viewValue);
+          // Set this control's "match" validation key based on whether its view
+          // value matches the independent control's view value.
+          dNgModelCtrl.$setValidity('match', viewValue === iNgModelCtrl.$viewValue);
         });
       }
 
-      // Always return true.
       return true;
-    };
+    }
+
+
+    // ----- Sanity-Checking ---------------------------------------------------
+
+    // Ensure both controls use ngModel. If not, return a validator function
+    // that always returns false.
+    if (!iNgModelCtrl || !dNgModelCtrl) {
+      form.$debug(`[match] Both controls must use ngModel.`);
+      return () => false;
+    }
+
+    // Ensure we are not trying to match ourself. If so, return a validator
+    // function that always returns true (effectively a no-op).
+    if (iCtrl.$getName() === dCtrl.$getName()) {
+      form.$debug(`Control "${dCtrl.$getName()}" is trying to match itself.`);
+      return () => true;
+    }
+
+    // Otherwise, return the match validator function.
+    return matchValidator;
   });
 }
 
