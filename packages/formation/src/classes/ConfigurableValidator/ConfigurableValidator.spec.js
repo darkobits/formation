@@ -6,8 +6,7 @@ import {
 
 import {
   CONFIGURABLE_VALIDATOR,
-  FORM_CONTROLLER,
-  NG_MODEL_CTRL
+  FORM_CONTROLLER
 } from '../../etc/constants';
 
 import Formation from '../../index';
@@ -49,13 +48,13 @@ describe('ConfigurableValidator', () => {
         wrap: wrapper
       });
 
-      configurableValidator = ConfigurableValidator(({form, ngModelCtrl, scope}) => {
+      configurableValidator = ConfigurableValidator(({form, control, scope}) => {
         return modelValue => {
           switch (modelValue) {
             case 'form':
               return form;
-            case 'ngModelCtrl':
-              return ngModelCtrl;
+            case 'control':
+              return control;
             case 'scope':
               return scope;
             default:
@@ -79,8 +78,8 @@ describe('ConfigurableValidator', () => {
       expect(validatorFn('scope').$id).toBeTruthy();
     });
 
-    it('should make the controls ngModel controller available to the validator function', () => {
-      expect(validatorFn('ngModelCtrl')).toEqual(control.fmInput[NG_MODEL_CTRL]);
+    it('should make the control available to the validator function', () => {
+      expect(validatorFn('control')).toEqual(control.fmInput);
     });
   });
 
