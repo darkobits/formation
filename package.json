@@ -13,7 +13,7 @@
     "build": "lerna run build",
     "prepare": "run-s lint build test",
     "prerelease": "lerna updated && npm run prepare",
-    "release": "lerna publish",
+    "release": "lerna publish --conventional-commits",
     "release:canary": "npm run release -- --npm-tag=canary",
     "release:beta": "npm run release:canary -- --cd-version=prerelease --preid=beta",
     "start": "(cd packages/formation-demo; yarn start)"
