@@ -45,7 +45,7 @@
     "babel-polyfill": "6.x",
     "babel-preset-env": "1.6.x",
     "eslint": "4.x",
-    "jest": "20.x",
+    "jest": "21.x",
     "npm-run-all": "4.x",
     "rimraf": "2.6.x",
     "webpack": "3.x",
