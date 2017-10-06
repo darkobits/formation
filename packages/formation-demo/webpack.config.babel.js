@@ -110,7 +110,7 @@ export default env => {
   };
 
   const extractSass = new ExtractTextWebpackPlugin({
-    filename: '[name].[contenthash].css',
+    filename: '[name]-[md5:contenthash:hex:20].css',
     allChunks: true
   });
 
