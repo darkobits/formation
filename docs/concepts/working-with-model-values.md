@@ -87,7 +87,7 @@ function FormCtrl ($http) {
   };
 
   vm.$onInit = () => {
-    // Disable the form while we load data so as to avoid weird state.
+    // Disable the form while we load data from our API.
     vm.myForm.disable();
 
     $http.get('/api/someEndpoint').then(({data}) => {
@@ -98,7 +98,7 @@ function FormCtrl ($http) {
       vm.resetForm();
 
       // Finally, enable the form.
-      vm.formationForm.enable();
+      vm.myForm.enable();
     });
   };
 });

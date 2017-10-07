@@ -76,8 +76,9 @@ For example, let's say we wanted to build a control that would serve as an e-mai
 
 Here's what that might look like:
 
+> `emailAddress.js`
+
 ```js
-// emailAddress.js
 import app from 'app';
 
 import {
@@ -85,15 +86,15 @@ import {
 } from '@darkobits/formation-validaotrs';
 
 function EmailCtrl () {
-  const Email = this;
+  const EmailInput = this;
 
   // Set a default label. If the consumer provides one via transclusion,
-  // it will be overwritten.
-  Email.label = 'E-Mail Address:';
+  // this one will be overwritten.
+  EmailInput.label = 'E-Mail Address:';
 
-  Email.placeholder = 'user@example.com';
+  EmailInput.placeholder = 'user@example.com';
 
-  Email.config = {
+  EmailInput.config = {
     validators: {
       email
     },
@@ -109,40 +110,42 @@ app.component('emailAddress', {
     name: '@',
   },
   controller: EmailCtrl,
-  controllerAs: 'vm',
+  controllerAs: 'EmailInput',
   transclude: true,
   template: `
-    <fm-input name="{{ vm.name }}"
+    <fm-input name="{{ EmailInput.name }}"
       type="email"
-      placeholder="{{ vm.placeholder }}"
-      config="vm.config">
+      placeholder="{{ EmailInput.placeholder }}"
+      config="EmailInput.config">
       <span ng-transclude>
-        {{ vm.label }}
+        {{ EmailInput.label }}
       </span>
     <fm-input>
-    <fm-errors for="{{ vm.name }}"><fm-errors>
+    <fm-errors for="{{ EmailInput.name }}"><fm-errors>
   `
 });
 ```
 
 We can then use this component thusly:
 
+> `userForm.html`
+
 ```html
-<!-- userForm.html -->
 <fm name="vm.myForm" controls="vm.controls">
   <email-address name="emailAddress"></email-address>
   <!-- etc. -->
 </fm>
 ```
 
-This will render a fully configured email input control. If the consumer of this control decides to provide additional configuration via `vm.controls`, that configuration will take precedence over the configuration provided in the `emailAddress` component's controller.
+This will render a fully-configured email input control. If the consumer of this control decides to provide additional configuration via `vm.controls`, that configuration will take precedence over the configuration provided in the `emailAddress` component's controller.
 
 Also notice that we have supplied a validation message for the `required` error,  but did not apply the `required` validator. This allows the control to be used in contexts where it _may_ be optional. However, by providing the `required` validation message in the component configuration, we have the opportunity to use a message specific to the kind of control we are creating. In this case, rather than using a generic _"This field is required."_ message, we can say _"Please provide your e-mail address"_.
 
 If another developer wanted to make this control required in their form, they would only need to add the `required` validator:
 
+> `userForm.js`
+
 ```js
-// userForm.js
 import app from 'app';
 
 import {

@@ -1,6 +1,6 @@
 # Conventions Used In This Book
 
-* Code samples in this book are written in ES6. Therefore, you should have a firm understanding of ES6/ES2015.
+* Code samples in this book are written in ES6, so you should have a solid grasp of ES6 features before continuing.
 
   > See: [How to Learn ES6](https://medium.com/javascript-scene/how-to-learn-es6-47d9a1ac2620) by Eric Elliott & Babel's [Learn ES2015](https://babeljs.io/learn-es2015/) article.
 
@@ -14,7 +14,7 @@
 
 * `import app from 'app';`is commonly used throughout code samples and refers to an Angular module reference. When using a module-bundler like Webpack, it is more terse and less error-prone to refer to an application's Angular module directly, by reference, rather than using `angular.module` to look it up.
 
-  Prior to module-bundlers, this how Angular 1 applications were built:
+  Prior to module-bundlers, this how Angular modules were referenced:
 
   ```js
   // app.js

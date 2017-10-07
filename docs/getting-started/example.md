@@ -2,7 +2,7 @@
 
 For those readers who want to see a fully functional, real world, not-in-any-way-contrived example before diving into the rest of this guide,  the following has been provided.
 
-In this example, we will be refactoring a component that renders a U.S. address form. The form has the following requirements:
+In this example, we will be refactoring a component that renders a U.S. address form. The form has the following requirements, which cannot be altered by the refactor:
 
 * It must have fields for name, street address, city, state, and postal code.
 * All fields are required.
@@ -13,8 +13,9 @@ In this example, we will be refactoring a component that renders a U.S. address 
 
 Here's the code for the existing form, written using vanilla Angular:
 
+> `addressForm.html`
+
 ```html
-<!-- addressForm.html -->
 <form name="vm.addressForm"
   ng-submit="vm.submit"
   novalidate>
@@ -107,8 +108,9 @@ Here's the code for the existing form, written using vanilla Angular:
 </form>
 ```
 
+> `addressForm.js`
+
 ```js
-// addressForm.js
 import app from 'app';
 import templateUrl from './addressForm.html';
 
@@ -157,8 +159,9 @@ To see how Formation addresses these concerns, let's refactor the above componen
 
 First, let's import Formation and add it to our module's dependencies:
 
+> `app.js`
+
 ```js
-// app.js
 import angular from 'angular';
 
 import Formation from '@darkobits/formation';
@@ -170,8 +173,9 @@ export default angular.module('MyApp', [
 
 Then, in our application's config files, we can tell Formation when to show error messages on controls:
 
+> `config.js`
+
 ```js
-// config.js
 import {
   configure
 } from '@darkobits/formation';
@@ -183,8 +187,9 @@ configure({
 
 Next, lets update our template:
 
+> `addressForm.html`
+
 ```html
-<!-- addressForm.html -->
 <fm controls="vm.controls" on-submit="vm.submit">
   <fm-input type="text" name="name">
     Name
@@ -215,8 +220,9 @@ Next, lets update our template:
 
 That's it! We've used just enough markup to describe how we want to structure the document. The rest of the logic to drive the form will reside in its controller:
 
+> `addressForm.js`
+
 ```js
-// addressForm.js
 import app from 'app';
 
 // Formation offers an optional "formation-validators" package with,
@@ -315,7 +321,7 @@ Let's look at how things have improved:
 * Zero business logic in the template; it is focused only on the structure of the document.
 * Template size will never increase if validators/error messages are added to controls.
 * The form's data model is reflected by its controls, eliminating the need for `ngModel` and reducing scope bindings.
-* The form's submit handler is only invoked if the form is valid, and Formation automatically disables the form while our API request is pending.
+* The form's submit handler is only invoked if the form is valid, and because we returned a promise, Formation automatically disables the form while our API request is pending.
 * There are **0** references to `vm.addressForm` in our refactored component.
 
 <p align="center">

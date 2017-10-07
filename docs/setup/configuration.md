@@ -1,25 +1,26 @@
 # Global Configuration
 
-Application-wide behaviors can be set up by importing the `configure` method from the Formation package.
+Application-wide behaviors can be set up by importing the `configure` function from the Formation package.
 
 ### `configure(options: object): void`
 
 Configures global Formation behavior.
 
-> **Note:** Formation components are registered during Angular's `run` phase. Therefore, configuration must be done prior to bootstrapping or during the `config` phase.
+> **Note:** Formation components are registered during Angular's `run` phase. Therefore, configuration must be done prior to bootstrapping, or during the `config` phase.
 
 #### **Parameters**
 
 | Name | Type | Description |
 | --- | --- | --- |
 | `options` | `Object` | Configuration options. |
-| `[options.showErrorsOn]` | `String` | _\(Optional\)_ Comma/space-delimited string of control or form states that, when true, will cause `ngMessage` errors to display for a given control. Possible values are: `pristine`, `dirty`, `valid`, `invalid`, `submitted`, `untouched`, and `touched`. |
-| `[options.prefix='fm']` | `String` | _\(Optional\)_ Overrides the default component prefix for all Formation controls. |
+| `[options.showErrorsOn]` | `String` | _\(Optional\)_ Comma/space-delimited string of control or form states that, when true, will cause `ngMessage` errors to display for an invalid control. Possible values are: `pristine`, `dirty`, `submitted`, `untouched`, and `touched`. |
+| `[options.prefix='fm']` | `String` | _\(Optional\)_ Overrides the default component name prefix for all Formation controls. |
 
 #### **Example**
 
+> `app.js`
+
 ```js
-// app.js
 import angular from 'angular';
 
 import Formation, {
