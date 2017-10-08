@@ -1,13 +1,12 @@
 {
   "gitbook": "3.2.3",
-  "title": "Formation",
+  "title": "Mastering Formation",
   "root": "./docs",
   "plugins": [
     "-highlight",
     "github",
     "prism",
-    "styles-sass",
-    "versions"
+    "styles-sass"
   ],
   "styles": {
     "website": "./styles/website.scss"
@@ -23,9 +22,6 @@
       "weibo": false,
       "instapaper": false,
       "vk": false
-    },
-    "versions": {
-      "type": "tags"
     }
   }
 }
