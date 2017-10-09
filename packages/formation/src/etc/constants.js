@@ -99,7 +99,6 @@ export const HTML5_ATTRIBUTES = [
   'max',
   'maxlength',
   'min',
-  // 'multiple',
   'placeholder',
   'readonly',
   'size',

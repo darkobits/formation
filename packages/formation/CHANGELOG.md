@@ -9,7 +9,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Bug Fixes
 
-* Don't clone() on $getModelValue. This was causing issues with multi-select controls. ([4aa9916](https://github.com/darkobits/formation/commit/4aa9916))
+* Don't clone() on $getModelValue. ([4aa9916](https://github.com/darkobits/formation/commit/4aa9916))
 * Deep merging works correctly in IE11. ([9383c12](https://github.com/darkobits/formation/commit/9383c12))
 
 
