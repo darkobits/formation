@@ -14,8 +14,8 @@ Creates a new Formation form. This component should be used in lieu of `<form>` 
 | `controls` | `<` | Expression in parent scope to use for control configuration. |
 | `on-submit` | `<` | Function in parent scope to invoke when submitting the form. |
 | `on-ready` | `<` | Function in parent scope to invoke when the form has finished compiling and the component's API is ready. |
-| `show-errorson` | `@` | String of comma/space delimited control/form states to check for showing control errors. This can also be configured globally using the [configure](/packages/formation/src/etc/config#configureopts-object--void) method. |
-| `ng-disabled` | `<` | Expression to evaluate to determine if the form and all controls should be disabled. |
+| `show-errors-on` | `@` | String of comma/space delimited control/form states to check for showing control errors. This can also be configured globally using the [configure](/packages/formation/src/etc/config#configureopts-object--void) method. |
+| `ng-disabled` | `<` | Expression to evaluate to determine if the form, its controls, and all child forms should be disabled. |
 
 ### Properties
 
