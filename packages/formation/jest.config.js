@@ -2,7 +2,6 @@ module.exports = {
   moduleDirectories: [
     '<rootDir>',
     '<rootDir>/src',
-    '<rootDir>/tests',
     'node_modules'
   ],
   testPathIgnorePatterns: [
@@ -11,9 +10,6 @@ module.exports = {
   coveragePathIgnorePatterns: [
     '/dist/',
     '/tests/'
-  ],
-  setupFiles: [
-    '<rootDir>/src/etc/testSetup.js'
   ],
   coverageThreshold: {
     global: {
