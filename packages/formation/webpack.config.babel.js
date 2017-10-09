@@ -69,6 +69,16 @@ export default env => {
   });
 
 
+  // ----- Module Resolving ----------------------------------------------------
+
+  config.resolve = {
+    modules: [
+      CONTEXT,
+      'node_modules'
+    ]
+  };
+
+
   // ----- Plugins -------------------------------------------------------------
 
   if (env.stats) {
