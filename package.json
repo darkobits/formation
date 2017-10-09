@@ -7,7 +7,7 @@
     "yarn": ">=1.0"
   },
   "scripts": {
-    "clean": "rimraf ./node_modules && lerna clean",
+    "clean": "lerna clean --yes && rimraf ./node_modules",
     "lint": "lerna run lint",
     "test": "lerna run test",
     "build": "lerna run build",
@@ -20,7 +20,7 @@
   },
   "devDependencies": {
     "husky": "0.14.x",
-    "lerna": "2.1.x",
+    "lerna": "2.4.x",
     "npm-run-all": "4.x",
     "rimraf": "2.6.x"
   },
