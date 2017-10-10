@@ -33,6 +33,12 @@ configureFormation({
 });
 ```
 
+## Change Logs
+
+
+* [formation](/packages/formation/CHANGELOG.md)
+* [formation-validators](/packages/formation-validators/CHANGELOG.md)
+
 ## Documentation
 
 The Formation documentation is [available on GitBook](https://darkobits.gitbooks.io/formation/).
