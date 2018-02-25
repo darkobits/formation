@@ -155,7 +155,9 @@ app.component('addressFormDemo', {
           return {
             apiError: err.data
           };
-        } else if (R.is(Object, err.data)) {
+        }
+
+        if (R.is(Object, err.data)) {
           // If we got an object, attempt to return its "fields" property. If it
           // doesn't have a "fields" property, fall back to a generic error
           // message.

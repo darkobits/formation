@@ -35,19 +35,19 @@
   },
   "dependencies": {
     "@darkobits/formation": "^1.0.0",
-    "ramda": "0.24.x"
+    "ramda": "~0.25.0"
   },
   "devDependencies": {
     "@darkobits/unity": "1.x",
-    "babel-jest": "21.x",
+    "babel-jest": "^22.4.1",
     "babel-loader": "7.x",
     "babel-polyfill": "6.x",
     "babel-preset-env": "1.6.x",
     "eslint": "4.x",
-    "jest": "21.x",
+    "jest": "^22.4.2",
     "npm-run-all": "4.x",
     "rimraf": "2.6.x",
-    "webpack": "3.x",
-    "xo": "0.18.x"
+    "webpack": "^3.11.0",
+    "xo": "~0.20.3"
   }
 }

@@ -7,7 +7,7 @@
   },
   "scripts": {
     "bootstrap": "lerna bootstrap --hoist",
-    "clean": "lerna clean --yes && rimraf ./node_modules",
+    "clean": "lerna run clean && lerna clean --yes && rimraf ./node_modules",
     "lint": "lerna run lint --stream",
     "test": "lerna run test",
     "build": "lerna run build",
@@ -34,6 +34,14 @@
     ],
     "space": true,
     "rules": {
+      "indent": [
+        "error",
+        2,
+        {
+          "MemberExpression": "off",
+          "SwitchCase": 1
+        }
+      ],
       "capitalized-comments": "warn",
       "import/extensions": "off",
       "import/no-extraneous-dependencies": "off",

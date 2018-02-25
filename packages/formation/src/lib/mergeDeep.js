@@ -21,7 +21,9 @@ const DEFAULT_MERGER = (d, s) => {
     // [Arrays] Prepend the array from the source object to the one in the
     // destination object.
     return concat(s, d);
-  } else if (isPlainObject(d) && isPlainObject(s)) {
+  }
+
+  if (isPlainObject(d) && isPlainObject(s)) {
     // [Objects] Recursively deep-merge plain objects.
     return mergeWithDeep(DEFAULT_MERGER, d, s);
   }

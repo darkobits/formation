@@ -25,8 +25,11 @@ export default function mergeWithDeep (f, ...objs) {
     }
 
     const rest = slice(0, -2, objs);
+
     return mergeWithDeep(f, ...append(merged, rest));
-  } else if (objs.length === 1) {
+  }
+
+  if (objs.length === 1) {
     return head(objs);
   }
 

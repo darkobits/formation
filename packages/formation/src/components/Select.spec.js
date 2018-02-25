@@ -35,7 +35,7 @@ describe('Select Component', () => {
   it('should set ngOptions correctly', () => {
     expect(T.$element.find('select').attr('ng-options')).toBe(options);
 
-    Array.from(T.$element.find('option')).forEach((optionEl, index) => {
+    [...T.$element.find('option')].forEach((optionEl, index) => {
       const label = angular.element(optionEl).text();
       const value = angular.element(optionEl).attr('value');
 

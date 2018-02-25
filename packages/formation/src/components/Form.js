@@ -1,15 +1,15 @@
 import angular from 'angular';
 
 import {
- clone,
- find,
- forEach,
- fromPairs,
- is,
- keys,
- prop,
- propEq,
- without
+  clone,
+  find,
+  forEach,
+  fromPairs,
+  is,
+  keys,
+  prop,
+  propEq,
+  without
 } from 'ramda';
 
 import {FormGroupController} from 'components/FormGroup';

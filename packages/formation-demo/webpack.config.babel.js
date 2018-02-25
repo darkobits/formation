@@ -1,5 +1,4 @@
-import path from 'path';
-
+import {resolve} from 'path';
 import autoprefixer from 'autoprefixer';
 import bourbon from 'bourbon';
 import bourbonNeat from 'bourbon-neat';
@@ -9,17 +8,17 @@ import HtmlWebpackPlugin from 'html-webpack-plugin';
 import SassLintPlugin from 'sasslint-webpack-plugin';
 import VisualizerWebpackPlugin from 'webpack-visualizer-plugin';
 import webpack from 'webpack';
-
 import packageJson from './package';
-
-const resolve = path.resolve;
-const CONTEXT = resolve(__dirname, 'src');
-const MODULE_NAME = packageJson.name;
-const VERSION = packageJson.version;
 
 
 export default env => {
   const config = {module: {rules: []}, plugins: []};
+
+  const CONTEXT = resolve(__dirname, 'src');
+
+  const MODULE_NAME = packageJson.name;
+
+  const VERSION = packageJson.version;
 
 
   // ----- Core ----------------------------------------------------------------

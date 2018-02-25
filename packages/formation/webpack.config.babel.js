@@ -1,13 +1,11 @@
-import path from 'path';
+import {resolve} from 'path';
 import VisualizerWebpackPlugin from 'webpack-visualizer-plugin';
-
-
-const resolve = path.resolve;
-const CONTEXT = resolve(__dirname, 'src');
 
 
 export default env => {
   const config = {module: {rules: []}, plugins: []};
+
+  const CONTEXT = resolve(__dirname, 'src');
 
 
   // ----- Core ----------------------------------------------------------------

@@ -1,12 +1,10 @@
-import path from 'path';
-
-
-const resolve = path.resolve;
-const CONTEXT = resolve(__dirname, 'src');
+import {resolve} from 'path';
 
 
 export default () => {
   const config = {module: {rules: []}, plugins: []};
+
+  const CONTEXT = resolve(__dirname, 'src');
 
 
   // ----- Core ----------------------------------------------------------------

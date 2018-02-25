@@ -216,7 +216,7 @@ export function configure (opts) {
   }
 
   if (check([String, undefined], 'prefix', opts.prefix)) {
-    prefix = opts.prefix;
+    ({prefix} = opts);
   }
 }
 
@@ -278,31 +278,31 @@ app.config($provide => {
     directives.forEach(directiveName => {
       $provide.decorator(directiveName, $delegate => {
         const [directiveSpec] = $delegate;
-        const compile = directiveSpec.compile;
+        const {compile} = directiveSpec;
 
         // Add requires.
         directiveSpec.require = concat(directiveSpec.require || [], require);
 
         directiveSpec.compile = function () {
           // Invoke original compile to get link object.
-          const link = Reflect.apply(compile, this, arguments);
+          const link = Reflect.apply(compile, this, arguments); // eslint-disable-line prefer-rest-params
 
           // Return new link object.
           return {
             pre () {
               if (isFunction(link.pre)) {
                 // Invoke original pre-link.
-                Reflect.apply(link.pre, this, arguments);
+                Reflect.apply(link.pre, this, arguments); // eslint-disable-line prefer-rest-params
               }
             },
             post () {
               if (isFunction(link.post)) {
                 // Invoke original post-link.
-                Reflect.apply(link.post, this, arguments);
+                Reflect.apply(link.post, this, arguments); // eslint-disable-line prefer-rest-params
               }
 
               // Invoke new post-link.
-              Reflect.apply(postLink, this, arguments);
+              Reflect.apply(postLink, this, arguments); // eslint-disable-line prefer-rest-params
             }
           };
         };
