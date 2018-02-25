@@ -27,8 +27,7 @@
     "build": "webpack --env.dist --progress",
     "build:watch": "npm run build -- --watch",
     "bundle-stats": "webpack --env.stats --env.dist",
-    "prepublish": "run-p test build",
-    "postpublish": "npm dist-tag ls"
+    "prepublishOnly": "run-p test build"
   },
   "xo": false,
   "peerDependencies": {

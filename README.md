@@ -7,13 +7,7 @@ Formation is a form framework for Angular 1.5+ designed for medium-to-large appl
 ## Installation
 
 ```bash
-$ yarn add @darkobits/formation
-```
-
-or
-
-```bash
-$ npm install --save @darkobits/formation
+$ npm i @darkobits/formation
 ```
 
 ```js

@@ -1,13 +1,9 @@
 language: node_js
-node_js: 6
-
-before_install:
-  - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.0.1
-  - export PATH="$HOME/.yarn/bin:$PATH"
+node_js: 8
 
 install:
-  - yarn install --ignore-scripts
-  - yarn build
+  - npm install --ignore-scripts
+  - npm run prepare
 
 env:
   - PACKAGE=formation
@@ -16,14 +12,12 @@ env:
 script:
   - cd packages/$PACKAGE
   - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> .npmrc
-  - yarn lint
-  - yarn test --coverage
+  - npm test -- --coverage
 
 after_success:
-  - yarn add codacy-coverage
+  - npm install codacy-coverage
   - $(npm bin)/codacy-coverage -v < ./coverage/lcov.info
 
 cache:
-  yarn: true
   directories:
     - node_modules

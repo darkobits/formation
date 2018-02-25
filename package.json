@@ -3,8 +3,7 @@
   "private": true,
   "engines": {
     "node": ">=6.0",
-    "npm": ">=4.0",
-    "yarn": ">=1.0"
+    "npm": ">=4.0"
   },
   "scripts": {
     "clean": "lerna clean --yes && rimraf ./node_modules",
@@ -16,7 +15,7 @@
     "release": "lerna publish --conventional-commits",
     "release:canary": "npm run release -- --npm-tag=canary",
     "release:beta": "npm run release:canary -- --cd-version=prerelease --preid=beta",
-    "start": "(cd packages/formation-demo; yarn start)"
+    "start": "(cd packages/formation-demo; npm start)"
   },
   "devDependencies": {
     "husky": "0.14.x",
