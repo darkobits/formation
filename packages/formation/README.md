@@ -1,30 +1,22 @@
-[![][travis-img]][travis-url] [![][npm-img]][npm-url] [![][deps-img]][deps-url] [![][peer-deps-img]][peer-deps-url] [![][dev-deps-img]][dev-deps-url]
-
-# formation
+[![][npm-img]][npm-url] [![][travis-img]][travis-url] [![][deps-img]][deps-url] [![][peer-deps-img]][peer-deps-url] [![][dev-deps-img]][dev-deps-url]
 
 This is the primary package for Formation.
 
 ## Install
 
 ```bash
-$ yarn add @darkobits/formation
+$ npm i @darkobits/formation
 ```
 
-or
-
-```bash
-$ npm install --save @darkobits/formation
-```
-
-## Setup
+## Use
 
 See the [official documentation](https://darkobits.gitbooks.io/formation/) for setup instructions.
 
-[travis-img]: https://img.shields.io/travis/darkobits/formation.svg?style=flat-square
-[travis-url]: https://travis-ci.org/darkobits/formation
-
 [npm-img]: https://img.shields.io/npm/v/@darkobits/formation.svg?style=flat-square
 [npm-url]: https://www.npmjs.com/package/@darkobits/formation
+
+[travis-img]: https://img.shields.io/travis/darkobits/formation.svg?style=flat-square
+[travis-url]: https://travis-ci.org/darkobits/formation
 
 [deps-img]: https://david-dm.org/darkobits/formation/status.svg?path=packages/formation&style=flat-square
 [deps-url]: https://david-dm.org/darkobits/formation?path=packages/formation

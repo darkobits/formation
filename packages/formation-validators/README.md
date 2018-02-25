@@ -1,22 +1,14 @@
-[![][travis-img]][travis-url] [![][npm-img]][npm-url] [![][deps-img]][deps-url] [![][peer-deps-img]][peer-deps-url] [![][dev-deps-img]][dev-deps-url]
+[![][npm-img]][npm-url] [![][travis-img]][travis-url] [![][deps-img]][deps-url] [![][peer-deps-img]][peer-deps-url] [![][dev-deps-img]][dev-deps-url]
 
-# formation-validators
-
-Validators for the Formation framework.
+This package contains several validators for the Formation framework.
 
 ## Install
 
 ```bash
-$ yarn add @darkobits/formation-validators
+$ npm i @darkobits/formation-validators
 ```
 
-or
-
-```bash
-$ npm install --save @darkobits/formation-validators
-```
-
-## Documentation
+## Use
 
 Please consult the Validators section of the [Formation documentation](https://darkobits.gitbooks.io/formation/).
 
@@ -26,11 +18,11 @@ Please consult the Validators section of the [Formation documentation](https://d
   <img width="22" height="22" src="https://cloud.githubusercontent.com/assets/441546/25318539/db2f4cf2-2845-11e7-8e10-ef97d91cd538.png">
 </p>
 
-[travis-img]: https://img.shields.io/travis/darkobits/formation.svg?style=flat-square
-[travis-url]: https://travis-ci.org/darkobits/formation
-
 [npm-img]: https://img.shields.io/npm/v/@darkobits/formation-validators.svg?style=flat-square
 [npm-url]: https://www.npmjs.com/package/@darkobits/formation-validators
+
+[travis-img]: https://img.shields.io/travis/darkobits/formation.svg?style=flat-square
+[travis-url]: https://travis-ci.org/darkobits/formation
 
 [deps-img]: https://david-dm.org/darkobits/formation/status.svg?path=packages/formation-validators&style=flat-square
 [deps-url]: https://david-dm.org/darkobits/formation?path=packages/formation-validators
