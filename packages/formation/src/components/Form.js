@@ -6,6 +6,7 @@ import {
  forEach,
  fromPairs,
  is,
+ keys,
  prop,
  propEq,
  without
@@ -22,6 +23,7 @@ import {
 } from 'etc/config';
 
 import {
+  CUSTOM_ERROR_KEY,
   FORM_COMPONENT_NAME,
   FORM_CONTROLLER,
   FORM_GROUP_COMPONENT_NAME
@@ -260,7 +262,7 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
       Reflect.defineProperty(Form, prop, {
         get: () => Form[NG_FORM_CONTROLLER][prop]
       });
-    }, ['$dirty', '$invalid', '$pending', '$pristine', '$submitted', '$valid']);
+    }, ['$dirty', '$error', '$invalid', '$pending', '$pristine', '$submitted', '$valid']);
   });
 
 
@@ -789,6 +791,19 @@ export function FormController ($attrs, $compile, $element, $log, $parse, $scope
    */
   Form.enable = () => {
     Form.$disabled = false;
+  };
+
+
+  /**
+   * Returns true if the form could be submitted. A simple check of $valid or
+   * $invalid is not sufficient, because the form may have custom errors set by
+   * an API that must be disregarded when making this consideration.
+   *
+   * @return {boolean}
+   */
+  Form.isSubmittable = () => {
+    const hasNonCustomErrors = Boolean(without([CUSTOM_ERROR_KEY], keys(Form.$error)).length);
+    return !hasNonCustomErrors && !Form.$pending && !Form.isDisabled();
   };
 
 
