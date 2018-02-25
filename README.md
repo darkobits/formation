@@ -1,10 +1,10 @@
 ![formation](https://user-images.githubusercontent.com/441546/36626621-d671c000-18ea-11e8-8c88-c462d806d23a.png)
 
-[![][travis-img]][travis-url] [![][npm-img]][npm-url] [![][codacy-img]][codacy-url] [![][xo-img]][xo-url] [![][cc-img]][cc-url]
+[![][npm-img]][npm-url] [![][travis-img]][travis-url] [![][codacy-img]][codacy-url] [![][cc-img]][cc-url] [![][xo-img]][xo-url]
 
 Formation is a form framework for Angular 1.5+ designed for medium-to-large applications that require consistent, robust forms. It aims to reduce template size by moving business logic to controllers, which also encourages code-reuse and improves consistency.
 
-## Installation
+## Install
 
 ```bash
 $ npm i @darkobits/formation
@@ -25,8 +25,7 @@ configureFormation({
 });
 ```
 
-## Change Logs
-
+## Changelogs
 
 * [formation](/packages/formation/CHANGELOG.md)
 * [formation-validators](/packages/formation-validators/CHANGELOG.md)
@@ -53,5 +52,5 @@ The Formation documentation is [available on GitBook](https://darkobits.gitbooks
 [xo-img]: https://img.shields.io/badge/code_style-XO-e271a5.svg?style=flat-square
 [xo-url]: https://github.com/sindresorhus/xo
 
-[cc-img]: https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg?style=flat-square
-[cc-url]: https://conventionalcommits.org/
+[cc-img]: https://img.shields.io/badge/conventional%20commits-1.0.0-027dc6.svg?style=flat-square
+[cc-url]: https://github.com/conventional-changelog/standard-version
