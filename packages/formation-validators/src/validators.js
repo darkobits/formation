@@ -1,6 +1,13 @@
-// -----------------------------------------------------------------------------
-// ----- Formation Validators --------------------------------------------------
-// -----------------------------------------------------------------------------
+/**
+ * This module contains several common validators that can be used to configure
+ * Formation controls.
+ *
+ * Note: Functions in the `validators` control configuration object will be
+ * copied to a control's `$validators`, so they can be any function with the
+ * signature:
+ *
+ * (modelValue: object, viewValue?: object) -> boolean
+ */
 
 import {
   isNil
@@ -10,19 +17,6 @@ import {
   ConfigurableValidator,
   $constants
 } from '@darkobits/formation';
-
-
-/**
- * This module contains several common validators that can be used to configure
- * Formation controls.
- *
- * Note: Functions in the `validators` control configuration object will be
- * copied to a control's `$validators`, so they can be any function with the
- * signature:
- *
- * (modelValue: object[, viewValue: object]): boolean
- */
-
 
 const {
   NG_MODEL_CTRL
@@ -253,7 +247,7 @@ export function match (independentControlName) {
   return new ConfigurableValidator(({form, control, scope}) => {
     /**
      * Reference to the independent (control we are matching against) Formation
-     * controller.
+     * control.
      *
      * @type {FormationControl}
      */
@@ -284,70 +278,39 @@ export function match (independentControlName) {
     const dNgModelCtrl = control[NG_MODEL_CTRL];
 
 
-    /**
-     * Whether or not we have installed watchers on controls (one-time process).
-     *
-     * @type {boolean}
-     */
-    let initialized = false;
+    // ----- Initialization ----------------------------------------------------
 
-
-    /**
-     * Match validator function that will be installed onto this control's
-     * ngModel controller's $validators.
-     *
-     * @param  {any} modelValue - Current model value.
-     * @param  {any} viewValue - Current view value.
-     * @return {boolean}
-     */
-    function matchValidator (modelValue, viewValue) {
-      if (!initialized) {
-        // Watch for changes to the error states of both controls. When either
-        // control enters or leaves its error state, validate the other control.
-        scope.$watch(() => form.getControl(dCtrl.$getName()).getErrors(), (newValue, oldValue) => {
-          if (newValue !== oldValue) {
-            iNgModelCtrl.$validate();
-          }
-        });
-
-        scope.$watch(() => form.getControl(iCtrl.$getName()).getErrors(), (newValue, oldValue) => {
-          if (newValue !== oldValue) {
-            dNgModelCtrl.$validate();
-          }
-        });
-
-        // Install a complementary validator on the independent control that
-        // will cause it to re-validate against this control's view value.
-        iNgModelCtrl.$validators[`match:${dCtrl.$getName()}`] = (modelValue, viewValue) => {
-          // Set the independent control's "match" validation key based on
-          // whether its view value matches this control's view value. We must
-          // always return true and set the validation key in a later digest
-          // cycle or the co-validation process can cause an infinite loop.
-          if (dNgModelCtrl.$viewValue) {
-            scope.$applyAsync(() => {
-              iNgModelCtrl.$setValidity('match', viewValue === dNgModelCtrl.$viewValue);
-            });
-          }
-
-          return true;
-        };
-
-        initialized = true;
+    // Watch for changes to the error states of both controls. When either
+    // control enters or leaves its error state, validate the other control.
+    scope.$watch(() => form.getControl(dCtrl.$getName()).getErrors(), (newValue, oldValue) => {
+      if (newValue !== oldValue) {
+        iNgModelCtrl.$validate();
       }
+    });
 
 
-      // ----- Dependent Control Validator -------------------------------------
+    scope.$watch(() => form.getControl(iCtrl.$getName()).getErrors(), (newValue, oldValue) => {
+      if (newValue !== oldValue) {
+        dNgModelCtrl.$validate();
+      }
+    });
 
-      if (viewValue) {
+
+    // Install a complementary validator on the independent control that
+    // will cause it to re-validate against this control's view value.
+    iNgModelCtrl.$validators[`match:${dCtrl.$getName()}`] = (modelValue, viewValue) => {
+      // Set the independent control's "match" validation key based on
+      // whether its view value matches this control's view value. We must
+      // always return true and set the validation key in a later digest
+      // cycle or the co-validation process can cause an infinite loop.
+      if (dNgModelCtrl.$viewValue) {
         scope.$applyAsync(() => {
-          // Set this control's "match" validation key based on whether its view
-          // value matches the independent control's view value.
-          dNgModelCtrl.$setValidity('match', viewValue === iNgModelCtrl.$viewValue);
+          iNgModelCtrl.$setValidity('match', viewValue === dNgModelCtrl.$viewValue);
         });
       }
 
       return true;
-    }
+    };
 
 
     // ----- Sanity-Checking ---------------------------------------------------
@@ -366,8 +329,20 @@ export function match (independentControlName) {
       return () => true;
     }
 
-    // Otherwise, return the match validator function.
-    return matchValidator;
+
+    // Match validator function that will be installed onto this control's
+    // ngModel controller's $validators.
+    return function (modelValue, viewValue) {
+      if (viewValue) {
+        scope.$applyAsync(() => {
+          // Set this control's "match" validation key based on whether its view
+          // value matches the independent control's view value.
+          dNgModelCtrl.$setValidity('match', viewValue === iNgModelCtrl.$viewValue);
+        });
+      }
+
+      return true;
+    };
   });
 }
 
