@@ -11,62 +11,6 @@
 @import url('//fonts.googleapis.com/css?family=Merriweather:300,400');
 @import url('//fonts.googleapis.com/css?family=Roboto+Mono:300,400');
 
-@font-face {
-  font-family: 'Operator Mono Ssm';
-  font-style: normal;
-  font-weight: 300;
-  src: url('~assets/OperatorMonoSSm-Light.woff2') format('woff2'), url('~assets/OperatorMonoSSm-Light.woff') format('woff');
-}
-
-@font-face {
-  font-family: 'Operator Mono Ssm';
-  font-style: italic;
-  font-weight: 300;
-  src: url('~assets/OperatorMonoSSm-LightItalic.woff2') format('woff2'), url('~assets/OperatorMonoSSm-LightItalic.woff') format('woff');
-}
-
-@font-face {
-  font-family: 'Operator Mono Ssm';
-  font-style: italic;
-  font-weight: bold;
-  src: url('~assets/OperatorMonoSSm-BoldItalic.woff2') format('woff2'), url('~assets/OperatorMonoSSm-BoldItalic.woff') format('woff');
-}
-
-@font-face {
-  font-family: 'Operator Mono Ssm';
-  font-style: normal;
-  font-weight: bold;
-  src: url('~assets/OperatorMonoSSm-Bold.woff2') format('woff2'), url('~assets/OperatorMonoSSm-Bold.woff') format('woff');
-}
-
-@font-face {
-  font-family: 'Operator Mono Ssm';
-  font-style: italic;
-  font-weight: normal;
-  src: url('~assets/OperatorMonoSSm-BookItalic.woff2') format('woff2'), url('~assets/OperatorMonoSSm-BookItalic.woff') format('woff');
-}
-
-@font-face {
-  font-family: 'Operator Mono Ssm';
-  font-style: normal;
-  font-weight: normal;
-  src: url('~assets/OperatorMonoSSm-Book.woff2') format('woff2'), url('~assets/OperatorMonoSSm-Book.woff') format('woff');
-}
-
-@font-face {
-  font-family: 'Operator Mono Ssm';
-  font-style: normal;
-  font-weight: 500;
-  src: url('~assets/OperatorMonoSSm-Medium.woff2') format('woff2'), url('~assets/OperatorMonoSSm-Medium.woff') format('woff');
-}
-
-@font-face {
-  font-family: 'Operator Mono Ssm';
-  font-style: italic;
-  font-weight: 500;
-  src: url('~assets/OperatorMonoSSm-MediumItalic.woff2') format('woff2'), url('~assets/OperatorMonoSSm-MediumItalic.woff') format('woff');
-}
-
 
 // ----- Globals ---------------------------------------------------------------
 
@@ -133,29 +77,33 @@ a {
   background-color: #FFFFFF;
 }
 
-
-fm {
-  & form {
-    border: 1px solid #FF0000;
-    display: block;
-    margin: 8px 0;
-    padding: 8px;
-  }
-
-  & ng-form {
-    border: 1px solid #0000FF;
-    display: block;
-    margin: 8px 0;
-    padding: 8px;
-  }
-}
-
-fm-group {
-  border: 1px solid #FFA500;
+fm, form, ng-form {
   display: block;
-  margin: 8px 0;
-  padding: 0px 8px;
 }
+
+
+// fm {
+//   & form {
+//     border: 1px solid #FF0000;
+//     display: block;
+//     margin: 8px 0;
+//     padding: 8px;
+//   }
+
+//   & ng-form {
+//     border: 1px solid #0000FF;
+//     display: block;
+//     margin: 8px 0;
+//     padding: 8px;
+//   }
+// }
+
+// fm-group {
+//   border: 1px solid #FFA500;
+//   display: block;
+//   margin: 8px 0;
+//   padding: 0px 8px;
+// }
 
 
 // ----- Labels ----------------------------------------------------------------
@@ -491,6 +439,7 @@ fm-select {
   display: inline-block;
   margin-bottom: $error-element-min-height;
   position: relative;
+  width: 100%;
 
   label {
     @include label;
@@ -599,6 +548,22 @@ fm-errors {
     &.ng-leave.ng-leave-active {
       opacity: 0;
     }
+  }
+}
+
+.ErrorToast {
+  // min-height: 3.5em;
+  // border: 1px solid green;
+  margin: 0 0 1em 0;
+  padding: 0;
+
+  [ng-message] {
+    background-color: lighten($rosewood, 75%);
+    display: block;
+    border: 1px solid $rosewood;
+    border-radius: 3px;
+    padding: 1em;
+    position: initial;
   }
 }
 

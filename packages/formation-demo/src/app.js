@@ -1,10 +1,10 @@
 import 'angular-mocks';
-import 'angular-ui-router/release/stateEvents';
+import '@uirouter/angularjs/release/stateEvents';
 import angular from 'angular';
 import ngAnimate from 'angular-animate';
 import ngAria from 'angular-aria';
 import ngMessages from 'angular-messages';
-import uiRouter from 'angular-ui-router';
+import uiRouter from '@uirouter/angularjs';
 
 import Formation, {
   configure as configureFormation

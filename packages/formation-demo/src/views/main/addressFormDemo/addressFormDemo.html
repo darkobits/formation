@@ -2,7 +2,14 @@
   name="vm.addressForm"
   on-submit="vm.submit"
   on-ready="vm.fmReady"
-  ng-disabled="vm.disableForm">
+  ng-disabled="vm.disableForm"
+  debug>
+
+  <!-- API Errors -->
+  <section>
+    <fm-input type="hidden" name="apiError"></fm-input>
+    <fm-errors for="apiError" class="ErrorToast"></fm-errors>
+  </section>
 
   <!-- Name -->
   <section>
@@ -82,7 +89,6 @@
       <!-- Administrative Area -->
       <section>
         <fm-select
-          multiple="true"
           name="administrativeArea"
           options="i.value as i.label for i in [
             {label: 'Rivendell', value: 'RD'},
@@ -96,18 +102,11 @@
   </fm-group>
 
   <button type="submit"
-    ng-disabled="$fm.isDisabled()">
+    ng-disabled="!$fm.isSubmittable()"
+    title="{{ $fm.$valid ? 'Submit' : 'Complete the form before submitting.' }}">
     Submit
   </button>
-
-  <input id="disableForms"
-    type="checkbox"
-    name="disableForms"
-    ng-model="vm.disableForm">
-  <label class="label-inline" for="disableForms">Disable Forms</label>
 </fm>
-
-
 
 <highlight lang="json"
   code="vm.addressForm.getModelValues() | json">

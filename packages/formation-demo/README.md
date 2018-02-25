@@ -1,13 +1,13 @@
 # formation-demo
 
-Demo application for Formation. Hosted at [http://darkobits.github.io/formation](http://darkobits.github.io/formation).
+Demo application for Formation.
 
 To run locally:
 
 ```bash
 $ git clone git@github.com:darkobits/formation.git
+$ cd formation
 $ yarn
-$ cd packages/formation-demo
 $ yarn start
 ```
 
@@ -15,7 +15,7 @@ or
 
 ```bash
 $ git clone git@github.com:darkobits/formation.git
+$ cd formation
 $ npm install
-$ cd packages/formation-demo
 $ npm start
 ```

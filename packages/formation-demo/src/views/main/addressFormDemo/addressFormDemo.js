@@ -1,4 +1,5 @@
 import app from 'app';
+import R from 'ramda';
 
 import {
   required,
@@ -7,11 +8,12 @@ import {
 } from '@darkobits/formation-validators';
 
 import templateUrl from './addressFormDemo.html';
+import './addressFormDemo.scss';
 
 
 app.component('addressFormDemo', {
   controllerAs: 'vm',
-  controller ($log, $q, $scope, $timeout, Api) {
+  controller ($http, $log, $q, $scope) {
     const vm = this;
 
     vm.disableForm = false;
@@ -28,11 +30,6 @@ app.component('addressFormDemo', {
         {
           type: 'Work',
           streetAddress: 'asdf1',
-          locality: 'foo'
-        },
-        {
-          type: 'Other',
-          streetAddress: 'asdf2',
           locality: 'foo'
         }
       ]
@@ -120,22 +117,6 @@ app.component('addressFormDemo', {
     };
 
 
-    vm.modelCollection = [
-      {
-        name: 'foo'
-      },
-      {
-        name: 'bar'
-      },
-      {
-        name: 'baz'
-      }
-    ];
-
-
-    vm.foo = 'bar';
-
-
     vm.submit = modelValues => {
       console.log('[vm.submit] Model:', modelValues);
       /**
@@ -144,8 +125,7 @@ app.component('addressFormDemo', {
        * their state, do the user's passwords match) and reject with any custom
        * field errors needed.
        */
-
-      return Api.req({
+      return $http({
         method: 'POST',
         url: '/api',
         data: modelValues
@@ -155,17 +135,8 @@ app.component('addressFormDemo', {
         $log.info('[AddressForm] Got API response:', response);
       })
       .catch(err => {
-        $log.log('[AddressForm] Got API error:', err);
+        $log.error('[AddressForm] Got API error:', err);
 
-        return {
-          name: 'Bad name.',
-          group: [
-            null,
-            {
-              name: 'Bad nested name.'
-            }
-          ]
-        };
 
         /**
          * Let's assume that when this API responds with a "fields" object in the
@@ -174,30 +145,21 @@ app.component('addressFormDemo', {
          * the form. If not, assign a generic error message to our "apiErrors"
          * control.
          */
-        // const alternativeError = {
-        //   apiErrors: 'An unknown error has occurred.'
-        // };
+        const alternativeError = {
+          apiError: 'An unknown error has occurred.'
+        };
 
-        // return R.pathOr(alternativeError, ['data', 'fields'], err);
-      });
-    };
-
-
-    vm.isFormDisabled = () => {
-      return vm.disableForm;
-    };
-
-
-    vm.reset = () => {
-      vm.addressForm.reset({
-        name: 'N/A',
-        gender: 'M',
-        bar: {
-          name: 'N/A',
-          gender: 'F'
-        },
-        baz: {
-          name: null
+        if (R.is(String, err.data)) {
+          // If we got a simple string error from the API, assign it to our
+          // "apiError" control.
+          return {
+            apiError: err.data
+          };
+        } else if (R.is(Object, err.data)) {
+          // If we got an object, attempt to return its "fields" property. If it
+          // doesn't have a "fields" property, fall back to a generic error
+          // message.
+          return R.pathOr(alternativeError, ['fields'], err.data);
         }
       });
     };
