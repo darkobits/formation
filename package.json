@@ -20,7 +20,7 @@
   },
   "devDependencies": {
     "husky": "0.14.x",
-    "lerna": "^2.9.0",
+    "lerna": "^2.11.0",
     "npm-run-all": "4.x",
     "rimraf": "2.6.x"
   },
