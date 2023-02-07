@@ -2,6 +2,12 @@
 
 [![][npm-img]][npm-url] [![][travis-img]][travis-url] [![][codacy-img]][codacy-url] [![][cc-img]][cc-url] [![][xo-img]][xo-url]
 
+## ⚠️ Deprecation Notice
+
+This project is no longer actively maintained.
+
+---
+
 Formation is a form framework for Angular 1.5+ designed for medium-to-large applications that require consistent, robust forms. It aims to reduce template size by moving business logic to controllers, which also encourages code-reuse and improves consistency.
 
 ## Install
